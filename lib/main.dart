@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-// import 'login_screen.dart';
-import 'sign_up_screen.dart';
+import 'home_screen.dart';
+import 'recherche_screen.dart';
+import 'panier_screen.dart';
+import 'favoris_screen.dart';
+import 'profil_screen.dart';
+import 'nav_bar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,55 +13,50 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      debugShowCheckedModeBanner: false,
-      home: const SignUpScreen(),
+    return const MaterialApp(
+      debugShowCheckedModeBanner:
+          false, // Set to false to remove the debug banner
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int _selectedIndex = 0;
+
+  // Liste des pages pour le navigation bar
+  final List<Widget> _pages = const [
+    PanierScreen(),
+    RechercheScreen(),
+    HomeScreen(),
+    FavorisScreen(),
+    ProfilScreen(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: const Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'main screen :',
-            ),
-          ],
-        ),
-      ),
+      body: _pages[
+          _selectedIndex], // Affiche la page en fonction de l'index sélectionné
+      bottomNavigationBar: NavBar(
+          onItemTapped: _onItemTapped,
+          selectedIndex:
+              _selectedIndex), // Passer la fonction et l'index au NavBar
     );
   }
 }

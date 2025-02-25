@@ -297,8 +297,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        validator: (value) =>
-            value == null || value.isEmpty ? 'Veuillez entrer $label' : null,
+        validator: (value) {
+          if (label == 'Adresse e-mail' && value != null && value.isNotEmpty) {
+            // Validate email format only if provided
+            final emailRegex =
+                RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+            if (!emailRegex.hasMatch(value)) {
+              return 'Veuillez entrer une adresse e-mail valide';
+            }
+          } else if (label != 'Adresse e-mail' &&
+              (value == null || value.isEmpty)) {
+            return 'Veuillez entrer $label';
+          }
+          return null;
+        },
       ),
     );
   }
