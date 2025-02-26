@@ -14,17 +14,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const CustomDrawer(), // Ajout du menu latéral
+      appBar: null, // Supprime l'AppBar par défaut
+      drawer:
+          const CustomDrawer(), // Utilisation de `drawer` pour ouvrir à gauche
       body: CustomScrollView(
-        // Utilisation de CustomScrollView pour rendre l'AppBar défilable
         slivers: [
           SliverAppBar(
-            backgroundColor: primaryColor, // Couleur bleu-vert
-            expandedHeight: 200.0, // Taille maximale de l'AppBar
-            floating: false, // Empêche l'AppBar de flotter
-            pinned: false, // L'AppBar reste fixée en haut quand on scroll
-            automaticallyImplyLeading:
-                false, // Empêche l'affichage du bouton par défaut
+            backgroundColor: primaryColor,
+            expandedHeight: 200.0,
+            floating: false,
+            pinned: false,
+            automaticallyImplyLeading: false, // Supprime le bouton automatique
+            leading: Container(), // Supprime l'icône du menu par défaut
+            actions: const [], // Aucune icône à droite
             flexibleSpace: FlexibleSpaceBar(
               title: Row(
                 children: [
@@ -36,13 +38,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.white,
                     ),
                   ),
-                  const Spacer(), // Pousse le bouton drawer à droite
+                  const Spacer(), // Pousse le bouton menu vers la droite
                   Builder(
                     builder: (context) => IconButton(
                       icon:
                           const Icon(Icons.menu, color: Colors.white, size: 30),
                       onPressed: () {
-                        Scaffold.of(context).openDrawer(); // ✅ Ouvre le drawer
+                        Scaffold.of(context)
+                            .openDrawer(); // Ouvre le drawer à gauche
                       },
                     ),
                   ),
@@ -72,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       TextField(
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: const Color.fromARGB(207, 255, 255, 255),
                           hintText: "Chercher un produit",
                           prefixIcon:
                               const Icon(Icons.search, color: Colors.grey),
@@ -81,12 +84,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             borderSide: BorderSide.none,
                           ),
                           contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal:
-                                  16), // Ajuster la hauteur de la barre de recherche
+                              vertical: 12, horizontal: 16),
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 15),
                       // ✅ Boutons de catégories avec image + texte
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
@@ -103,7 +104,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-
                 // Partie blanche contenant le reste du contenu
                 Container(
                   color: Colors.white,
