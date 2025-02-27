@@ -63,6 +63,8 @@ flutter:
     - assets/logo.png
     - assets/elecro.png
     - assets/elec.png
+    - assets/logo_no_bg.png
+    - assets/tdiscount16.jpg
 
 
   #   - images/a_dot_burr.jpeg
