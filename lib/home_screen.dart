@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tdiscount_app/custom_drawer.dart'; // Import the custom drawer
 import 'package:tdiscount_app/widgets/carousel_widget.dart'; // Import the carousel widget
+import 'package:tdiscount_app/widgets/product_card.dart'; // Import the product card widget
+import 'package:tdiscount_app/widgets/category_card.dart'; // Import the category card widget
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,43 +13,50 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final Color primaryColor = const Color(0xFF006D77);
+  final Color backgroundColor = Colors.grey[300]!; // Add this line
+  int _currentPage = 0; // Track the current page index
 
   // List of items with title, description, and visibility control
   final List<Map<String, dynamic>> items = [
     {
       'title': 'LIVRAISON RAPIDE',
       'description':
-          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenat! Ne maquez pas cette offre exceptionnelle pour faire des "connomies sur vos achats!',
+          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenant! Ne manquez pas cette offre exceptionnelle pour faire des économies sur vos achats!',
       'showDescription': false,
     },
     {
       'title': 'GARANTIE',
       'description':
-          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenat! Ne maquez pas cette offre exceptionnelle pour faire des "connomies sur vos achats!',
+          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenant! Ne manquez pas cette offre exceptionnelle pour faire des économies sur vos achats!',
       'showDescription': false,
     },
     {
       'title': 'SERVICE CLIENT',
       'description':
-          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenat! Ne maquez pas cette offre exceptionnelle pour faire des "connomies sur vos achats!',
+          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenant! Ne manquez pas cette offre exceptionnelle pour faire des économies sur vos achats!',
       'showDescription': false,
     },
     {
       'title': 'SAV',
       'description':
-          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenat! Ne maquez pas cette offre exceptionnelle pour faire des "connomies sur vos achats!',
+          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenant! Ne manquez pas cette offre exceptionnelle pour faire des économies sur vos achats!',
       'showDescription': false,
     },
     {
       'title': 'CONTACTEZ-NOUS',
       'description':
-          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenat! Ne maquez pas cette offre exceptionnelle pour faire des "connomies sur vos achats!',
+          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenant! Ne manquez pas cette offre exceptionnelle pour faire des économies sur vos achats!',
       'showDescription': false,
     },
   ];
 
   @override
   Widget build(BuildContext context) {
+    // Calculate the number of columns based on screen width
+    final screenWidth = MediaQuery.of(context).size.width;
+    final crossAxisCount =
+        screenWidth > 600 ? 3 : 2; // 3 columns for tablets, 2 for phones
+
     return Scaffold(
       appBar: null,
       drawer: const CustomDrawer(), // Replace with your custom drawer
@@ -93,14 +102,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                "Bonjour username",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
                               const SizedBox(height: 12),
                               TextField(
                                 decoration: InputDecoration(
@@ -145,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 0),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: backgroundColor, //gray
                               borderRadius: BorderRadius.circular(30),
                               boxShadow: [
                                 BoxShadow(
@@ -159,22 +160,75 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const AutoScrollCarousel(), // ✅ Insert Carousel Here
+                                AutoScrollCarousel(
+                                  onPageChanged: (index) {
+                                    setState(() {
+                                      _currentPage = index;
+                                    });
+                                  },
+                                ), // ✅ Insert Carousel Here
 
-                                const SizedBox(height: 16),
-                                Container(
-                                  height: 100,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[200],
-                                    borderRadius: BorderRadius.circular(12),
+                                const SizedBox(height: 20),
+
+                                // ✅ "Meilleures Ventes" Section
+                                const Text(
+                                  "Meilleures Ventes",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
                                   ),
-                                  alignment: Alignment.center,
-                                  child: const Text("Liste des produits ici"),
                                 ),
+
+                                const SizedBox(height: 1),
+
+                                // ✅ Dynamic GridView for Products
+                                GridView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount:
+                                        crossAxisCount, // Dynamic columns
+                                    crossAxisSpacing: 15,
+                                    mainAxisSpacing: 8,
+                                    childAspectRatio: 0.75, // Adjust as needed
+                                  ),
+                                  itemCount: products.length,
+                                  itemBuilder: (context, index) {
+                                    final product = products[index];
+                                    return ProductCard(
+                                      imagePath: product['imagePath']!,
+                                      name: product['name']!,
+                                      price: product['price']!,
+                                      discount: product['discount'],
+                                      previousPrice: products[index][
+                                          'previousPrice'], // Ensure this is passed
+                                    );
+                                  },
+                                ),
+
+                                const SizedBox(height: 100),
+
+                                // ✅ "Meilleures Ventes" Section
+                                const Text(
+                                  "Top Categories",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 20),
+
+                                // ✅ Display Category Cards
+                                const CategoryList(),
                               ],
                             ),
                           ),
                         ),
+
                         const SizedBox(height: 40),
 
                         // ✅ Display Titles with Buttons and Descriptions

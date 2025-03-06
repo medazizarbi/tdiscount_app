@@ -57,7 +57,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 radius: 30,
               ),
               title: const Text(
-                "Oueslati Hyba",
+                "Med Aziz El Arbi",
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),

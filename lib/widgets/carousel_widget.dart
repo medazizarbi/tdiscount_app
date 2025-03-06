@@ -2,24 +2,36 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class AutoScrollCarousel extends StatefulWidget {
-  const AutoScrollCarousel({super.key});
+  final Function(int) onPageChanged; // Callback to update the current page
+
+  const AutoScrollCarousel({
+    super.key,
+    required this.onPageChanged,
+  });
 
   @override
   _AutoScrollCarouselState createState() => _AutoScrollCarouselState();
 }
 
 class _AutoScrollCarouselState extends State<AutoScrollCarousel> {
-  final PageController _pageController = PageController(viewportFraction: 0.8);
+  final PageController _pageController = PageController(viewportFraction: 1);
   late Timer _timer;
   int _currentPage = 0;
   bool _isUserInteracting = false;
-  bool _isForward = true; // ✅ Track direction
+  bool _isScrollingForward = true; // Track scrolling direction
 
+  // List of images (hardcoded for now, will be replaced with server data later)
   final List<String> images = [
     "assets/tdiscount16.jpg",
     "assets/tdiscount16.jpg",
     "assets/tdiscount16.jpg",
+    "assets/tdiscount16.jpg",
+    "assets/tdiscount16.jpg",
+    "assets/tdiscount16.jpg",
   ];
+
+  // Original aspect ratio (1132 / 490)
+  final double aspectRatio = 1132 / 490;
 
   @override
   void initState() {
@@ -30,25 +42,33 @@ class _AutoScrollCarouselState extends State<AutoScrollCarousel> {
   void _startAutoScroll() {
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (!_isUserInteracting) {
-        setState(() {
-          if (_isForward) {
-            _currentPage++; // Move forward
-            if (_currentPage >= images.length - 1) {
-              _isForward = false; // Reverse direction when reaching last image
-            }
+        if (_isScrollingForward) {
+          // Scroll forward
+          if (_currentPage < images.length - 1) {
+            _currentPage++;
           } else {
-            _currentPage--; // Move backward
-            if (_currentPage <= 0) {
-              _isForward = true; // Forward again when reaching first image
-            }
+            // Reverse direction when reaching the last image
+            _isScrollingForward = false;
+            _currentPage--;
           }
-        });
+        } else {
+          // Scroll backward
+          if (_currentPage > 0) {
+            _currentPage--;
+          } else {
+            // Reverse direction when reaching the first image
+            _isScrollingForward = true;
+            _currentPage++;
+          }
+        }
 
-        _pageController.animateToPage(
-          _currentPage,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
+        if (mounted) {
+          _pageController.animateToPage(
+            _currentPage,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        }
       }
     });
   }
@@ -62,41 +82,84 @@ class _AutoScrollCarouselState extends State<AutoScrollCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onPanDown: (_) {
-        setState(() {
-          _isUserInteracting = true;
-        });
-      },
-      onPanEnd: (_) {
-        setState(() {
-          _isUserInteracting = false;
-        });
-      },
-      child: SizedBox(
-        height: 200,
-        child: PageView.builder(
-          controller: _pageController,
-          itemCount: images.length,
-          onPageChanged: (index) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double imageHeight = screenWidth / aspectRatio; // 📌 Dynamic height
+
+    return Column(
+      children: [
+        GestureDetector(
+          onPanDown: (_) {
             setState(() {
-              _currentPage = index;
+              _isUserInteracting = true;
             });
           },
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: Image.asset(
-                  images[index],
-                  fit: BoxFit.cover,
-                ),
-              ),
-            );
+          onPanEnd: (_) {
+            setState(() {
+              _isUserInteracting = false;
+            });
           },
+          child: SizedBox(
+            height: imageHeight, // ✅ Maintain aspect ratio
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: images.length,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentPage = index;
+                });
+                widget.onPageChanged(index); // Notify parent of page change
+              },
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Image.asset(
+                      images[index],
+                      fit: BoxFit.cover,
+                      width: screenWidth * 0.8,
+                      height: imageHeight,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
-      ),
+        const SizedBox(height: 10),
+        IndicatorDots(
+          currentPage: _currentPage,
+          totalPages: images.length, // Use the length of the images list
+        ),
+      ],
+    );
+  }
+}
+
+class IndicatorDots extends StatelessWidget {
+  final int currentPage;
+  final int totalPages;
+
+  const IndicatorDots({
+    super.key,
+    required this.currentPage,
+    required this.totalPages,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(totalPages, (index) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: Icon(
+            index == currentPage ? Icons.circle : Icons.circle_outlined,
+            size: 10, // Adjust the size of the icons
+            color: index == currentPage ? Colors.blue : Colors.grey,
+          ),
+        );
+      }),
     );
   }
 }
