@@ -22,12 +22,12 @@ class CategoryCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12), // Rounded corners
               child: Image.asset(
                 imagePath!,
-                width: 100, // Adjust the width as needed
-                height: 100, // Adjust the height as needed
+                width: 110, // Adjust the width as needed
+                height: 110, // Adjust the height as needed
                 fit: BoxFit.cover,
               ),
             ),
-          const SizedBox(height: 8), // Space between image and text
+          const SizedBox(height: 10), // Space between image and text
           // Name
           Text(
             name,

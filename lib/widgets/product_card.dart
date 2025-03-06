@@ -180,18 +180,4 @@ final List<Map<String, String>> products = [
     'discount': '-60%',
     'previousPrice': '2599', // Add previous price
   },
-  {
-    'imagePath': 'assets/prod2.jpg',
-    'name': 'Carte Graphique',
-    'price': '659',
-    'discount': '-30%',
-    'previousPrice': '899', // Add previous price
-  },
-  {
-    'imagePath': 'assets/produit1.jpg',
-    'name': 'Chauffantes',
-    'price': '2199',
-    'discount': '-60%',
-    'previousPrice': '5499', // Add previous price
-  },
 ];

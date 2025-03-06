@@ -3,6 +3,7 @@ import 'package:tdiscount_app/custom_drawer.dart'; // Import the custom drawer
 import 'package:tdiscount_app/widgets/carousel_widget.dart'; // Import the carousel widget
 import 'package:tdiscount_app/widgets/product_card.dart'; // Import the product card widget
 import 'package:tdiscount_app/widgets/category_card.dart'; // Import the category card widget
+import 'package:tdiscount_app/widgets/highlight_section.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -98,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       [
                         Container(
                           color: primaryColor,
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(1),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -156,74 +157,149 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ],
                             ),
-                            padding: const EdgeInsets.all(16),
+                            //padding: const EdgeInsets.all(16),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                AutoScrollCarousel(
-                                  onPageChanged: (index) {
-                                    setState(() {
-                                      _currentPage = index;
-                                    });
-                                  },
-                                ), // ✅ Insert Carousel Here
-
-                                const SizedBox(height: 20),
-
-                                // ✅ "Meilleures Ventes" Section
-                                const Text(
-                                  "Meilleures Ventes",
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                // ✅ Carousel with Padding
+                                Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: AutoScrollCarousel(
+                                    onPageChanged: (index) {
+                                      setState(() {
+                                        _currentPage = index;
+                                      });
+                                    },
                                   ),
                                 ),
 
-                                const SizedBox(height: 1),
+                                const SizedBox(height: 0),
+
+                                // ✅ "Meilleures Ventes" Section
+                                const Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Text(
+                                    "Meilleures Ventes",
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 0),
 
                                 // ✅ Dynamic GridView for Products
-                                GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount:
-                                        crossAxisCount, // Dynamic columns
-                                    crossAxisSpacing: 15,
-                                    mainAxisSpacing: 8,
-                                    childAspectRatio: 0.75, // Adjust as needed
+                                Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: GridView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount:
+                                          crossAxisCount, // Dynamic columns
+                                      crossAxisSpacing: 15,
+                                      mainAxisSpacing: 8,
+                                      childAspectRatio:
+                                          0.75, // Adjust as needed
+                                    ),
+                                    itemCount: products.length,
+                                    itemBuilder: (context, index) {
+                                      final product = products[index];
+                                      return ProductCard(
+                                        imagePath: product['imagePath']!,
+                                        name: product['name']!,
+                                        price: product['price']!,
+                                        discount: product['discount'],
+                                        previousPrice: products[index][
+                                            'previousPrice'], // Ensure this is passed
+                                      );
+                                    },
                                   ),
-                                  itemCount: products.length,
-                                  itemBuilder: (context, index) {
-                                    final product = products[index];
-                                    return ProductCard(
-                                      imagePath: product['imagePath']!,
-                                      name: product['name']!,
-                                      price: product['price']!,
-                                      discount: product['discount'],
-                                      previousPrice: products[index][
-                                          'previousPrice'], // Ensure this is passed
-                                    );
-                                  },
+                                ),
+
+                                const SizedBox(height: 8),
+
+                                // ✅ HighlightSection Widget (Full Width)
+                                const HighlightSection(
+                                  title: "Nouveautés",
+                                  subtitle:
+                                      "Découvrez les derniers produits - SAMSUNG",
+                                  mainImage:
+                                      "assets/samsung.png", // Replace with real URL
+                                  products: [
+                                    {
+                                      "image": "assets/produit1.jpg",
+                                      "name": "Samsung"
+                                    },
+                                    {
+                                      "image": "assets/prod2.jpg",
+                                      "name": "Samsung "
+                                    },
+                                    {
+                                      "image": "assets/produit1.jpg",
+                                      "name": "Samsung"
+                                    },
+                                  ],
+                                  highlightColorBG: Colors
+                                      .yellow, // Specify the background color here
+                                ),
+
+                                const SizedBox(height: 8),
+
+                                // ✅ "Top Categories" Section
+                                const Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Text(
+                                    "Top Categories",
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 8),
+
+                                // ✅ Display Category Cards
+                                const CategoryList(),
+
+                                const SizedBox(height: 18),
+
+                                // ✅ HighlightSection Widget (Full Width)
+                                const HighlightSection(
+                                  title: "Gaming",
+                                  subtitle: "Plongez dans l'univers du gaming",
+                                  mainImage:
+                                      "assets/samsung.png", // Replace with real URL
+                                  products: [
+                                    {
+                                      "image": "assets/produit1.jpg",
+                                      "name": "Samsung"
+                                    },
+                                    {
+                                      "image": "assets/prod2.jpg",
+                                      "name": "Samsung "
+                                    },
+                                    {
+                                      "image": "assets/produit1.jpg",
+                                      "name": "Samsung"
+                                    },
+                                  ],
+                                  highlightColorBG: Color.fromARGB(
+                                      255,
+                                      173,
+                                      161,
+                                      208), // Specify the background color here
                                 ),
 
                                 const SizedBox(height: 100),
 
-                                // ✅ "Meilleures Ventes" Section
-                                const Text(
-                                  "Top Categories",
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-
-                                const SizedBox(height: 20),
-
-                                // ✅ Display Category Cards
-                                const CategoryList(),
+                                //**** */
                               ],
                             ),
                           ),
