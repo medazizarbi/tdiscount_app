@@ -70,9 +70,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 slivers: [
                   SliverAppBar(
                     backgroundColor: primaryColor,
-                    expandedHeight: 200.0,
-                    floating: false,
-                    pinned: false,
+                    floating: true, // Make the app bar floating
+                    pinned: false, // Keep the app bar visible when scrolling
                     automaticallyImplyLeading: false,
                     leading: Builder(
                       builder: (context) => IconButton(
@@ -83,13 +82,29 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                     ),
-                    flexibleSpace: const FlexibleSpaceBar(
-                      title: Text(
-                        "Tdiscount",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: Colors.white,
+                    flexibleSpace: FlexibleSpaceBar(
+                      title: Container(
+                        height:
+                            40, // Adjust the height to make the search field thinner
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16), // Adjust horizontal padding
+                        child: TextField(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: const Color.fromARGB(207, 255, 255, 255),
+                            hintText: "Chercher un produit",
+                            prefixIcon:
+                                const Icon(Icons.search, color: Colors.grey),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical:
+                                  8, // Reduce vertical padding to make it thinner
+                              horizontal: 16,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -104,23 +119,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const SizedBox(height: 12),
-                              TextField(
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor:
-                                      const Color.fromARGB(207, 255, 255, 255),
-                                  hintText: "Chercher un produit",
-                                  prefixIcon: const Icon(Icons.search,
-                                      color: Colors.grey),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 12, horizontal: 16),
-                                ),
-                              ),
-                              const SizedBox(height: 15),
                               SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 child: Row(

@@ -157,7 +157,7 @@ final List<Map<String, String>> products = [
     'imagePath': 'assets/produit1.jpg',
     'name': 'TV TCL 32"',
     'price': '799',
-    'previousPrice': '999', // Add previous price
+    //'previousPrice': '999', // Add previous price
   },
   {
     'imagePath': 'assets/prod2.jpg',
