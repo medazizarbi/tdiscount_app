@@ -14,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final Color primaryColor = const Color(0xFF006D77);
-  final Color backgroundColor = Colors.grey[300]!; // Add this line
+  final Color backgroundColor = Colors.grey[300]!;
   int _currentPage = 0; // Track the current page index
 
   // List of items with title, description, and visibility control
