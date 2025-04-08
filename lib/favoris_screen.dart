@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tdiscount_app/Provider/favorites_provider.dart';
 import 'package:tdiscount_app/custom_drawer.dart';
-import 'package:tdiscount_app/main.dart';
 import 'package:tdiscount_app/widgets/product_card.dart';
 
 class FavorisScreen extends StatefulWidget {
@@ -97,7 +96,7 @@ class _FavorisScreenState extends State<FavorisScreen>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "My Favoris",
+                            "Mes Favoris",
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
