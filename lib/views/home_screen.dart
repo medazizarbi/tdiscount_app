@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:tdiscount_app/custom_drawer.dart'; // Import the custom drawer
+import 'package:provider/provider.dart';
+import 'package:tdiscount_app/widgets/custom_drawer.dart'; // Import the custom drawer
 import 'package:tdiscount_app/widgets/carousel_widget.dart'; // Import the carousel widget
 import 'package:tdiscount_app/widgets/product_card.dart'; // Import the product card widget
 import 'package:tdiscount_app/widgets/category_card.dart'; // Import the category card widget
 import 'package:tdiscount_app/widgets/highlight_section.dart';
+import '../viewmodels/category_viewmodel.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +18,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final Color primaryColor = const Color(0xFF006D77);
   final Color backgroundColor = Colors.grey[300]!;
   int _currentPage = 0; // Track the current page index
+  int? _selectedCategoryId; // Track the selected category ID
+  List<dynamic> _fetchedProducts = []; // Store fetched products
+  bool _isFetchingProducts = false; // Track loading state
 
   // List of items with title, description, and visibility control
   final List<Map<String, dynamic>> items = [
@@ -52,7 +57,18 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Fetch categories when the screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<CategoryViewModel>(context, listen: false).fetchCategories();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final categoryViewModel = Provider.of<CategoryViewModel>(context);
+
     // Calculate the number of columns based on screen width
     final screenWidth = MediaQuery.of(context).size.width;
     final crossAxisCount =
@@ -119,22 +135,22 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const SizedBox(height: 12),
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: [
-                                    categoryItem("Montres", "assets/elec.png"),
-                                    categoryItem(
-                                        "Chaussures", "assets/elecro.png"),
-                                    categoryItem(
-                                        "Accessoires", "assets/elec.png"),
-                                    categoryItem(
-                                        "Vêtements", "assets/elecro.png"),
-                                    categoryItem(
-                                        "Vêtements", "assets/elec.png"),
-                                  ],
-                                ),
-                              ),
+                              categoryViewModel.isLoading
+                                  ? const Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: categoryViewModel.categories
+                                            .map((category) => categoryItem(
+                                                category.name,
+                                                "assets/elec.png",
+                                                category.id,
+                                                categoryViewModel))
+                                            .toList(),
+                                      ),
+                                    ),
                             ],
                           ),
                         ),
@@ -428,33 +444,54 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget categoryItem(String label, String imagePath) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Column(
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              image: DecorationImage(
-                image: AssetImage(imagePath),
-                fit: BoxFit.cover,
+  Widget categoryItem(String label, String imagePath, int categoryId,
+      CategoryViewModel categoryViewModel) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedCategoryId = categoryId;
+        });
+        categoryViewModel.fetchProductsByCategory(
+            categoryId); // Fetch products for the selected category
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                image: DecorationImage(
+                  image: AssetImage(imagePath),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
+            const SizedBox(height: 6),
+            SizedBox(
+              width: 75,
+              height: 30,
+              child: Tooltip(
+                message: label,
+                child: Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

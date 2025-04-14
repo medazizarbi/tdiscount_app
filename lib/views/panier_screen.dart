@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tdiscount_app/custom_drawer.dart';
+import 'package:tdiscount_app/widgets/custom_drawer.dart';
 
 class PanierProductCard extends StatelessWidget {
   final String imagePath;

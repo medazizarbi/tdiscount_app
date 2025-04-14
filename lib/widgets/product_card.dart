@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tdiscount_app/Provider/favorites_provider.dart';
+import 'package:tdiscount_app/viewModels/favorites_view_model.dart';
 
 class ProductCard extends StatefulWidget {
   final String imagePath;
@@ -25,7 +25,7 @@ class ProductCard extends StatefulWidget {
 class _ProductCardState extends State<ProductCard> {
   @override
   Widget build(BuildContext context) {
-    final favoritesProvider = Provider.of<FavoritesProvider>(context);
+    final favoritesProvider = Provider.of<FavoriteViewModel>(context);
     bool isFavorite = favoritesProvider.isFavorite(widget.name);
 
     return Container(

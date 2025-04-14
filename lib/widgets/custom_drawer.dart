@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tdiscount_app/profil_screen.dart';
+import 'package:tdiscount_app/views/profil_screen.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});

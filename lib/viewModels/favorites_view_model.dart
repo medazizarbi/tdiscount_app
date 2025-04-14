@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class FavoritesProvider extends ChangeNotifier {
+class FavoriteViewModel extends ChangeNotifier {
   final List<String> _favoriteProductNames = [];
 
   List<String> get favoriteProductNames => _favoriteProductNames;

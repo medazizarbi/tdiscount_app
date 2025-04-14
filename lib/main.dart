@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'home_screen.dart';
-import 'recherche_screen.dart';
-import 'panier_screen.dart';
-import 'favoris_screen.dart';
-import 'profil_screen.dart';
-import 'nav_bar.dart';
-import 'package:tdiscount_app/Provider/favorites_provider.dart';
+import 'package:tdiscount_app/viewModels/home_view_model.dart';
+import 'package:tdiscount_app/viewmodels/category_viewmodel.dart';
+import 'views/home_screen.dart';
+import 'views/recherche_screen.dart';
+import 'views/panier_screen.dart';
+import 'views/favoris_screen.dart';
+import 'views/profil_screen.dart';
+import 'widgets/nav_bar.dart';
+import 'package:tdiscount_app/viewModels/favorites_view_model.dart';
 
 final GlobalKey<_MyHomePageState> homePageKey = GlobalKey<_MyHomePageState>();
 
@@ -14,7 +16,8 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => FavoritesProvider()),
+        ChangeNotifierProvider(create: (context) => FavoriteViewModel()),
+        ChangeNotifierProvider(create: (_) => CategoryViewModel()),
       ],
       child: const MyApp(),
     ),

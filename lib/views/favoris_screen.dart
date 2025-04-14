@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tdiscount_app/Provider/favorites_provider.dart';
-import 'package:tdiscount_app/custom_drawer.dart';
+import 'package:tdiscount_app/viewModels/favorites_view_model.dart';
+import 'package:tdiscount_app/widgets/custom_drawer.dart';
 import 'package:tdiscount_app/widgets/product_card.dart';
 
 class FavorisScreen extends StatefulWidget {
@@ -40,7 +40,7 @@ class _FavorisScreenState extends State<FavorisScreen>
 
   @override
   Widget build(BuildContext context) {
-    final favoritesProvider = Provider.of<FavoritesProvider>(context);
+    final favoritesProvider = Provider.of<FavoriteViewModel>(context);
 
     // Filtrer les produits favoris à afficher
     final favoriteProducts = products.where((product) {

@@ -40,7 +40,7 @@ class _AutoScrollCarouselState extends State<AutoScrollCarousel> {
   }
 
   void _startAutoScroll() {
-    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (!_isUserInteracting) {
         if (_isScrollingForward) {
           // Scroll forward
@@ -62,7 +62,7 @@ class _AutoScrollCarouselState extends State<AutoScrollCarousel> {
           }
         }
 
-        if (mounted) {
+        if (mounted && _currentPage >= 0 && _currentPage < images.length) {
           _pageController.animateToPage(
             _currentPage,
             duration: const Duration(milliseconds: 500),
