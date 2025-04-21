@@ -1,44 +1,56 @@
 import 'package:flutter/material.dart';
-import '../models/category_model.dart';
-import '../models/product_model.dart';
+import 'package:tdiscount_app/models/category_model.dart';
+import 'package:tdiscount_app/models/product_model.dart';
 import '../services/category_service.dart';
-import '../views/home_screen.dart';
 
 class CategoryViewModel extends ChangeNotifier {
   final CategoryService _categoryService = CategoryService();
-  List<Category> _categories = [];
-  List<Product> _productsByCategory = [];
-  bool _isLoading = false;
-  bool _isLoadingProducts = false;
 
-  List<Category> get categories => _categories;
-  List<Product> get productsByCategory => _productsByCategory;
-  bool get isLoading => _isLoading;
-  bool get isLoadingProducts => _isLoadingProducts;
+  bool isLoading = false;
+  List<Category> categories = [];
+  List<Product> products = []; // Store fetched products
+  List<Category> subCategories = []; // Store fetched subcategories
+  Map<int, List<Product>> productsBySubCategory =
+      {}; // Map to store products by subcategory ID
 
   Future<void> fetchCategories() async {
-    _isLoading = true;
+    isLoading = true;
     notifyListeners();
 
-    try {
-      _categories = await _categoryService.fetchCategories();
-    } catch (e) {
-      _categories = [];
-      print("Error: $e");
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+    categories = await _categoryService.fetchCategories();
+    isLoading = false;
+    notifyListeners();
   }
 
   Future<void> fetchProductsByCategory(int categoryId) async {
-    _isLoadingProducts = true;
+    isLoading = true;
     notifyListeners();
 
-    _productsByCategory =
-        await _categoryService.fetchProductsByCategory(categoryId);
+    products = await _categoryService.fetchProductsByCategory(categoryId);
+    isLoading = false;
+    notifyListeners();
+  }
 
-    _isLoadingProducts = false;
+  Future<void> fetchSubCategories(
+      int parentCategoryId, String parentCategoryName) async {
+    isLoading = true;
+    notifyListeners();
+
+    subCategories = await _categoryService.fetchSubCategories(
+        parentCategoryId, parentCategoryName);
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> fetchProductsBySubCategory(int subCategoryId) async {
+    isLoading = true;
+    notifyListeners();
+
+    final products =
+        await _categoryService.fetchProductsByCategory(subCategoryId);
+    productsBySubCategory[subCategoryId] =
+        products; // Store products for the subcategory
+    isLoading = false;
     notifyListeners();
   }
 }

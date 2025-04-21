@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tdiscount_app/widgets/custom_drawer.dart';
+import 'package:tdiscount_app/utils/widgets/custom_drawer.dart';
 
 class PanierProductCard extends StatelessWidget {
   final String imagePath;
@@ -148,14 +148,14 @@ class _PanierScreenState extends State<PanierScreen>
   // Simulated cart data
   final List<Map<String, dynamic>> cartItems = [
     {
-      'imagePath': 'assets/produit1.jpg',
+      'imagePath': 'assets/images/produit1.jpg',
       'productName': 'Product 1 iehg rh hui  hui hui hui hui hui hui hui hui',
       'quantity': 2,
       'price': 20.0,
       'previousPrice': 25.0,
     },
     {
-      'imagePath': 'assets/prod2.jpg',
+      'imagePath': 'assets/images/prod2.jpg',
       'productName': 'Product 2  hui  hui hui hui hui hui hui hui hui ',
       'quantity': 1,
       'price': 15.0,

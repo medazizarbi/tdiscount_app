@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tdiscount_app/widgets/custom_drawer.dart'; // Import the custom drawer
-import 'package:tdiscount_app/widgets/carousel_widget.dart'; // Import the carousel widget
-import 'package:tdiscount_app/widgets/product_card.dart'; // Import the product card widget
-import 'package:tdiscount_app/widgets/category_card.dart'; // Import the category card widget
-import 'package:tdiscount_app/widgets/highlight_section.dart';
+import 'package:tdiscount_app/views/sub_categorie.dart';
+import 'package:tdiscount_app/utils/widgets/custom_drawer.dart'; // Import the custom drawer
+import 'package:tdiscount_app/utils/widgets/carousel_widget.dart'; // Import the carousel widget
+import 'package:tdiscount_app/utils/widgets/product_card.dart'; // Import the product card widget
+import 'package:tdiscount_app/utils/widgets/category_card.dart'; // Import the category card widget
+import 'package:tdiscount_app/utils/widgets/highlight_section.dart';
 import '../viewmodels/category_viewmodel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -145,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         children: categoryViewModel.categories
                                             .map((category) => categoryItem(
                                                 category.name,
-                                                "assets/elec.png",
+                                                "assets/images/elec.png",
                                                 category.id,
                                                 categoryViewModel))
                                             .toList(),
@@ -224,12 +225,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                     itemBuilder: (context, index) {
                                       final product = products[index];
                                       return ProductCard(
-                                        imagePath: product['imagePath']!,
+                                        imageUrl: product['imageUrl']!,
                                         name: product['name']!,
                                         price: product['price']!,
-                                        discount: product['discount'],
-                                        previousPrice: products[index][
-                                            'previousPrice'], // Ensure this is passed
+                                        discountPercentage:
+                                            product['discountPercentage'],
+                                        regularPrice: products[index][
+                                            'regularPrice'], // Ensure this is passed
                                       );
                                     },
                                   ),
@@ -243,18 +245,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                   subtitle:
                                       "Découvrez les derniers produits - SAMSUNG",
                                   mainImage:
-                                      "assets/samsung.png", // Replace with real URL
+                                      "assets/images/samsung.png", // Replace with real URL
                                   products: [
                                     {
-                                      "image": "assets/produit1.jpg",
+                                      "image": "assets/images/produit1.jpg",
                                       "name": "Samsung"
                                     },
                                     {
-                                      "image": "assets/prod2.jpg",
+                                      "image": "assets/images/prod2.jpg",
                                       "name": "Samsung "
                                     },
                                     {
-                                      "image": "assets/produit1.jpg",
+                                      "image": "assets/images/produit1.jpg",
                                       "name": "Samsung"
                                     },
                                   ],
@@ -289,18 +291,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                   title: "Gaming",
                                   subtitle: "Plongez dans l'univers du gaming",
                                   mainImage:
-                                      "assets/samsung.png", // Replace with real URL
+                                      "assets/images/samsung.png", // Replace with real URL
                                   products: [
                                     {
-                                      "image": "assets/produit1.jpg",
+                                      "image": "assets/images/produit1.jpg",
                                       "name": "Samsung"
                                     },
                                     {
-                                      "image": "assets/prod2.jpg",
+                                      "image": "assets/images/prod2.jpg",
                                       "name": "Samsung "
                                     },
                                     {
-                                      "image": "assets/produit1.jpg",
+                                      "image": "assets/images/produit1.jpg",
                                       "name": "Samsung"
                                     },
                                   ],
@@ -448,11 +450,33 @@ class _HomeScreenState extends State<HomeScreen> {
       CategoryViewModel categoryViewModel) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _selectedCategoryId = categoryId;
-        });
-        categoryViewModel.fetchProductsByCategory(
-            categoryId); // Fetch products for the selected category
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                SubCategorieScreen(
+              categoryId: categoryId,
+              categoryName: label,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(1.0, 0.0); // Start from the right
+              const end = Offset.zero; // End at the current position
+              const curve = Curves.easeInOut;
+
+              var tween = Tween(begin: begin, end: end).chain(
+                CurveTween(curve: curve),
+              );
+
+              var offsetAnimation = animation.drive(tween);
+
+              return SlideTransition(
+                position: offsetAnimation,
+                child: child,
+              );
+            },
+          ),
+        );
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),

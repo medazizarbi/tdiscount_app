@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:http/http.dart' as http;
 import '../models/category_model.dart';
 import '../models/product_model.dart'; // Import your Product model
@@ -12,7 +11,7 @@ class CategoryService {
   final String consumerSecret = "REMOVED_SECRET";
 
   Future<List<Category>> fetchCategories() async {
-    final String endpoint =
+    const String endpoint =
         "products/categories?parent=0&per_page=8&order=desc&orderby=count";
     final String url = "$baseUrl$endpoint";
 
@@ -70,6 +69,72 @@ class CategoryService {
     }
   }
 
+  Future<List<Category>> fetchSubCategories(
+      int parentCategoryId, String parentCategoryName) async {
+    final String endpoint = "products/categories?parent=$parentCategoryId";
+    final String url = "$baseUrl$endpoint";
+
+    try {
+      print("Fetching subcategories for parent category ID: $parentCategoryId");
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization':
+              'Basic ${base64Encode(utf8.encode('$consumerKey:$consumerSecret'))}',
+        },
+      );
+
+      print("Response status code: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        print("Response body: ${response.body}");
+
+        final List<dynamic> data = json.decode(response.body);
+
+        // Map the data to Category objects and replace "&amp;" with "&"
+        List<Category> subCategories = data.map((json) {
+          final category = Category.fromJson(json);
+
+          // Replace "&amp;" with "&" in the category name
+          final updatedName = category.name.replaceAll("&amp;", "&");
+
+          // Return a new Category object with the updated name
+          return Category(
+            id: category.id,
+            name: updatedName,
+            // Add other fields from the Category model as needed
+          );
+        }).toList();
+
+        // If no subcategories are found, add the parent category itself
+        if (subCategories.isEmpty) {
+          print(
+              "No subcategories found for category ID: $parentCategoryId. Adding itself as a subcategory.");
+          subCategories.add(Category(
+            id: parentCategoryId,
+            name: parentCategoryName,
+          ));
+        }
+
+        // Print each subcategory's details
+        for (var subCategory in subCategories) {
+          print("SubCategory ID: ${subCategory.id}, Name: ${subCategory.name}");
+        }
+
+        return subCategories;
+      } else {
+        print(
+            "Failed to load subcategories. Status code: ${response.statusCode}");
+        print("Response body: ${response.body}");
+        throw Exception("Failed to load subcategories: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error fetching subcategories: $e");
+      throw Exception("Error fetching subcategories: $e");
+    }
+  }
+
   Future<List<Product>> fetchProductsByCategory(int categoryId) async {
     final String endpoint = "products?category=$categoryId";
     final String url = "$baseUrl$endpoint";
@@ -92,8 +157,20 @@ class CategoryService {
 
         final List<dynamic> data = json.decode(response.body);
 
-        // Map the data to Product objects
-        final products = data.map((json) => Product.fromJson(json)).toList();
+        // Map the data to Product objects and filter out invalid products
+        final products =
+            data.map((json) => Product.fromJson(json)).where((product) {
+          return product.imageUrl != null &&
+              product.imageUrl != null &&
+              product.imageUrl!.isNotEmpty &&
+              product.name.isNotEmpty;
+        }).toList();
+
+        // Print each valid product's details
+        for (var product in products) {
+          print(
+              "Product ID: ${product.id}, Name: ${product.name}, Price: ${product.price}, Regular Price: ${product.regularPrice}, Image URL: ${product.imageUrl}");
+        }
 
         return products;
       } else {

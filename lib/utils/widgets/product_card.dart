@@ -3,19 +3,19 @@ import 'package:provider/provider.dart';
 import 'package:tdiscount_app/viewModels/favorites_view_model.dart';
 
 class ProductCard extends StatefulWidget {
-  final String imagePath;
+  final String imageUrl; // Updated to match fetched product's image URL
   final String name;
   final String price;
-  final String? discount;
-  final String? previousPrice;
+  final String? discountPercentage; // Optional discount percentage
+  final String? regularPrice; // Optional regular price
 
   const ProductCard({
     super.key,
-    required this.imagePath,
+    required this.imageUrl,
     required this.name,
     required this.price,
-    this.discount,
-    this.previousPrice,
+    this.discountPercentage,
+    this.regularPrice,
   });
 
   @override
@@ -47,8 +47,8 @@ class _ProductCardState extends State<ProductCard> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                child: Image.asset(
-                  widget.imagePath,
+                child: Image.network(
+                  widget.imageUrl, // Use the fetched product's image URL
                   width: double.infinity,
                   height: 150,
                   fit: BoxFit.cover,
@@ -68,7 +68,7 @@ class _ProductCardState extends State<ProductCard> {
                   },
                 ),
               ),
-              if (widget.discount != null)
+              if (widget.discountPercentage != null)
                 Positioned(
                   bottom: 8,
                   left: 8,
@@ -80,7 +80,7 @@ class _ProductCardState extends State<ProductCard> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      widget.discount!,
+                      widget.discountPercentage!,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -110,11 +110,11 @@ class _ProductCardState extends State<ProductCard> {
                       fontWeight: FontWeight.bold,
                       color: Colors.black),
                 ),
-                if (widget.previousPrice != null)
+                if (widget.regularPrice != null)
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Text(
-                      'TND ${widget.previousPrice}',
+                      'TND ${widget.regularPrice}',
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color.fromARGB(255, 109, 109, 109),
@@ -148,7 +148,7 @@ class _ProductCardState extends State<ProductCard> {
                     size: 24,
                   ),
                   onPressed: () {
-                    // Ajouter au panier
+                    // Add to cart functionality
                   },
                 ),
               ],
@@ -161,86 +161,29 @@ class _ProductCardState extends State<ProductCard> {
 }
 
 // List of products
-final List<Map<String, String>> products = [
+final List<Map<String, String?>> products = [
   {
-    'imagePath': 'assets/produit1.jpg',
+    'imageUrl': 'assets/images/produit1.jpg',
     'name': 'TV TCL 32"',
     'price': '799',
-    //'previousPrice': '999', // Add previous price
+    'regularPrice': '999', // Add previous price
   },
   {
-    'imagePath': 'assets/prod2.jpg',
+    'imageUrl': 'assets/images/prod2.jpg',
     'name': 'TV SAMSUNG',
     'price': '899',
-    'discount': '-40%',
-    'previousPrice': '1499', // Add previous price
+    'regularPrice': '1499', // Add previous price
   },
   {
-    'imagePath': 'assets/prod2.jpg',
+    'imageUrl': 'assets/images/prod2.jpg',
     'name': 'Sshfdiofdsk jsdhfosh jk jskdk  hs hD ',
     'price': '499',
-    'discount': '-30%',
-    'previousPrice': '699', // Add previous price
+    'regularPrice': '699', // Add previous price
   },
   {
-    'imagePath': 'assets/produit1.jpg',
+    'imageUrl': 'assets/images/produit1.jpg',
     'name': 'PC Portable',
     'price': '1099',
-    'discount': '-60%',
-    'previousPrice': '2599', // Add previous price
-  },
-  {
-    'imagePath': 'assets/produit1.jpg',
-    'name': 'TV TCL 32"',
-    'price': '799',
-    //'previousPrice': '999', // Add previous price
-  },
-  {
-    'imagePath': 'assets/prod2.jpg',
-    'name': 'TV SAMSUNG',
-    'price': '899',
-    'discount': '-40%',
-    'previousPrice': '1499', // Add previous price
-  },
-  {
-    'imagePath': 'assets/prod2.jpg',
-    'name': 'Sshfdiofdsk jsdhfosh jk jskdk  hs hD ',
-    'price': '499',
-    'discount': '-30%',
-    'previousPrice': '699', // Add previous price
-  },
-  {
-    'imagePath': 'assets/produit1.jpg',
-    'name': 'PC Portable',
-    'price': '1099',
-    'discount': '-60%',
-    'previousPrice': '2599', // Add previous price
-  },
-  {
-    'imagePath': 'assets/produit1.jpg',
-    'name': 'TV TCL 32"',
-    'price': '799',
-    //'previousPrice': '999', // Add previous price
-  },
-  {
-    'imagePath': 'assets/prod2.jpg',
-    'name': 'TV SAMSUNG',
-    'price': '899',
-    'discount': '-40%',
-    'previousPrice': '1499', // Add previous price
-  },
-  {
-    'imagePath': 'assets/prod2.jpg',
-    'name': 'Sshfdiofdsk jsdhfosh jk jskdk  hs hD ',
-    'price': '499',
-    'discount': '-30%',
-    'previousPrice': '699', // Add previous price
-  },
-  {
-    'imagePath': 'assets/produit1.jpg',
-    'name': 'PC Portable',
-    'price': '1099',
-    'discount': '-60%',
-    'previousPrice': '2599', // Add previous price
+    'regularPrice': '2599', // Add previous price
   },
 ];

@@ -47,19 +47,19 @@ class CategoryCard extends StatelessWidget {
 final List<Map<String, String>> categories = [
   {
     'name': 'Smartphones',
-    'imagePath': 'assets/produit1.jpg', // Add your image path
+    'imagePath': 'assets/images/produit1.jpg', // Add your image path
   },
   {
     'name': 'Informatiques',
-    'imagePath': 'assets/prod2.jpg', // Add your image path
+    'imagePath': 'assets/images/prod2.jpg', // Add your image path
   },
   {
     'name': 'Electronics',
-    'imagePath': 'assets/produit1.jpg', // Add your image path
+    'imagePath': 'assets/images/produit1.jpg', // Add your image path
   },
   {
     'name': 'Fashion',
-    'imagePath': 'assets/prod2.jpg', // Add your image path
+    'imagePath': 'assets/images/prod2.jpg', // Add your image path
   },
 ];
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tdiscount_app/viewModels/favorites_view_model.dart';
-import 'package:tdiscount_app/widgets/custom_drawer.dart';
-import 'package:tdiscount_app/widgets/product_card.dart';
+import 'package:tdiscount_app/utils/widgets/custom_drawer.dart';
+import 'package:tdiscount_app/utils/widgets/product_card.dart';
 
 class FavorisScreen extends StatefulWidget {
   const FavorisScreen({super.key});
@@ -151,11 +151,11 @@ class _FavorisScreenState extends State<FavorisScreen>
                                     milliseconds: 300 +
                                         (index * 100)), // Staggered animation
                                 child: ProductCard(
-                                  imagePath: product['imagePath']!,
+                                  imageUrl: product['imagePath']!,
                                   name: product['name']!,
                                   price: product['price']!,
-                                  discount: product['discount'],
-                                  previousPrice: product['previousPrice'],
+                                  discountPercentage: product['discount'],
+                                  regularPrice: product['previousPrice'],
                                 ),
                               );
                             },

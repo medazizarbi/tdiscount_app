@@ -53,7 +53,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
             // Profil utilisateur (left side image and profile)
             ListTile(
               leading: const CircleAvatar(
-                backgroundImage: AssetImage("assets/logo.png"), // Profile image
+                backgroundImage:
+                    AssetImage("assets/images/logo.png"), // Profile image
                 radius: 30,
               ),
               title: const Text(
