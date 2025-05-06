@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/viewModels/favorites_view_model.dart';
 
 class ProductCard extends StatefulWidget {
@@ -60,7 +61,9 @@ class _ProductCardState extends State<ProductCard> {
                 child: IconButton(
                   icon: Icon(
                     isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: isFavorite ? Colors.red : Colors.white,
+                    color: isFavorite
+                        ? TColors.textprice
+                        : TColors.buttonSecondary,
                     size: 24,
                   ),
                   onPressed: () {

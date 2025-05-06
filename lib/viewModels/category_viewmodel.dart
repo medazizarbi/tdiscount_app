@@ -8,27 +8,82 @@ class CategoryViewModel extends ChangeNotifier {
 
   bool isLoading = false;
   List<Category> categories = [];
-  List<Product> products = []; // Store fetched products
-  List<Category> subCategories = []; // Store fetched subcategories
-  Map<int, List<Product>> productsBySubCategory =
-      {}; // Map to store products by subcategory ID
+  List<Product> products = [];
+  List<Category> subCategories = [];
+  Map<int, List<Product>> productsBySubCategory = {};
+  int currentPage = 1;
+  bool hasMoreProducts = true;
+  bool _isLoadingMore = false;
+  final ScrollController scrollController = ScrollController();
 
   Future<void> fetchCategories() async {
     isLoading = true;
     notifyListeners();
 
-    categories = await _categoryService.fetchCategories();
-    isLoading = false;
-    notifyListeners();
+    try {
+      categories = await _categoryService.fetchCategories();
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> fetchProductsByCategory(int categoryId) async {
-    isLoading = true;
+    if (!hasMoreProducts || _isLoadingMore) return;
+
+    _isLoadingMore = true;
     notifyListeners();
 
-    products = await _categoryService.fetchProductsByCategory(categoryId);
-    isLoading = false;
-    notifyListeners();
+    try {
+      final category = categories.firstWhere(
+        (cat) => cat.id == categoryId,
+        orElse: () => Category(id: categoryId, name: '', count: 0),
+      );
+
+      const int perPage = 20;
+      final newProducts = await _categoryService.fetchProductsByCategory(
+        categoryId,
+        currentPage,
+        perPage,
+      );
+
+      if (newProducts.isEmpty) {
+        hasMoreProducts = false;
+        return;
+      }
+
+      if (productsBySubCategory.containsKey(categoryId)) {
+        productsBySubCategory[categoryId]!.addAll(newProducts);
+      } else {
+        productsBySubCategory[categoryId] = newProducts;
+      }
+
+      // Check if we've loaded all products using the count field
+      if (productsBySubCategory[categoryId]!.length >= category.count) {
+        hasMoreProducts = false;
+      }
+
+      currentPage++;
+    } catch (e) {
+      print('Error fetching products: $e');
+      rethrow;
+    } finally {
+      _isLoadingMore = false;
+      notifyListeners();
+    }
+  }
+
+  void initScrollListener(int categoryId) {
+    scrollController.addListener(() {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
+        fetchProductsByCategory(categoryId);
+      }
+    });
+  }
+
+  void disposeScrollController() {
+    scrollController.dispose();
   }
 
   Future<void> fetchSubCategories(
@@ -36,21 +91,43 @@ class CategoryViewModel extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    subCategories = await _categoryService.fetchSubCategories(
-        parentCategoryId, parentCategoryName);
-    isLoading = false;
-    notifyListeners();
+    try {
+      subCategories = await _categoryService.fetchSubCategories(
+          parentCategoryId, parentCategoryName);
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> fetchProductsBySubCategory(int subCategoryId) async {
     isLoading = true;
     notifyListeners();
 
-    final products =
-        await _categoryService.fetchProductsByCategory(subCategoryId);
-    productsBySubCategory[subCategoryId] =
-        products; // Store products for the subcategory
-    isLoading = false;
+    try {
+      const int perPage = 20;
+      products = await _categoryService.fetchProductsByCategory(
+          subCategoryId, currentPage, perPage);
+      productsBySubCategory[subCategoryId] = products;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void resetPagination() {
+    currentPage = 1;
+    hasMoreProducts = true;
+    _isLoadingMore = false;
     notifyListeners();
+  }
+
+  int getCategoryCount(int categoryId) {
+    return categories
+        .firstWhere(
+          (cat) => cat.id == categoryId,
+          orElse: () => Category(id: categoryId, name: '', count: 0),
+        )
+        .count;
   }
 }

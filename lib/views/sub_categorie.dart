@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/utils/widgets/single_image_banner.dart';
-import 'package:tdiscount_app/utils/widgets/horizontal_product_card.dart'; // Import the HorizontalProductCard widget
-import 'package:tdiscount_app/utils/widgets/view_more_btn.dart'; // Import the ViewMoreButton
+import 'package:tdiscount_app/utils/widgets/product_card.dart';
+import 'package:tdiscount_app/utils/widgets/view_more_btn.dart';
 import '../viewmodels/category_viewmodel.dart';
-import 'sub_category_products_screen.dart'; // Import the SubCategoryProductsScreen
+import 'sub_category_products_screen.dart';
 
 class SubCategorieScreen extends StatefulWidget {
   final int categoryId;
@@ -46,130 +46,195 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
     final categoryViewModel = Provider.of<CategoryViewModel>(context);
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(50.0),
-        child: AppBar(
-          title: Text(widget.categoryName), // Display the category name
-          centerTitle: false, // Align title to the left
-          backgroundColor: TColors.primary,
-        ),
-      ),
-      body: SingleChildScrollView(
+      body: Container(
+        color: TColors.primary, // Set the background color
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Add the banner at the top
-            const SingleImageBanner(
-                imagePath: 'assets/images/banner_example.png'),
-            const SizedBox(height: 20), // Add spacing below the banner
+            // AppBar-like section with back button and title
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+              color: TColors.primary,
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  const SizedBox(width: 8.0),
+                  Text(
+                    widget.categoryName,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // White container for content
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: TColors.light,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20.0),
+                    topRight: Radius.circular(20.0),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Add the banner at the top
+                      const SingleImageBanner(
+                          imagePath: 'assets/images/banner_example.png'),
+                      const SizedBox(
+                          height: 20), // Add spacing below the banner
 
-            // Display the category name
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                widget.categoryName,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                      // Display the category name
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          widget.categoryName,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                          height: 10), // Add spacing below the category name
+
+                      // Display subcategories
+                      categoryViewModel.isLoading
+                          ? const Center(
+                              child:
+                                  CircularProgressIndicator(), // Show loading indicator
+                            )
+                          : categoryViewModel.subCategories.isEmpty
+                              ? const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: Text(
+                                      'No subcategories found.',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                )
+                              : Column(
+                                  children: categoryViewModel.subCategories
+                                      .map((subCategory) {
+                                    final products =
+                                        categoryViewModel.productsBySubCategory[
+                                                subCategory.id] ??
+                                            [];
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16.0, vertical: 8.0),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(16.0),
+                                        decoration: BoxDecoration(
+                                          color: TColors.lightContainer,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.grey.withOpacity(0.3),
+                                              blurRadius: 5,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // First Row: Subcategory Name and "View More" Button
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  subCategory.name,
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                ViewMoreButton(
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            SubCategoryProductsScreen(
+                                                          subCategoryId:
+                                                              subCategory.id,
+                                                          subCategoryName:
+                                                              subCategory.name,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                                height:
+                                                    10), // Space between rows
+
+                                            // Second Row: Horizontal List of Products
+                                            SizedBox(
+                                              height:
+                                                  250, // Adjust height for the ProductCard
+                                              child: ListView.builder(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                itemCount: products.length,
+                                                itemBuilder: (context, index) {
+                                                  final product =
+                                                      products[index];
+                                                  return Padding(
+                                                    padding: const EdgeInsets
+                                                        .only(
+                                                        right:
+                                                            8.0), // Add spacing between cards
+                                                    child: SizedBox(
+                                                      width:
+                                                          200, // Set a fixed width for each ProductCard
+                                                      child: ProductCard(
+                                                        imageUrl: product
+                                                            .imageUrls.first,
+                                                        name: product.name,
+                                                        price: product.price
+                                                            .toString(),
+                                                        regularPrice: product
+                                                            .regularPrice
+                                                            ?.toString(),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                    ],
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 10), // Add spacing below the category name
-
-            // Display subcategories
-            categoryViewModel.isLoading
-                ? const Center(
-                    child:
-                        CircularProgressIndicator(), // Show loading indicator
-                  )
-                : categoryViewModel.subCategories.isEmpty
-                    ? const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Text(
-                            'No subcategories found.',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                      )
-                    : Column(
-                        children:
-                            categoryViewModel.subCategories.map((subCategory) {
-                          final products = categoryViewModel
-                                  .productsBySubCategory[subCategory.id] ??
-                              [];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 8.0),
-                            child: Container(
-                              padding: const EdgeInsets.all(16.0),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.3),
-                                    blurRadius: 5,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // First Row: Subcategory Name and "View More" Button
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        subCategory.name,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      ViewMoreButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  SubCategoryProductsScreen(
-                                                subCategoryId: subCategory.id,
-                                                subCategoryName:
-                                                    subCategory.name,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                      height: 10), // Space between rows
-
-                                  // Second Row: Horizontal List of Products
-                                  SizedBox(
-                                    height:
-                                        200, // Set height for the product list
-                                    child: ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: products.length,
-                                      itemBuilder: (context, index) {
-                                        final product = products[index];
-                                        return HorizontalProductCard(
-                                            product: product);
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
           ],
         ),
       ),

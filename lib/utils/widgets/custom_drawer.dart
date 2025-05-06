@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tdiscount_app/views/profil_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:tdiscount_app/main.dart';
+import 'package:tdiscount_app/viewmodels/category_viewmodel.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -9,11 +11,14 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-  // To keep track of the expanded state of the "Catégories" section
   bool isCategoriesExpanded = false;
 
   @override
   Widget build(BuildContext context) {
+    // Access the categories list from the CategoryViewModel
+    final categoryViewModel = Provider.of<CategoryViewModel>(context);
+    final categories = categoryViewModel.categories;
+
     return Drawer(
       backgroundColor: const Color(0xFF006D77), // Background color
       child: SingleChildScrollView(
@@ -67,17 +72,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 style: TextStyle(color: Colors.white70),
               ),
               onTap: () {
-                // Navigate to ProfilScreen when tapped
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProfilScreen()),
-                );
+                homePageKey.currentState
+                    ?.onItemTapped(4); // Navigate to ProfilScreen
+                Navigator.pop(context); // Close the drawer
               },
             ),
 
             const Divider(color: Colors.white38),
 
-            // Catégories (Expandable list)
+            // Dynamic Categories Section
             ExpansionTile(
               leading: const Icon(Icons.category, color: Colors.white),
               title: const Text("Catégories",
@@ -88,17 +91,28 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 });
               },
               children: [
-                // This will be shown when the "Catégories" section is expanded
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 32.0), // Indentation for categories
-                  child: Column(
-                    children: List.generate(
-                      10, // Change this number to dynamically generate more categories
-                      (index) => CategoryTile(title: "Category ${index + 1}"),
+                if (categoryViewModel.isLoading)
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(color: Colors.white),
+                  )
+                else if (categories.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text(
+                      "Aucune catégorie disponible",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.only(left: 32.0),
+                    child: Column(
+                      children: categories
+                          .map((category) => CategoryTile(title: category.name))
+                          .toList(),
                     ),
                   ),
-                ),
               ],
             ),
 

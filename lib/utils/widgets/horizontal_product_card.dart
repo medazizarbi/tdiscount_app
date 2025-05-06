@@ -37,8 +37,7 @@ class HorizontalProductCard extends StatelessWidget {
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
             child: Image.network(
-              product.imageUrl ??
-                  'https://via.placeholder.com/150', // Provide a default image URL if null
+              product.imageUrls.first, // Provide a default image URL if null
               height: 100,
               width: double.infinity,
               fit: BoxFit.cover,

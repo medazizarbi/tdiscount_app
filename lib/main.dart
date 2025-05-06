@@ -28,10 +28,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner:
           false, // Set to false to remove the debug banner
-      home: MyHomePage(),
+      home: MyHomePage(key: homePageKey), // Assign the global key here
     );
   }
 }
@@ -44,7 +44,7 @@ class MyHomePage extends StatefulWidget {
 
   // Expose a method to navigate to the HomeScreen
   static void navigateToHome() {
-    homePageKey.currentState?._onItemTapped(2); // Set index to HomeScreen
+    homePageKey.currentState?.onItemTapped(2); // Set index to HomeScreen
   }
 }
 
@@ -59,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ProfilScreen(),
   ];
 
-  void _onItemTapped(int index) {
+  void onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -85,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: NavBar(
-        onItemTapped: _onItemTapped,
+        onItemTapped: onItemTapped,
         selectedIndex: _selectedIndex,
       ),
     );

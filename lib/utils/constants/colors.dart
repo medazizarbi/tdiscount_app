@@ -17,8 +17,8 @@ class TColors {
   static const Color dark = Color(0xFF272727);
   static const Color primaryBackground = Color(0xFFF3F5FF);
 
-  // Background Container colors
-  static const Color lightContainer = Color(0xFFF6F6F6);
+  // Background Container colors for the white widget in evry screen
+  static const Color lightContainer = Color.fromRGBO(222, 222, 222, 1);
   static Color darkContainer = TColors.white.withOpacity(0.1);
 
   // Button colors

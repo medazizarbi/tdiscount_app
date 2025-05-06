@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/category_model.dart';
-import '../models/product_model.dart'; // Import your Product model
+import '../models/product_model.dart';
+import 'package:html/parser.dart' show parse;
+import 'package:html_unescape/html_unescape.dart';
 
 class CategoryService {
   final String baseUrl = "REMOVED_SECRET/";
-
-  // Add variables for consumer_key and consumer_secret
   final String consumerKey = "REMOVED_SECRET";
   final String consumerSecret = "REMOVED_SECRET";
 
@@ -15,57 +15,98 @@ class CategoryService {
         "products/categories?parent=0&per_page=8&order=desc&orderby=count";
     final String url = "$baseUrl$endpoint";
 
-    try {
-      print("Fetching categories from API: $url");
+    final response = await http.get(
+      Uri.parse(url),
+      headers: _getAuthHeaders(),
+    );
 
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization':
-              'Basic ${base64Encode(utf8.encode('$consumerKey:$consumerSecret'))}',
-        },
-      );
-
-      print("Response status code: ${response.statusCode}");
-
-      if (response.statusCode == 200) {
-        print("Response body: ${response.body}");
-
-        final List<dynamic> data = json.decode(response.body);
-
-        // Map the data and process categories
-        List<Category> categories = data.map((json) {
-          final category = Category.fromJson(json);
-
-          // Replace "&amp;" with "&" in category names and create a new Category object
-          return Category(
-            id: category.id,
-            name: category.name.replaceAll("&amp;", "&"),
-            // Add other fields from the Category model as needed
-          );
-        }).toList();
-
-        // Move "Autres catégories" to the end of the list
-        categories.sort((a, b) {
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((json) {
+        final category = Category.fromJson(json);
+        return Category(
+          id: category.id,
+          name: category.name.replaceAll("&amp;", "&"),
+          count: category.count,
+        );
+      }).toList()
+        ..sort((a, b) {
           if (a.name == "Autres catégories") return 1;
           if (b.name == "Autres catégories") return -1;
           return 0;
         });
+    }
+    throw Exception("Failed to load categories: ${response.statusCode}");
+  }
 
-        // Log the processed categories
-        for (var category in categories) {
-          print("Category ID: ${category.id}, Name: ${category.name}");
-        }
+  Future<List<Product>> fetchProductsByCategory(
+      int categoryId, int page, int perPage) async {
+    final String endpoint =
+        "products?category=$categoryId&page=$page&per_page=$perPage";
+    final String url = "$baseUrl$endpoint";
 
-        return categories;
+    print('⏳ [API Request] Starting to fetch products for:');
+    print('   - Category ID: $categoryId');
+    print('   - Page: $page');
+    print('   - Items per page: $perPage');
+    print('   - URL: $url');
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: _getAuthHeaders(),
+      );
+
+      print('✅ [API Response] Received response:');
+      print('   - Status Code: ${response.statusCode}');
+      print('   - URL: ${response.request?.url}');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        print('📦 [Data Processing] Total products received: ${data.length}');
+
+        final products = data.map((json) {
+          final product = Product.fromJson(json);
+
+          final cleanedDescription = product.description != null
+              ? htmlToPlainText(product.description!)
+              : null;
+
+          final cleanedShortDescription = product.shortDescription != null
+              ? htmlToPlainText(product.shortDescription!)
+              : null;
+
+          print('🖼️ Product: ${product.name}');
+          print('   - Total Images: ${product.imageUrls.length}');
+          for (var imgUrl in product.imageUrls) {
+            print('     • $imgUrl');
+          }
+          final updatedProduct = Product(
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            regularPrice: product.price == product.regularPrice
+                ? null
+                : product.regularPrice,
+            imageUrls: product.imageUrls,
+            inStock: product.inStock,
+            description: cleanedDescription,
+            shortDescription: cleanedShortDescription,
+          );
+
+          return updatedProduct;
+        }).where((product) {
+          final isValid =
+              product.imageUrls.isNotEmpty && product.name.isNotEmpty;
+          return isValid;
+        }).toList();
+
+        return products;
       } else {
-        print("Failed to load categories. Status code: ${response.statusCode}");
-        print("Response body: ${response.body}");
-        throw Exception("Failed to load categories: ${response.statusCode}");
+        throw Exception("Failed to load products: ${response.statusCode}");
       }
     } catch (e) {
-      print("Error fetching categories: $e");
-      throw Exception("Error fetching categories: $e");
+      throw Exception("Error fetching products: $e");
     }
   }
 
@@ -99,27 +140,37 @@ class CategoryService {
           // Replace "&amp;" with "&" in the category name
           final updatedName = category.name.replaceAll("&amp;", "&");
 
-          // Return a new Category object with the updated name
+          // Clean the description using htmlToPlainText
+          final cleanedDescription = category.description != null
+              ? htmlToPlainText(category.description!)
+              : null;
+
+          // Return a new Category object with the updated name, count, and cleaned description
           return Category(
             id: category.id,
             name: updatedName,
-            // Add other fields from the Category model as needed
+            count: category.count, // Include the count field
+            description: cleanedDescription, // Use the cleaned description
           );
         }).toList();
 
-        // If no subcategories are found, add the parent category itself
+        // If no subcategories are found, fetch the parent category details
         if (subCategories.isEmpty) {
           print(
-              "No subcategories found for category ID: $parentCategoryId. Adding itself as a subcategory.");
-          subCategories.add(Category(
-            id: parentCategoryId,
-            name: parentCategoryName,
-          ));
+              "No subcategories found for category ID: $parentCategoryId. Fetching parent category details.");
+
+          // Fetch the parent category details
+          final parentCategory = await fetchCategoryById(parentCategoryId);
+
+          if (parentCategory != null) {
+            subCategories.add(parentCategory);
+          }
         }
 
         // Print each subcategory's details
         for (var subCategory in subCategories) {
-          print("SubCategory ID: ${subCategory.id}, Name: ${subCategory.name}");
+          print(
+              "SubCategory ID: ${subCategory.id}, Name: ${subCategory.name}, Count: ${subCategory.count}, Description: ${subCategory.description}");
         }
 
         return subCategories;
@@ -135,12 +186,12 @@ class CategoryService {
     }
   }
 
-  Future<List<Product>> fetchProductsByCategory(int categoryId) async {
-    final String endpoint = "products?category=$categoryId";
+  Future<Category?> fetchCategoryById(int categoryId) async {
+    final String endpoint = "products/categories/$categoryId";
     final String url = "$baseUrl$endpoint";
 
     try {
-      print("Fetching products for category ID: $categoryId");
+      print("Fetching category details for ID: $categoryId");
 
       final response = await http.get(
         Uri.parse(url),
@@ -155,32 +206,36 @@ class CategoryService {
       if (response.statusCode == 200) {
         print("Response body: ${response.body}");
 
-        final List<dynamic> data = json.decode(response.body);
+        final Map<String, dynamic> data = json.decode(response.body);
 
-        // Map the data to Product objects and filter out invalid products
-        final products =
-            data.map((json) => Product.fromJson(json)).where((product) {
-          return product.imageUrl != null &&
-              product.imageUrl != null &&
-              product.imageUrl!.isNotEmpty &&
-              product.name.isNotEmpty;
-        }).toList();
+        // Parse the category details
+        final category = Category.fromJson(data);
 
-        // Print each valid product's details
-        for (var product in products) {
-          print(
-              "Product ID: ${product.id}, Name: ${product.name}, Price: ${product.price}, Regular Price: ${product.regularPrice}, Image URL: ${product.imageUrl}");
-        }
+        print(
+            "Fetched Category - ID: ${category.id}, Name: ${category.name}, Count: ${category.count}");
 
-        return products;
+        return category;
       } else {
-        print("Failed to load products. Status code: ${response.statusCode}");
+        print("Failed to fetch category. Status code: ${response.statusCode}");
         print("Response body: ${response.body}");
-        throw Exception("Failed to load products: ${response.statusCode}");
+        return null;
       }
     } catch (e) {
-      print("Error fetching products: $e");
-      throw Exception("Error fetching products: $e");
+      print("Error fetching category: $e");
+      return null;
     }
+  }
+
+  Map<String, String> _getAuthHeaders() {
+    return {
+      'Authorization':
+          'Basic ${base64Encode(utf8.encode('$consumerKey:$consumerSecret'))}',
+    };
+  }
+
+  String htmlToPlainText(String htmlString) {
+    final document = parse(htmlString);
+    final String parsed = document.body?.text ?? '';
+    return HtmlUnescape().convert(parsed);
   }
 }

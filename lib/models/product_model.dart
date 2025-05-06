@@ -5,7 +5,7 @@ class Product {
   final String? regularPrice;
   final String? description;
   final String? shortDescription;
-  final String? imageUrl;
+  final List<String> imageUrls; // Store all image URLs
   final bool inStock;
 
   Product({
@@ -15,15 +15,12 @@ class Product {
     this.regularPrice,
     this.description,
     this.shortDescription,
-    this.imageUrl,
+    required this.imageUrls,
     required this.inStock,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
     // Extract the first image URL if available
-    final imageUrl = (json['images'] as List<dynamic>?)?.isNotEmpty == true
-        ? json['images'][0]['src']
-        : null;
 
     return Product(
       id: json['id'],
@@ -32,7 +29,10 @@ class Product {
       regularPrice: json['regular_price'],
       description: json['description'],
       shortDescription: json['short_description'],
-      imageUrl: imageUrl,
+      imageUrls: (json['images'] as List<dynamic>?)
+              ?.map((img) => img['src'] as String)
+              .toList() ??
+          [],
       inStock: json['stock_status'] == 'instock',
     );
   }

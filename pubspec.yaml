@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.6
   provider: ^6.1.4
   http: ^1.2.2
+  html: ^0.15.4
+  html_unescape: ^2.0.0
 
 dev_dependencies:
   flutter_test:
@@ -62,8 +64,42 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-      - assets/images/
+    - assets/images/
+    - assets/fonts/
+  fonts:
+    - family: Coolvetica
+      fonts:
+        - asset: assets/fonts/coolvetica_regular.otf
+        - asset: assets/fonts/coolvetica_regular_italic.otf  
+          style: italic
     
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Poppins-LightItalic.ttf  
+          weight: 300
+          style: italic
+        - asset: assets/fonts/Poppins-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Poppins-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-MediumItalic.ttf  
+          weight: 500
+          style: italic
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-SemiBoldItalic.ttf  
+          weight: 600
+          style: italic
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Poppins-BoldItalic.ttf  
+          weight: 700
+          style: italic
 
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
