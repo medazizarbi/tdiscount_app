@@ -76,11 +76,6 @@ class CategoryService {
               ? htmlToPlainText(product.shortDescription!)
               : null;
 
-          print('🖼️ Product: ${product.name}');
-          print('   - Total Images: ${product.imageUrls.length}');
-          for (var imgUrl in product.imageUrls) {
-            print('     • $imgUrl');
-          }
           final updatedProduct = Product(
             id: product.id,
             name: product.name,

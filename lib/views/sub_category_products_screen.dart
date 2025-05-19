@@ -31,17 +31,30 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _initialize());
   }
 
-  void _initialize() async {
+  void _initialize() {
     final viewModel = Provider.of<CategoryViewModel>(context, listen: false);
-    viewModel.resetPagination();
+
+    // Assign the scroll controller (optional)
+    viewModel.scrollController = _scrollController;
+
+    // Attach the scroll listener once per screen
     _setupScrollListener(viewModel);
-    await viewModel.fetchProductsByCategory(widget.subCategoryId);
+
+    // ✅ Only fetch if the category hasn't been fetched yet
+    final alreadyLoaded =
+        viewModel.productsBySubCategory[widget.subCategoryId]?.isNotEmpty ??
+            false;
+    if (!alreadyLoaded) {
+      viewModel.fetchProductsByCategory(widget.subCategoryId);
+    }
   }
 
   void _setupScrollListener(CategoryViewModel viewModel) {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
+              _scrollController.position.maxScrollExtent &&
+          viewModel.hasMoreProductsFor(widget.subCategoryId) &&
+          !viewModel.isLoading) {
         viewModel.fetchProductsByCategory(widget.subCategoryId);
       }
     });
@@ -59,11 +72,12 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
     final products =
         viewModel.productsBySubCategory[widget.subCategoryId] ?? [];
     final isLoadingMore = viewModel.isLoading && products.isNotEmpty;
-    final subCategoryDescription = viewModel.subCategories
-        .firstWhere(
-          (subCategory) => subCategory.id == widget.subCategoryId,
-        )
-        ?.description; // Assuming description is a field in your model
+
+    final subCategory = viewModel.subCategories.firstWhere(
+      (subCategory) => subCategory.id == widget.subCategoryId,
+      orElse: () => viewModel.subCategories.first,
+    );
+
     return Scaffold(
       body: Container(
         color: TColors.primary,
@@ -75,8 +89,12 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
                 decoration: _whiteContainerDecoration(),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: _buildContent(viewModel, products, isLoadingMore,
-                      subCategoryDescription),
+                  child: _buildContent(
+                    viewModel,
+                    products,
+                    isLoadingMore,
+                    subCategory.description,
+                  ),
                 ),
               ),
             ),
@@ -126,74 +144,56 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
     bool isLoadingMore,
     String? subCategoryDescription,
   ) {
-    // Show a loading indicator if data is still being fetched
     if (viewModel.isLoading && products.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // Show a message if no products are found
     if (products.isEmpty) {
       return const Center(child: Text('No products found.'));
     }
 
-    return NotificationListener<ScrollNotification>(
-      onNotification: (notification) {
-        if (notification is ScrollEndNotification &&
-            _scrollController.position.pixels ==
-                _scrollController.position.maxScrollExtent &&
-            viewModel.hasMoreProducts &&
-            !isLoadingMore) {
-          viewModel.fetchProductsByCategory(widget.subCategoryId);
-        }
-        return false;
-      },
-      child: SingleChildScrollView(
-        // Make the entire content scrollable
-        controller: _scrollController,
-        child: Column(
-          children: [
-            // Display the description before the product list
-            if (subCategoryDescription != null &&
-                subCategoryDescription.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: Text(
-                  subCategoryDescription,
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                      fontStyle: FontStyle.italic),
-                  textAlign: TextAlign.justify, // Ensures the text is justified
+    return SingleChildScrollView(
+      controller: _scrollController,
+      child: Column(
+        children: [
+          if (subCategoryDescription != null &&
+              subCategoryDescription.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Text(
+                subCategoryDescription,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500,
+                  fontStyle: FontStyle.italic,
                 ),
+                textAlign: TextAlign.justify,
               ),
-
-            // The list of products
-            GridView.builder(
-              shrinkWrap: true, // Make the grid view shrink to fit its content
-              physics:
-                  const NeverScrollableScrollPhysics(), // Disable grid view scrolling (handled by SingleChildScrollView)
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16.0,
-                mainAxisSpacing: 16.0,
-                childAspectRatio: 0.7,
-              ),
-              itemCount: products.length + (viewModel.hasMoreProducts ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index >= products.length) {
-                  return const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-                return _buildProductCard(products[index]);
-              },
             ),
-          ],
-        ),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16.0,
+              mainAxisSpacing: 16.0,
+              childAspectRatio: 0.7,
+            ),
+            itemCount: products.length + (isLoadingMore ? 1 : 0),
+            itemBuilder: (context, index) {
+              if (index >= products.length) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+              return _buildProductCard(products[index]);
+            },
+          ),
+        ],
       ),
     );
   }

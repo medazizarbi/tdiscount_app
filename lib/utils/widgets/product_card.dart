@@ -166,25 +166,43 @@ class _ProductCardState extends State<ProductCard> {
 // List of products
 final List<Map<String, String?>> products = [
   {
-    'imageUrl': 'assets/images/produit1.jpg',
+    'imageUrl':
+        'https://tdiscount.tn/wp-content/uploads/2025/03/micro-onde-focus-fm250-25l-noir.jpg',
     'name': 'TV TCL 32"',
     'price': '799',
     'regularPrice': '999', // Add previous price
   },
   {
-    'imageUrl': 'assets/images/prod2.jpg',
+    'imageUrl':
+        'https://tdiscount.tn/wp-content/uploads/2025/03/micro-onde-focus-fm250-25l-noir.jpg',
     'name': 'TV SAMSUNG',
     'price': '899',
     'regularPrice': '1499', // Add previous price
   },
   {
-    'imageUrl': 'assets/images/prod2.jpg',
+    'imageUrl':
+        'https://tdiscount.tn/wp-content/uploads/2025/03/micro-onde-focus-fm250-25l-noir.jpg',
     'name': 'Sshfdiofdsk jsdhfosh jk jskdk  hs hD ',
     'price': '499',
     'regularPrice': '699', // Add previous price
   },
   {
-    'imageUrl': 'assets/images/produit1.jpg',
+    'imageUrl':
+        'https://tdiscount.tn/wp-content/uploads/2025/03/micro-onde-focus-fm250-25l-noir.jpg',
+    'name': 'PC Portable',
+    'price': '1099',
+    'regularPrice': '2599', // Add previous price
+  },
+  {
+    'imageUrl':
+        'https://tdiscount.tn/wp-content/uploads/2025/03/micro-onde-focus-fm250-25l-noir.jpg',
+    'name': 'Sshfdiofdsk jsdhfosh jk jskdk  hs hD ',
+    'price': '499',
+    'regularPrice': '699', // Add previous price
+  },
+  {
+    'imageUrl':
+        'https://tdiscount.tn/wp-content/uploads/2025/03/micro-onde-focus-fm250-25l-noir.jpg',
     'name': 'PC Portable',
     'price': '1099',
     'regularPrice': '2599', // Add previous price
