@@ -15,7 +15,7 @@ class Category {
     return Category(
       id: json['id'],
       name: json['name'],
-      count: json['count'],
+      count: json['count'] ?? 0,
       description: json['description'],
     );
   }

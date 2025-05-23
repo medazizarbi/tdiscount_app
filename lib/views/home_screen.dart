@@ -148,6 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 category.name,
                                                 "assets/images/elec.png",
                                                 category.id,
+                                                category.count,
                                                 categoryViewModel))
                                             .toList(),
                                       ),
@@ -447,7 +448,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget categoryItem(String label, String imagePath, int categoryId,
-      CategoryViewModel categoryViewModel) {
+      int categoryCount, CategoryViewModel categoryViewModel) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -457,6 +458,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 SubCategorieScreen(
               categoryId: categoryId,
               categoryName: label,
+              categoryCount: categoryCount,
             ),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {

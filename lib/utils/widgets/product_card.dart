@@ -113,7 +113,10 @@ class _ProductCardState extends State<ProductCard> {
                       fontWeight: FontWeight.bold,
                       color: Colors.black),
                 ),
-                if (widget.regularPrice != null)
+                if (widget.regularPrice != null &&
+                    double.tryParse(
+                            widget.regularPrice!.replaceAll(',', '.')) !=
+                        null)
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
                     child: Text(
@@ -170,14 +173,14 @@ final List<Map<String, String?>> products = [
         'https://tdiscount.tn/wp-content/uploads/2025/03/micro-onde-focus-fm250-25l-noir.jpg',
     'name': 'TV TCL 32"',
     'price': '799',
-    'regularPrice': '999', // Add previous price
+    'regularPrice': '11.55', // Add previous price
   },
   {
     'imageUrl':
         'https://tdiscount.tn/wp-content/uploads/2025/03/micro-onde-focus-fm250-25l-noir.jpg',
     'name': 'TV SAMSUNG',
     'price': '899',
-    'regularPrice': '1499', // Add previous price
+    'regularPrice': '11,55', // Add previous price
   },
   {
     'imageUrl':

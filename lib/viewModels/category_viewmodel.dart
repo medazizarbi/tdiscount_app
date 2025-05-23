@@ -31,9 +31,12 @@ class CategoryViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchProductsByCategory(int categoryId) async {
+    print(
+        "DEBUG: categories at fetchProductsByCategory: ${categories.map((c) => '${c.id}:${c.count}').toList()}");
+
     if (activeCategoryId != categoryId) {
       activeCategoryId = categoryId;
-      currentPageByCategory[categoryId] = 3;
+      currentPageByCategory[categoryId] = 2;
       hasMoreProductsByCategory[categoryId] = true;
     }
 
@@ -46,12 +49,19 @@ class CategoryViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final category = categories.firstWhere(
-        (cat) => cat.id == categoryId,
-        orElse: () => Category(id: categoryId, name: '', count: 0),
-      );
+      final category = categories.followedBy(subCategories).firstWhere(
+            (cat) => cat.id == categoryId,
+            orElse: () => Category(id: categoryId, name: 'not found', count: 0),
+          );
 
-      const int perPage = 10;
+      final currentList = productsBySubCategory[categoryId]!;
+      final remaining = category.count - currentList.length;
+      if (remaining <= 0) {
+        hasMoreProductsByCategory[categoryId] = false;
+        return;
+      }
+      final int perPage =
+          remaining < 10 ? remaining : 10; // Fetch only what's left
 
       print(
           "🔄 Fetching products: category=$categoryId, page=$currentPage, per_page=$perPage");
@@ -91,6 +101,10 @@ class CategoryViewModel extends ChangeNotifier {
       }
 
       productsBySubCategory[categoryId]!.addAll(uniqueProducts);
+
+// ✅ Log current count of products and total expected count
+      print(
+          "📦 Fetched ${productsBySubCategory[categoryId]!.length} / ${category.count} products for category $categoryId");
 
       // ✅ Check against category count
       if (productsBySubCategory[categoryId]!.length >= category.count) {
@@ -142,6 +156,8 @@ class CategoryViewModel extends ChangeNotifier {
     try {
       subCategories = await _categoryService.fetchSubCategories(
           parentCategoryId, parentCategoryName);
+      print(
+          "Fetched subCategories: ${subCategories.map((c) => '${c.id}:${c.name}:${c.count}').toList()}");
     } finally {
       isLoading = false;
       notifyListeners();
@@ -153,7 +169,7 @@ class CategoryViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      const int perPage = 20;
+      const int perPage = 10;
       products = await _categoryService.fetchProductsByCategory(
           subCategoryId, 1, perPage);
       productsBySubCategory[subCategoryId] = products;

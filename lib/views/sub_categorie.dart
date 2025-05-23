@@ -10,11 +10,13 @@ import 'sub_category_products_screen.dart';
 class SubCategorieScreen extends StatefulWidget {
   final int categoryId;
   final String categoryName;
+  final int categoryCount;
 
   const SubCategorieScreen({
     super.key,
     required this.categoryId,
     required this.categoryName,
+    required this.categoryCount,
   });
 
   @override
@@ -179,6 +181,8 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
                                                               subCategory.id,
                                                           subCategoryName:
                                                               subCategory.name,
+                                                          subCategoryCount:
+                                                              subCategory.count,
                                                         ),
                                                       ),
                                                     );

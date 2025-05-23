@@ -91,8 +91,11 @@ class CategoryService {
 
           return updatedProduct;
         }).where((product) {
-          final isValid =
-              product.imageUrls.isNotEmpty && product.name.isNotEmpty;
+          final isValid = product.imageUrls.any((url) =>
+                  url.endsWith('.jpg') ||
+                  url.endsWith('.jpeg') ||
+                  url.endsWith('.png')) &&
+              product.name.isNotEmpty;
           return isValid;
         }).toList();
 
