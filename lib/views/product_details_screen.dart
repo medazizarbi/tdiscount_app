@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
-import 'package:tdiscount_app/models/product_model.dart'; // Import the Product model
+import 'package:tdiscount_app/models/product_model.dart';
 import 'package:tdiscount_app/utils/widgets/product_images_viewer.dart';
 
-class ProductDetailsScreen extends StatelessWidget {
-  final Product product; // Accept the product object
+class ProductDetailsScreen extends StatefulWidget {
+  final Product product;
 
   const ProductDetailsScreen({
     super.key,
@@ -12,7 +12,26 @@ class ProductDetailsScreen extends StatelessWidget {
   });
 
   @override
+  State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
+}
+
+class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+  bool descriptionExpanded = false;
+
+  @override
   Widget build(BuildContext context) {
+    final product = widget.product;
+
+    String? formattedShortDescription;
+    if (product.shortDescription != null &&
+        product.shortDescription!.isNotEmpty) {
+      formattedShortDescription = product.shortDescription!
+          .split('-')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .join('\n');
+    }
+
     return Scaffold(
       body: SingleChildScrollView(
         // Make the entire page scrollable
@@ -69,6 +88,19 @@ class ProductDetailsScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Product Image
+                        // ignore: unnecessary_null_comparison
+                        const SizedBox(height: 16),
+
+                        product.imageUrls.isNotEmpty
+                            ? ProductImagesViewer(imageUrls: product.imageUrls)
+                            : const Placeholder(
+                                fallbackHeight: 200,
+                                fallbackWidth: double.infinity,
+                              ),
+
+                        const SizedBox(height: 16),
+
                         // Product Name
                         Text(
                           product.name,
@@ -103,47 +135,119 @@ class ProductDetailsScreen extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 16),
-
-                        // Product Image
-                        // ignore: unnecessary_null_comparison
-                        product.imageUrls.isNotEmpty
-                            ? ProductImagesViewer(imageUrls: product.imageUrls)
-                            : const Placeholder(
-                                fallbackHeight: 200,
-                                fallbackWidth: double.infinity,
+// Ajouter au panier button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: TColors.primary,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
                               ),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content:
+                                        Text('Produit ajouté au panier !')),
+                              );
+                            },
+                            child: const Text(
+                              'Ajouter au panier',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+                        const Divider(
+                            thickness: 1,
+                            color: Colors.grey), // <-- Add this line
+                        const SizedBox(height: 16),
+
+                        // Caractéristique title
+                        const Text(
+                          'Caractéristique :',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: TColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Product Short Description (shortDescription variable)
+                        if (formattedShortDescription != null &&
+                            formattedShortDescription.isNotEmpty)
+                          Text(
+                            formattedShortDescription,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Coolvetica',
+                              fontWeight: FontWeight.w400,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          )
+                        else
+                          const Text(
+                            'Aucune caractéristique disponible.',
+                            style: TextStyle(fontSize: 16),
+                          ),
 
                         const SizedBox(height: 16),
 
-                        // Product Description
-                        if ((product.description != null &&
-                                product.description!.isNotEmpty) ||
-                            (product.shortDescription != null &&
-                                product.shortDescription!.isNotEmpty)) ...[
-                          if (product.shortDescription != null &&
-                              product.shortDescription!.isNotEmpty)
-                            Text(
-                              product.shortDescription!,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'Coolvetica',
-                                fontStyle: FontStyle.normal,
-                              ),
-                            ),
-                          const SizedBox(height: 8),
-                          if (product.description != null &&
-                              product.description!.isNotEmpty)
-                            Text(
-                              product.description!,
-                              style: const TextStyle(
+                        // Description title
+                        const Text(
+                          'Description',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: TColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+
+                        // Product Description (description variable) with "Voir plus"
+                        if (product.description != null &&
+                            product.description!.isNotEmpty)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                product.description!,
+                                maxLines: descriptionExpanded ? null : 4,
+                                overflow: descriptionExpanded
+                                    ? TextOverflow.visible
+                                    : TextOverflow.ellipsis,
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w400,
-                                  fontStyle: FontStyle.italic),
-                            ),
-                        ] else
+                                  fontStyle: FontStyle.normal,
+                                ),
+                              ),
+                              if (!descriptionExpanded)
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          descriptionExpanded = true;
+                                        });
+                                      },
+                                      child: const Text('Voir plus'),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          )
+                        else
                           const Text(
-                            'No description available.',
+                            'Aucune description disponible.',
                             style: TextStyle(fontSize: 16),
                           ),
                       ],

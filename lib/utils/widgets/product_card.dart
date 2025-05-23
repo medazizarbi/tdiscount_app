@@ -31,7 +31,7 @@ class _ProductCardState extends State<ProductCard> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: themedColor(context, TColors.cardlight, TColors.primary),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(

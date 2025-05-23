@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tdiscount_app/main.dart';
+import 'package:tdiscount_app/models/category_model.dart';
 import 'package:tdiscount_app/viewmodels/category_viewmodel.dart';
+import 'package:tdiscount_app/views/sub_categorie.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -109,7 +111,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     padding: const EdgeInsets.only(left: 32.0),
                     child: Column(
                       children: categories
-                          .map((category) => CategoryTile(title: category.name))
+                          .map((category) => CategoryTile(category: category))
                           .toList(),
                     ),
                   ),
@@ -153,14 +155,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
 }
 
 class CategoryTile extends StatelessWidget {
-  final String title;
-  const CategoryTile({super.key, required this.title});
+  final Category category;
+  const CategoryTile({super.key, required this.category});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 40, // Fixed height for consistency
-      alignment: Alignment.center, // Ensures everything is centered vertically
+      height: 40,
+      alignment: Alignment.center,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 18),
         leading: const Icon(
@@ -169,17 +171,26 @@ class CategoryTile extends StatelessWidget {
           size: 20,
         ),
         title: Text(
-          title,
+          category.name,
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w500,
             fontSize: 14,
           ),
         ),
-        horizontalTitleGap: 10, // Ensures proper spacing between icon and text
-        dense: true, // Reduces ListTile height to fit within Container
+        horizontalTitleGap: 10,
+        dense: true,
         onTap: () {
-          // Action when category is tapped
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SubCategorieScreen(
+                categoryId: category.id, // Pass only the id
+                categoryName: category.name, // Pass the name as well
+                categoryCount: category.count, // Pass the count as well
+              ),
+            ),
+          );
         },
       ),
     );

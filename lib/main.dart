@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tdiscount_app/providers/theme_provider.dart';
 import 'package:tdiscount_app/viewmodels/category_viewmodel.dart';
 import 'views/home_screen.dart';
 import 'views/recherche_screen.dart';
@@ -17,6 +18,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => FavoriteViewModel()),
         ChangeNotifierProvider(create: (_) => CategoryViewModel()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const MyApp(),
     ),
@@ -28,10 +30,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
+      themeMode: themeProvider.themeMode,
+
       debugShowCheckedModeBanner:
           false, // Set to false to remove the debug banner
       home: MyHomePage(key: homePageKey), // Assign the global key here
+      theme: ThemeData(
+        brightness: Brightness.light,
+        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.white,
+        // Add other light theme customizations here
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.black,
+        // Add other dark theme customizations here
+      ),
     );
   }
 }

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 class TColors {
+  // product card colors
+  static const Color cardlight = Color.fromARGB(255, 255, 255, 255);
+  static const Color carddark = Color.fromARGB(255, 54, 54, 54);
   // App theme colors
-  static const Color primary = Color(0xFF006D77);
-  static const Color secondary = Color(0xFFFFE24B);
+  static const Color primary = Color.fromARGB(255, 251, 255, 0);
+  static const Color secondary = Color.fromARGB(255, 255, 15, 0);
   static const Color accent = Color(0xFFb0c7ff);
 
   // Text colors
@@ -19,7 +22,7 @@ class TColors {
 
   // Background Container colors for the white widget in evry screen
   static const Color lightContainer = Color.fromRGBO(222, 222, 222, 1);
-  static Color darkContainer = TColors.white.withOpacity(0.1);
+  static Color darkContainer = const Color.fromARGB(255, 0, 0, 0);
 
   // Button colors
   static const Color buttonPrimary = Color(0xFF4b68ff);
@@ -44,4 +47,8 @@ class TColors {
   static const Color softGrey = Color(0xFFF4F4F4);
   static const Color lightGrey = Color(0xFFF9F9F9);
   static const Color white = Color(0xFFFFFFFF);
+}
+
+Color themedColor(BuildContext context, Color light, Color dark) {
+  return Theme.of(context).brightness == Brightness.dark ? dark : light;
 }

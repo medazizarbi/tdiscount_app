@@ -80,9 +80,10 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
             // White container for content
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
-                  color: TColors.light,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: themedColor(
+                      context, TColors.lightContainer, TColors.darkContainer),
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20.0),
                     topRight: Radius.circular(20.0),
                   ),
@@ -102,10 +103,11 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
                           widget.categoryName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: themedColor(context, TColors.textPrimary,
+                                TColors.textWhite),
                           ),
                         ),
                       ),
@@ -141,7 +143,10 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
                                       child: Container(
                                         padding: const EdgeInsets.all(16.0),
                                         decoration: BoxDecoration(
-                                          color: TColors.lightContainer,
+                                          color: themedColor(
+                                              context,
+                                              TColors.lightContainer,
+                                              TColors.carddark),
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           boxShadow: [

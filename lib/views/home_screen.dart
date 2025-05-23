@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/views/sub_categorie.dart';
 import 'package:tdiscount_app/utils/widgets/custom_drawer.dart'; // Import the custom drawer
 import 'package:tdiscount_app/utils/widgets/carousel_widget.dart'; // Import the carousel widget
@@ -16,8 +17,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final Color primaryColor = const Color(0xFF006D77);
-  final Color backgroundColor = Colors.grey[300]!;
+  final Color primaryColor = const Color.fromARGB(255, 251, 255, 0);
+  Color get backgroundColor =>
+      themedColor(context, TColors.lightContainer, TColors.darkContainer);
   int _currentPage = 0; // Track the current page index
   int? _selectedCategoryId; // Track the selected category ID
   List<dynamic> _fetchedProducts = []; // Store fetched products
@@ -86,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: CustomScrollView(
                 slivers: [
                   SliverAppBar(
-                    backgroundColor: primaryColor,
+                    backgroundColor: TColors.primary,
                     floating: true, // Make the app bar floating
                     pinned: false, // Keep the app bar visible when scrolling
                     automaticallyImplyLeading: false,
@@ -199,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black,
+                                      // color: Colors.black,
                                     ),
                                   ),
                                 ),
@@ -511,7 +513,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white,
+                    color: Colors.black, // <-- Set text color to black
                   ),
                 ),
               ),

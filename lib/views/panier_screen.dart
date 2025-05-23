@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/utils/widgets/custom_drawer.dart';
 
 class PanierProductCard extends StatelessWidget {
@@ -219,9 +220,10 @@ class _PanierScreenState extends State<PanierScreen>
             const SizedBox(height: 20),
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 224, 224, 224),
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: themedColor(
+                      context, TColors.lightContainer, TColors.darkContainer),
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(25),
                     topRight: Radius.circular(25),
                   ),

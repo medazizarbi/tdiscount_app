@@ -39,6 +39,13 @@ class CategoryService {
     throw Exception("Failed to load categories: ${response.statusCode}");
   }
 
+  /// Filters out unsupported image formats (currently .avif)
+  List<String> filterUnsupportedImages(List<String> imageUrls) {
+    return imageUrls
+        .where((url) => !url.toLowerCase().endsWith('.avif'))
+        .toList();
+  }
+
   Future<List<Product>> fetchProductsByCategory(
       int categoryId, int page, int perPage) async {
     final String endpoint =
@@ -76,6 +83,9 @@ class CategoryService {
               ? htmlToPlainText(product.shortDescription!)
               : null;
 
+          // Use the filter method here
+          final filteredImageUrls = filterUnsupportedImages(product.imageUrls);
+
           final updatedProduct = Product(
             id: product.id,
             name: product.name,
@@ -83,7 +93,7 @@ class CategoryService {
             regularPrice: product.price == product.regularPrice
                 ? null
                 : product.regularPrice,
-            imageUrls: product.imageUrls,
+            imageUrls: filteredImageUrls,
             inStock: product.inStock,
             description: cleanedDescription,
             shortDescription: cleanedShortDescription,
@@ -91,11 +101,8 @@ class CategoryService {
 
           return updatedProduct;
         }).where((product) {
-          final isValid = product.imageUrls.any((url) =>
-                  url.endsWith('.jpg') ||
-                  url.endsWith('.jpeg') ||
-                  url.endsWith('.png')) &&
-              product.name.isNotEmpty;
+          final isValid =
+              product.imageUrls.isNotEmpty && product.name.isNotEmpty;
           return isValid;
         }).toList();
 

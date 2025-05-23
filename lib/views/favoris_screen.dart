@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/viewModels/favorites_view_model.dart';
 import 'package:tdiscount_app/utils/widgets/custom_drawer.dart';
 import 'package:tdiscount_app/utils/widgets/product_card.dart';
@@ -79,9 +80,10 @@ class _FavorisScreenState extends State<FavorisScreen>
             const SizedBox(height: 20),
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 255, 255, 255),
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: themedColor(
+                      context, TColors.lightContainer, TColors.darkContainer),
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(25),
                     topRight: Radius.circular(25),
                   ),
@@ -117,12 +119,14 @@ class _FavorisScreenState extends State<FavorisScreen>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(Icons.favorite_border,
-                                    size: 80, color: Colors.black54),
+                                    size: 80,
+                                    color: Color.fromARGB(137, 62, 62, 62)),
                                 SizedBox(height: 16),
                                 Text(
                                   "Aucun produit en favori.",
                                   style: TextStyle(
-                                      fontSize: 18, color: Colors.black54),
+                                      fontSize: 18,
+                                      color: Color.fromARGB(137, 62, 62, 62)),
                                 ),
                               ],
                             ),

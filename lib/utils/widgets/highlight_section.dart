@@ -42,9 +42,16 @@ class HighlightSection extends StatelessWidget {
                   Text(
                     title,
                     style: const TextStyle(
-                        fontSize: 22, fontWeight: FontWeight.bold),
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(
+                            255, 0, 0, 0)), // Customize the color
                   ),
-                  Text(subtitle, style: const TextStyle(fontSize: 12)),
+                  Text(subtitle,
+                      style: const TextStyle(
+                          fontSize: 12,
+                          color: Color.fromARGB(
+                              255, 0, 0, 0))), // Customize the color
                   const SizedBox(
                       height: 5), // Space between subtitle and "Voir plus"
 
