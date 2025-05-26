@@ -113,14 +113,14 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(Icons.arrow_back, color: TColors.textPrimary),
             onPressed: () => Navigator.pop(context),
           ),
           const SizedBox(width: 8.0),
           Text(
             widget.subCategoryName,
             style: const TextStyle(
-              color: Colors.white,
+              color: TColors.textPrimary,
               fontSize: 20.0,
               fontWeight: FontWeight.bold,
             ),
@@ -131,9 +131,13 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
   }
 
   BoxDecoration _whiteContainerDecoration() {
-    return const BoxDecoration(
-      color: TColors.lightContainer,
-      borderRadius: BorderRadius.only(
+    return BoxDecoration(
+      color: themedColor(
+        context,
+        TColors.lightContainer,
+        TColors.darkContainer,
+      ),
+      borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(20.0),
         topRight: Radius.circular(20.0),
       ),
@@ -166,7 +170,7 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
                 subCategoryDescription,
                 style: const TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Poppins',
+                  fontFamily: 'Coolvetica',
                   fontWeight: FontWeight.w500,
                   fontStyle: FontStyle.italic,
                 ),
@@ -188,7 +192,9 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.all(8.0),
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(
+                      color: TColors.primary,
+                    ),
                   ),
                 );
               }

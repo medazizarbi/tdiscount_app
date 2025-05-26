@@ -60,7 +60,8 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    icon: const Icon(Icons.arrow_back,
+                        color: TColors.textPrimary),
                     onPressed: () {
                       Navigator.pop(context);
                     },
@@ -69,7 +70,7 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
                   Text(
                     widget.categoryName,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: TColors.textPrimary,
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold,
                     ),
@@ -117,8 +118,9 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
                       // Display subcategories
                       categoryViewModel.isLoading
                           ? const Center(
-                              child:
-                                  CircularProgressIndicator(), // Show loading indicator
+                              child: CircularProgressIndicator(
+                                color: TColors.primary,
+                              ), // Show loading indicator
                             )
                           : categoryViewModel.subCategories.isEmpty
                               ? const Center(
@@ -151,8 +153,7 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
                                               BorderRadius.circular(10),
                                           boxShadow: [
                                             BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.3),
+                                              color: Colors.grey.withOpacity(1),
                                               blurRadius: 5,
                                               offset: const Offset(0, 3),
                                             ),

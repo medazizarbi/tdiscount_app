@@ -53,15 +53,14 @@ class _FavorisScreenState extends State<FavorisScreen>
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF006D77),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: TColors.primary,
         elevation: 0,
-        title: const Text("Tdiscount", style: TextStyle(color: Colors.white)),
+        title: const Text("Tdiscount", style: TextStyle(color: TColors.black)),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
+            icon: const Icon(Icons.menu, color: TColors.black),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
@@ -69,11 +68,7 @@ class _FavorisScreenState extends State<FavorisScreen>
       drawer: const CustomDrawer(),
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF006D77), Color(0xFF83C5BE)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
+          color: TColors.primary,
         ),
         child: Column(
           children: [

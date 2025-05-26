@@ -62,9 +62,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch categories when the screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<CategoryViewModel>(context, listen: false).fetchCategories();
+      final categoryViewModel =
+          Provider.of<CategoryViewModel>(context, listen: false);
+      if (categoryViewModel.categories.isEmpty &&
+          !categoryViewModel.isLoading) {
+        categoryViewModel.fetchCategories();
+      }
     });
   }
 
@@ -95,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     leading: Builder(
                       builder: (context) => IconButton(
                         icon: const Icon(Icons.menu,
-                            color: Colors.white, size: 30),
+                            color: Colors.black, size: 30),
                         onPressed: () {
                           Scaffold.of(context).openDrawer();
                         },
@@ -140,7 +144,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               const SizedBox(height: 12),
                               categoryViewModel.isLoading
                                   ? const Center(
-                                      child: CircularProgressIndicator(),
+                                      child: CircularProgressIndicator(
+                                        color: TColors.black,
+                                      ),
                                     )
                                   : SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
@@ -148,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         children: categoryViewModel.categories
                                             .map((category) => categoryItem(
                                                 category.name,
-                                                "assets/images/elec.png",
+                                                "assets/images/cat_icon.webp",
                                                 category.id,
                                                 category.count,
                                                 categoryViewModel))
@@ -277,7 +283,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black,
                                     ),
                                   ),
                                 ),
@@ -344,7 +349,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w500,
-                                        color: Colors.white,
+                                        color: TColors.black,
                                       ),
                                     ),
 
@@ -354,7 +359,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         item['showDescription']
                                             ? Icons.keyboard_arrow_up_rounded
                                             : Icons.keyboard_arrow_down_rounded,
-                                        color: Colors.white,
+                                        color: TColors.black,
                                       ),
                                       onPressed: () {
                                         setState(() {
@@ -377,7 +382,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     item['description'],
                                     style: const TextStyle(
                                       fontSize: 14,
-                                      color: Colors.white,
+                                      color: TColors.black,
                                     ),
                                   ),
                                 ),
@@ -401,8 +406,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               fontSize: 20, // Adjust the font size as needed
                               fontWeight: FontWeight
                                   .bold, // You can adjust the font weight
-                              color: Colors
-                                  .white, // You can adjust the color of the text
+                              color: TColors
+                                  .black, // You can adjust the color of the text
                             ),
                           ),
                         ),
@@ -414,8 +419,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 "Tdiscount © 2025 - Tous droits réservés | by ",
                                 style: TextStyle(
                                   fontSize: 13,
-                                  color: Color.fromARGB(255, 255, 255,
-                                      255), // Adjust the color for the non-clickable part
+                                  color: TColors
+                                      .black, // Adjust the color for the non-clickable part
                                 ),
                               ),
                               GestureDetector(
@@ -426,8 +431,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   "Trend", // The clickable word
                                   style: TextStyle(
                                     fontSize: 13,
-                                    color: Colors
-                                        .yellow, // The yellow color for "trend"
+                                    color: Color.fromARGB(255, 180, 0,
+                                        0), // The yellow color for "trend"
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),

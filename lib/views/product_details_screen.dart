@@ -54,7 +54,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        icon: const Icon(Icons.arrow_back,
+                            color: TColors.textPrimary),
                         onPressed: () {
                           Navigator.pop(context);
                         },
@@ -64,7 +65,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         child: Text(
                           "Produit Details",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: TColors.textPrimary,
                             fontSize: 20.0,
                             fontWeight: FontWeight.bold,
                           ),
@@ -76,9 +77,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
                 // White container with curved borders
                 Container(
-                  decoration: const BoxDecoration(
-                    color: TColors.lightContainer,
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    color: themedColor(
+                      context,
+                      TColors.lightContainer,
+                      TColors.darkContainer,
+                    ),
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20.0),
                       topRight: Radius.circular(20.0),
                     ),
@@ -142,7 +147,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: TColors.primary,
-                              foregroundColor: Colors.white,
+                              foregroundColor: Colors.black,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),

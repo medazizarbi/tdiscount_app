@@ -31,7 +31,7 @@ class _ProductCardState extends State<ProductCard> {
 
     return Container(
       decoration: BoxDecoration(
-        color: themedColor(context, TColors.cardlight, TColors.primary),
+        color: themedColor(context, TColors.cardlight, TColors.cardlight),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
@@ -50,7 +50,7 @@ class _ProductCardState extends State<ProductCard> {
                 borderRadius: BorderRadius.circular(15),
                 child: Image.network(
                   widget.imageUrl, // Use the fetched product's image URL
-                  width: double.infinity,
+                  width: 150,
                   height: 150,
                   fit: BoxFit.cover,
                 ),

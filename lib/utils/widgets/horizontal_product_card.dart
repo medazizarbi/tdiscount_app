@@ -1,76 +1,127 @@
 import 'package:flutter/material.dart';
-import 'package:tdiscount_app/models/product_model.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
 
 class HorizontalProductCard extends StatelessWidget {
-  final Product product;
+  final String imagePath;
+  final String productName;
+  final int quantity;
+  final double price;
+  final double? previousPrice;
+  final VoidCallback onAdd;
+  final VoidCallback onRemove;
+  final VoidCallback onDelete;
 
   const HorizontalProductCard({
     super.key,
-    required this.product,
+    required this.imagePath,
+    required this.productName,
+    required this.quantity,
+    required this.price,
+    this.previousPrice,
+    required this.onAdd,
+    required this.onRemove,
+    required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 150, // Set the width of the card
-      margin: const EdgeInsets.symmetric(horizontal: 8.0),
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: TColors.darkContainer,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: Colors.grey.shade400, // Set the border color
-          width: 1.5, // Set the border width
-        ),
+        color: themedColor(context, TColors.cardlight, TColors.carddark),
+        borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            blurRadius: 5,
-            offset: const Offset(0, 3),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Product Image
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-            child: Image.network(
-              product.imageUrls.first, // Provide a default image URL if null
-              height: 100,
-              width: double.infinity,
-              fit: BoxFit.cover,
+          Image.asset(
+            imagePath,
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+          ),
+          const SizedBox(width: 12),
+          // Name and Quantity Section
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Product Name
+                Text(
+                  productName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                // Quantity Controls
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.remove_circle_outline),
+                      onPressed: onRemove,
+                    ),
+                    Text(
+                      '$quantity',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add_circle_outline),
+                      onPressed: onAdd,
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          // Product Name
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              product.name,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
+          // Remove Button and Price Section
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // Remove Button
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: onDelete,
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(height: 4),
-          // Product Price
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              '${product.price} DT', // Display price with "DT" currency
-              style: const TextStyle(
-                fontSize: 12,
-                color: TColors.textprice,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 8),
+              // Price Row (Previous Price + Actual Price)
+              Row(
+                children: [
+                  if (previousPrice != null)
+                    Text(
+                      '\$${previousPrice!.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        decoration: TextDecoration.lineThrough,
+                        color: Colors.red,
+                      ),
+                    ),
+                  if (previousPrice != null) const SizedBox(width: 8),
+                  Text(
+                    '\$${price.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                ],
               ),
-            ),
+            ],
           ),
-          const SizedBox(height: 8),
         ],
       ),
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tdiscount_app/main.dart';
 import 'package:tdiscount_app/models/category_model.dart';
+import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/viewmodels/category_viewmodel.dart';
 import 'package:tdiscount_app/views/sub_categorie.dart';
 
@@ -22,7 +23,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
     final categories = categoryViewModel.categories;
 
     return Drawer(
-      backgroundColor: const Color(0xFF006D77), // Background color
+      backgroundColor: themedColor(context, TColors.lightContainer,
+          TColors.darkContainer), // Background color
       child: SingleChildScrollView(
         child: Column(
           children: [
@@ -37,15 +39,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   const Text(
                     "TDiscount", // Text at the top left
                     style: TextStyle(
-                      color: Colors.white,
+                      // color: Colors.white,
                       fontWeight: FontWeight.w400,
                       fontSize: 20,
                       letterSpacing: 1.2, // Letter spacing
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_outlined,
-                        color: Colors.white),
+                    icon: const Icon(
+                      Icons.arrow_back_ios_outlined,
+                      //  color: Colors.white
+                    ),
                     onPressed: () {
                       Navigator.pop(
                           context); // Close the drawer when back button is tapped
@@ -55,7 +59,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
             ),
 
-            const Divider(color: Colors.white38),
+            Divider(
+              color: themedColor(context, TColors.darkGrey, TColors.darkGrey),
+            ),
 
             // Profil utilisateur (left side image and profile)
             ListTile(
@@ -66,12 +72,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
               title: const Text(
                 "Med Aziz El Arbi",
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: const Text(
                 "Mon Profile",
-                style: TextStyle(color: Colors.white70),
+                //style: TextStyle(color: Colors.white70),
               ),
               onTap: () {
                 homePageKey.currentState
@@ -80,57 +85,58 @@ class _CustomDrawerState extends State<CustomDrawer> {
               },
             ),
 
-            const Divider(color: Colors.white38),
-
+            Divider(
+              color: themedColor(context, TColors.darkGrey, TColors.darkGrey),
+            ),
             // Dynamic Categories Section
-            ExpansionTile(
-              leading: const Icon(Icons.category, color: Colors.white),
-              title: const Text("Catégories",
-                  style: TextStyle(color: Colors.white)),
-              onExpansionChanged: (bool expanded) {
-                setState(() {
-                  isCategoriesExpanded = expanded;
-                });
-              },
-              children: [
-                if (categoryViewModel.isLoading)
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: CircularProgressIndicator(color: Colors.white),
-                  )
-                else if (categories.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text(
-                      "Aucune catégorie disponible",
-                      style: TextStyle(color: Colors.white),
+            Theme(
+              data:
+                  Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                tilePadding: const EdgeInsets.only(top: 10.0, left: 15.0),
+                leading: const Icon(Icons.category),
+                title: const Text("Catégories"),
+                onExpansionChanged: (bool expanded) {
+                  setState(() {
+                    isCategoriesExpanded = expanded;
+                  });
+                },
+                children: [
+                  if (categoryViewModel.isLoading)
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: CircularProgressIndicator(
+                          color: Color.fromARGB(255, 251, 255, 0)),
+                    )
+                  else if (categories.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Text("Aucune catégorie disponible"),
+                    )
+                  else
+                    Padding(
+                      padding: const EdgeInsets.only(left: 30.0, bottom: 10.0),
+                      child: Column(
+                        children: categories
+                            .map((category) => CategoryTile(category: category))
+                            .toList(),
+                      ),
                     ),
-                  )
-                else
-                  Padding(
-                    padding: const EdgeInsets.only(left: 32.0),
-                    child: Column(
-                      children: categories
-                          .map((category) => CategoryTile(category: category))
-                          .toList(),
-                    ),
-                  ),
-              ],
+                ],
+              ),
             ),
 
             // Coupons
             ListTile(
-              leading: const Icon(Icons.card_giftcard, color: Colors.white),
-              title:
-                  const Text("Coupons", style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.card_giftcard),
+              title: const Text("Coupons"),
               onTap: () {},
             ),
 
             // Suivi commande
             ListTile(
-              leading: const Icon(Icons.local_shipping, color: Colors.white),
-              title: const Text("Suivre votre commande",
-                  style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.local_shipping),
+              title: const Text("Suivre votre commande"),
               onTap: () {},
             ),
 
@@ -138,9 +144,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
             // Déconnexion
             ListTile(
-              leading: const Icon(Icons.logout, color: Colors.white),
-              title: const Text("Déconnexion",
-                  style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.logout),
+              title: const Text("Déconnexion"),
               onTap: () {
                 // Action de déconnexion ici
               },
@@ -167,13 +172,13 @@ class CategoryTile extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 18),
         leading: const Icon(
           Icons.arrow_circle_right_outlined,
-          color: Color.fromARGB(255, 140, 140, 140),
+          //color: Color.fromARGB(255, 140, 140, 140),
           size: 20,
         ),
         title: Text(
           category.name,
           style: const TextStyle(
-            color: Colors.white,
+            //  color: Colors.white,
             fontWeight: FontWeight.w500,
             fontSize: 14,
           ),
