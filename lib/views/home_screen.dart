@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
+import 'package:tdiscount_app/views/product_details_screen.dart';
 import 'package:tdiscount_app/views/sub_categorie.dart';
 import 'package:tdiscount_app/utils/widgets/custom_drawer.dart'; // Import the custom drawer
 import 'package:tdiscount_app/utils/widgets/carousel_widget.dart'; // Import the carousel widget
@@ -13,17 +14,12 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  HomeScreenState createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  final Color primaryColor = const Color.fromARGB(255, 251, 255, 0);
+class HomeScreenState extends State<HomeScreen> {
   Color get backgroundColor =>
       themedColor(context, TColors.lightContainer, TColors.darkContainer);
-  int _currentPage = 0; // Track the current page index
-  int? _selectedCategoryId; // Track the selected category ID
-  List<dynamic> _fetchedProducts = []; // Store fetched products
-  bool _isFetchingProducts = false; // Track loading state
 
   // List of items with title, description, and visibility control
   final List<Map<String, dynamic>> items = [
@@ -59,9 +55,28 @@ class _HomeScreenState extends State<HomeScreen> {
     },
   ];
 
+  // icons list
+  final Map<int, String> categoryIcons = {
+    347: "assets/images/white_cat_icons/tel.webp", // tel et tablettes
+    204: "assets/images/white_cat_icons/electro.webp", // electro
+    267: "assets/images/white_cat_icons/informatique.png", // informatique
+    780: "assets/images/white_cat_icons/maison.png", // maison et bricolage
+    407: "assets/images/white_cat_icons/printer.png", //impression
+    696:
+        "assets/images/white_cat_icons/vetement.webp", // vetement et accessoires
+    753: "assets/images/white_cat_icons/ordinateur.webp", // oridnateur bureau
+    401: "assets/images/white_cat_icons/autre.png", //autres categories
+
+    // Add more categoryId: imagePath pairs as needed
+  };
+
+  // Default icon path
+  final String defaultCategoryIcon = "assets/images/white_cat_icons/elec.png";
+
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final categoryViewModel =
           Provider.of<CategoryViewModel>(context, listen: false);
@@ -69,12 +84,17 @@ class _HomeScreenState extends State<HomeScreen> {
           !categoryViewModel.isLoading) {
         categoryViewModel.fetchCategories();
       }
+      if (categoryViewModel.trendingProducts.isEmpty) {
+        categoryViewModel.fetchTrendingProducts();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final categoryViewModel = Provider.of<CategoryViewModel>(context);
+    final trendingProducts =
+        Provider.of<CategoryViewModel>(context).trendingProducts;
 
     // Calculate the number of columns based on screen width
     final screenWidth = MediaQuery.of(context).size.width;
@@ -88,46 +108,68 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Expanded(
             child: Container(
-              color: primaryColor,
+              color: TColors.primary,
               child: CustomScrollView(
                 slivers: [
                   SliverAppBar(
                     backgroundColor: TColors.primary,
-                    floating: true, // Make the app bar floating
-                    pinned: false, // Keep the app bar visible when scrolling
+                    floating: true,
+                    pinned: false,
                     automaticallyImplyLeading: false,
-                    leading: Builder(
-                      builder: (context) => IconButton(
-                        icon: const Icon(Icons.menu,
-                            color: Colors.black, size: 30),
-                        onPressed: () {
-                          Scaffold.of(context).openDrawer();
-                        },
-                      ),
-                    ),
-                    flexibleSpace: FlexibleSpaceBar(
-                      title: Container(
-                        height:
-                            40, // Adjust the height to make the search field thinner
+                    toolbarHeight: 70,
+                    elevation: 0, // <-- Remove shadow
+                    shadowColor: Colors.transparent, // <-- Remove shadow color
+
+                    flexibleSpace: SafeArea(
+                      child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16), // Adjust horizontal padding
-                        child: TextField(
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: const Color.fromARGB(207, 255, 255, 255),
-                            hintText: "Chercher un produit",
-                            prefixIcon:
-                                const Icon(Icons.search, color: Colors.grey),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30),
-                              borderSide: BorderSide.none,
+                            horizontal: 8.0, vertical: 8),
+                        child: Row(
+                          children: [
+                            // Drawer button
+                            Builder(
+                              builder: (context) => IconButton(
+                                icon: const Icon(Icons.menu,
+                                    color: Colors.black, size: 30),
+                                onPressed: () {
+                                  Scaffold.of(context).openDrawer();
+                                },
+                              ),
                             ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical:
-                                  8, // Reduce vertical padding to make it thinner
-                              horizontal: 16,
+                            // Search bar (expand to fill available space)
+                            Expanded(
+                              child: Container(
+                                height: 40,
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: const Color.fromARGB(
+                                        207, 255, 255, 255),
+                                    hintText: "Chercher un produit",
+                                    prefixIcon: const Icon(Icons.search,
+                                        color: Colors.grey),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                      horizontal: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
+                            // Add image (replace with your asset path)
+                            Image.asset(
+                              "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png",
+                              width: 120,
+                              height: 60, // Increase height as needed
+                              fit: BoxFit.contain, // Show the whole logo
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -136,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     delegate: SliverChildListDelegate(
                       [
                         Container(
-                          color: primaryColor,
+                          color: TColors.primary,
                           padding: const EdgeInsets.all(1),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,7 +196,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         children: categoryViewModel.categories
                                             .map((category) => categoryItem(
                                                 category.name,
-                                                "assets/images/cat_icon.webp",
+                                                categoryIcons[category.id] ??
+                                                    defaultCategoryIcon, // Use map or default
                                                 category.id,
                                                 category.count,
                                                 categoryViewModel))
@@ -190,9 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   padding: const EdgeInsets.all(16),
                                   child: AutoScrollCarousel(
                                     onPageChanged: (index) {
-                                      setState(() {
-                                        _currentPage = index;
-                                      });
+                                      setState(() {});
                                     },
                                   ),
                                 ),
@@ -201,7 +242,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                 // ✅ "Meilleures Ventes" Section
                                 const Padding(
-                                  padding: EdgeInsets.all(16),
+                                  padding: EdgeInsets.only(
+                                      top: 8, left: 16, right: 16),
                                   child: Text(
                                     "Meilleures Ventes",
                                     style: TextStyle(
@@ -216,34 +258,67 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                 // ✅ Dynamic GridView for Products
                                 Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: GridView.builder(
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount:
-                                          crossAxisCount, // Dynamic columns
-                                      crossAxisSpacing: 15,
-                                      mainAxisSpacing: 8,
-                                      childAspectRatio:
-                                          0.75, // Adjust as needed
-                                    ),
-                                    itemCount: products.length,
-                                    itemBuilder: (context, index) {
-                                      final product = products[index];
-                                      return ProductCard(
-                                        imageUrl: product['imageUrl']!,
-                                        name: product['name']!,
-                                        price: product['price']!,
-                                        discountPercentage:
-                                            product['discountPercentage'],
-                                        regularPrice: products[index][
-                                            'regularPrice'], // Ensure this is passed
-                                      );
-                                    },
-                                  ),
+                                  padding: const EdgeInsets.only(
+                                      bottom: 16, left: 16, right: 16),
+                                  child: categoryViewModel.isLoading ||
+                                          trendingProducts.isEmpty
+                                      ? const Column(
+                                          children: [
+                                            SizedBox(
+                                                height:
+                                                    24), // Add space above the progress indicator
+                                            Center(
+                                              child: CircularProgressIndicator(
+                                                color: TColors.primary,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                                height:
+                                                    24), // Add space below the progress indicator
+                                          ],
+                                        )
+                                      : GridView.builder(
+                                          shrinkWrap: true,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount:
+                                                crossAxisCount, // Dynamic columns
+                                            crossAxisSpacing: 15,
+                                            mainAxisSpacing: 8,
+                                            childAspectRatio:
+                                                0.75, // Adjust as needed
+                                          ),
+                                          itemCount: trendingProducts.length,
+                                          itemBuilder: (context, index) {
+                                            final product =
+                                                trendingProducts[index];
+                                            return GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ProductDetailsScreen(
+                                                            product: product),
+                                                  ),
+                                                );
+                                              },
+                                              child: ProductCard(
+                                                imageUrl: product
+                                                        .imageUrls.isNotEmpty
+                                                    ? product.imageUrls.first
+                                                    : '',
+                                                name: product.name,
+                                                price: product.price,
+                                                regularPrice:
+                                                    product.regularPrice,
+                                                // Add other fields if needed
+                                              ),
+                                            );
+                                          },
+                                        ),
                                 ),
 
                                 const SizedBox(height: 8),
@@ -338,7 +413,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 8, horizontal: 16),
-                                color: primaryColor,
+                                color: TColors.primary,
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -377,7 +452,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 8, horizontal: 16),
-                                  color: primaryColor,
+                                  color: TColors.primary,
                                   child: Text(
                                     item['description'],
                                     style: const TextStyle(
@@ -495,12 +570,20 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               width: 60,
               height: 60,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
-                  image: AssetImage(imagePath),
-                  fit: BoxFit.cover,
+              decoration: const BoxDecoration(
+                color: Colors.black,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: ClipOval(
+                  child: SizedBox(
+                    width: 45, // Adjust this value for the image size
+                    height: 60,
+                    child: Image.asset(
+                      imagePath,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
               ),
             ),

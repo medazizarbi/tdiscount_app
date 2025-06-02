@@ -10,10 +10,10 @@ class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
 
   @override
-  _CustomDrawerState createState() => _CustomDrawerState();
+  CustomDrawerState createState() => CustomDrawerState();
 }
 
-class _CustomDrawerState extends State<CustomDrawer> {
+class CustomDrawerState extends State<CustomDrawer> {
   bool isCategoriesExpanded = false;
 
   @override
@@ -23,36 +23,32 @@ class _CustomDrawerState extends State<CustomDrawer> {
     final categories = categoryViewModel.categories;
 
     return Drawer(
-      backgroundColor: themedColor(context, TColors.lightContainer,
-          TColors.darkContainer), // Background color
+      backgroundColor: themedColor(
+          context, TColors.primary, TColors.darkContainer), // Background color
       child: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 20),
 
-            // Row for "Discount" text on the left and back button on the right
+            // Row for "Discount" img on the left and back button on the right
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "TDiscount", // Text at the top left
-                    style: TextStyle(
-                      // color: Colors.white,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 20,
-                      letterSpacing: 1.2, // Letter spacing
-                    ),
+                  // Use different logo for light/dark theme
+                  Image.asset(
+                    Theme.of(context).brightness == Brightness.dark
+                        ? "assets/images/tdiscount_images/Logo-Tdiscount-market-blanc.png" // White logo for dark theme
+                        : "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png", // Black logo for light theme
+                    width: 120,
+                    height: 40,
+                    fit: BoxFit.contain,
                   ),
                   IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back_ios_outlined,
-                      //  color: Colors.white
-                    ),
+                    icon: const Icon(Icons.arrow_back_ios_outlined),
                     onPressed: () {
-                      Navigator.pop(
-                          context); // Close the drawer when back button is tapped
+                      Navigator.pop(context);
                     },
                   ),
                 ],

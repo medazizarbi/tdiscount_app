@@ -56,7 +56,11 @@ class _FavorisScreenState extends State<FavorisScreen>
       appBar: AppBar(
         backgroundColor: TColors.primary,
         elevation: 0,
-        title: const Text("Tdiscount", style: TextStyle(color: TColors.black)),
+        title: Image.asset(
+          "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png", // Your logo path
+          height: 40,
+          fit: BoxFit.contain,
+        ),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(

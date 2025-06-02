@@ -11,6 +11,7 @@ class CategoryViewModel extends ChangeNotifier {
   List<Product> products = [];
   List<Category> subCategories = [];
   Map<int, List<Product>> productsBySubCategory = {};
+  List<Product> trendingProducts = [];
 
   Map<int, int> currentPageByCategory = {};
   Map<int, bool> hasMoreProductsByCategory = {};
@@ -18,7 +19,15 @@ class CategoryViewModel extends ChangeNotifier {
   late ScrollController scrollController;
   int? activeCategoryId;
 
+  Future<void> fetchTrendingProducts() async {
+    const trendingCategoryId = 1337; // best deals category ID
+    await fetchProductsBySubCategory(trendingCategoryId);
+    trendingProducts = productsBySubCategory[trendingCategoryId] ?? [];
+    notifyListeners();
+  }
+
   Future<void> fetchCategories() async {
+    print("🔄 viewmodel :  Fetching categories");
     isLoading = true;
     notifyListeners();
 
@@ -31,9 +40,7 @@ class CategoryViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchProductsByCategory(int categoryId) async {
-    print(
-        "DEBUG: categories at fetchProductsByCategory: ${categories.map((c) => '${c.id}:${c.count}').toList()}");
-
+    print("🔄 viewmodel :  Fetching products for category: $categoryId");
     if (activeCategoryId != categoryId) {
       activeCategoryId = categoryId;
       currentPageByCategory[categoryId] = 2;
@@ -60,8 +67,8 @@ class CategoryViewModel extends ChangeNotifier {
         hasMoreProductsByCategory[categoryId] = false;
         return;
       }
-      final int perPage =
-          remaining < 10 ? remaining : 10; // Fetch only what's left
+
+      const int perPage = 10;
 
       print(
           "🔄 Fetching products: category=$categoryId, page=$currentPage, per_page=$perPage");
@@ -104,7 +111,7 @@ class CategoryViewModel extends ChangeNotifier {
 
 // ✅ Log current count of products and total expected count
       print(
-          "📦 Fetched ${productsBySubCategory[categoryId]!.length} / ${category.count} products for category $categoryId");
+          "📦📦📦📦 Fetched ${productsBySubCategory[categoryId]!.length} / ${category.count} products for category $categoryId");
 
       // ✅ Check against category count
       if (productsBySubCategory[categoryId]!.length >= category.count) {

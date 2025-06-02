@@ -20,10 +20,10 @@ class ProductCard extends StatefulWidget {
   });
 
   @override
-  _ProductCardState createState() => _ProductCardState();
+  ProductCardState createState() => ProductCardState();
 }
 
-class _ProductCardState extends State<ProductCard> {
+class ProductCardState extends State<ProductCard> {
   @override
   Widget build(BuildContext context) {
     final favoritesProvider = Provider.of<FavoriteViewModel>(context);
@@ -174,6 +174,7 @@ final List<Map<String, String?>> products = [
     'name': 'TV TCL 32"',
     'price': '799',
     'regularPrice': '11.55', // Add previous price
+    'sku': 'TV-TCL-32-2025', // Add SKU
   },
   {
     'imageUrl':

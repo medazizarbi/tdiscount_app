@@ -139,7 +139,38 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               ),
                           ],
                         ),
+                        const SizedBox(height: 8), // Add some spacing
+// SKU
+                        if (product.sku != null && product.sku!.isNotEmpty)
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'SKU: ',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontStyle: FontStyle.italic,
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: product.sku,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         const SizedBox(height: 16),
+
 // Ajouter au panier button
                         SizedBox(
                           width: double.infinity,

@@ -7,6 +7,7 @@ class Product {
   final String? shortDescription;
   final List<String> imageUrls; // Store all image URLs
   final bool inStock;
+  final String? sku;
 
   Product({
     required this.id,
@@ -17,6 +18,7 @@ class Product {
     this.shortDescription,
     required this.imageUrls,
     required this.inStock,
+    this.sku,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -34,6 +36,7 @@ class Product {
               .toList() ??
           [],
       inStock: json['stock_status'] == 'instock',
+      sku: json['sku'] as String?,
     );
   }
 }

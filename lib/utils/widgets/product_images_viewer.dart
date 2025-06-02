@@ -6,10 +6,10 @@ class ProductImagesViewer extends StatefulWidget {
   const ProductImagesViewer({super.key, required this.imageUrls});
 
   @override
-  _ProductImagesViewerState createState() => _ProductImagesViewerState();
+  ProductImagesViewerState createState() => ProductImagesViewerState();
 }
 
-class _ProductImagesViewerState extends State<ProductImagesViewer> {
+class ProductImagesViewerState extends State<ProductImagesViewer> {
   late String displayedImageUrl;
 
   @override

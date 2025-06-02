@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tdiscount_app/utils/widgets/custom_drawer.dart'; // Import the CustomDrawer
 import 'package:provider/provider.dart';
 import 'package:tdiscount_app/providers/theme_provider.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
+import 'package:tdiscount_app/utils/widgets/custom_drawer.dart';
 
 class ProfilScreen extends StatefulWidget {
   const ProfilScreen({super.key});
@@ -15,27 +15,34 @@ class _ProfilScreenState extends State<ProfilScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: TColors.primary,
-        elevation: 0,
-        title: const Text("Tdiscount", style: TextStyle(color: TColors.black)),
-        centerTitle: true,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: TColors.black),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-      ),
-      drawer: const CustomDrawer(), // Use the CustomDrawer here
+      drawer: const CustomDrawer(),
       body: Container(
         decoration: const BoxDecoration(
           color: TColors.primary,
         ),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            Expanded(
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              backgroundColor: TColors.primary,
+              elevation: 0,
+              title: Image.asset(
+                "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png", // Your logo path
+                height: 40,
+                fit: BoxFit.contain,
+              ),
+              centerTitle: true,
+              leading: Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.menu, color: TColors.black),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                ),
+              ),
+              floating: false,
+              pinned: false,
+              snap: false,
+              automaticallyImplyLeading: false,
+            ),
+            SliverToBoxAdapter(
               child: Container(
                 decoration: BoxDecoration(
                   color: themedColor(
@@ -45,77 +52,182 @@ class _ProfilScreenState extends State<ProfilScreen> {
                     topRight: Radius.circular(25),
                   ),
                 ),
-                child: Column(
-                  children: [
-                    // Centered Title
-                    const Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 12.0),
-                      child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 36),
+                      // Centered Profile Email
+                      const Center(
                         child: Text(
-                          "My Profile",
+                          'Paramètres',
                           style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w400,
+                              //color: TColors.primary,
+                              fontSize: 20),
                         ),
                       ),
-                    ),
-
-                    // Theme Switch Buttons
-                    Consumer<ThemeProvider>(
-                      builder: (context, themeProvider, child) => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ChoiceChip(
-                              label: const Text('Système'),
-                              selected:
-                                  themeProvider.themeMode == ThemeMode.system,
-                              onSelected: (_) =>
-                                  themeProvider.setTheme(ThemeMode.system),
+                      const SizedBox(height: 16),
+                      const SectionTitle(title: 'Compte'),
+                      SettingTile(
+                        icon: Icons.person,
+                        title: 'Information Personnelle',
+                        subtitle: 'Modifier votre profile',
+                        onTap: () {
+                          // Handle on tap
+                        },
+                      ),
+                      SettingTile(
+                        icon: Icons.notifications,
+                        title: 'Notifications',
+                        subtitle: 'On',
+                        onTap: () {
+                          // Handle profile info tap
+                        },
+                      ),
+                      const SectionTitle(title: 'Interface'),
+                      const SettingTile(
+                        icon: Icons.color_lens,
+                        title: 'Thème',
+                        trailing: ThemeToggleSwitch(),
+                      ),
+                      SettingTile(
+                        icon: Icons.language,
+                        title: 'Language',
+                        subtitle: 'Français (FR)',
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'autre langue seront bientôt disponibles'),
+                              duration: Duration(seconds: 2),
+                              backgroundColor: Colors.grey,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(16)), // Curved borders
+                              ),
                             ),
-                            const SizedBox(width: 8),
-                            ChoiceChip(
-                              label: const Text('Clair'),
-                              selected:
-                                  themeProvider.themeMode == ThemeMode.light,
-                              onSelected: (_) =>
-                                  themeProvider.setTheme(ThemeMode.light),
-                            ),
-                            const SizedBox(width: 8),
-                            ChoiceChip(
-                              label: const Text('Sombre'),
-                              selected:
-                                  themeProvider.themeMode == ThemeMode.dark,
-                              onSelected: (_) =>
-                                  themeProvider.setTheme(ThemeMode.dark),
-                            ),
-                          ],
+                          );
+                        },
+                      ),
+                      const SectionTitle(title: 'Service'),
+                      SettingTile(
+                        icon: Icons.lock,
+                        title: 'Confidentialité & Sécurité',
+                        onTap: () {
+                          // Handle on tap
+                        },
+                      ),
+                      SettingTile(
+                        icon: Icons.help_outline,
+                        title: 'Aide',
+                        onTap: () {
+                          // Handle on tap
+                        },
+                      ),
+                      SettingTile(
+                        icon: Icons.info_outline,
+                        title: 'À propos',
+                        onTap: () {
+                          // Handle on tap
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      TextButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(Icons.logout, color: Colors.red),
+                        label: const Text(
+                          'Déconnexion',
+                          style: TextStyle(color: Colors.red),
                         ),
                       ),
-                    ),
-
-                    // Placeholder for profile content (empty for now)
-                    Expanded(
-                      child: Center(
-                        child: Text(
-                          "Profile content goes here!",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                      const SizedBox(height: 20),
+                    ],
+                  ),
                 ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class SectionTitle extends StatelessWidget {
+  final String title;
+  const SectionTitle({required this.title, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 24, bottom: 8),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+          color: Colors.grey,
+        ),
+      ),
+    );
+  }
+}
+
+class SettingTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+
+  const SettingTile({
+    super.key,
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    this.trailing,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent, // Keep background transparent
+      child: InkWell(
+        onTap: onTap,
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(vertical: 4),
+          leading: Icon(icon, color: Colors.teal),
+          title: Text(title),
+          subtitle: subtitle != null ? Text(subtitle!) : null,
+          trailing: trailing ?? const Icon(Icons.arrow_forward_ios, size: 16),
+        ),
+      ),
+    );
+  }
+}
+
+class ThemeToggleSwitch extends StatelessWidget {
+  const ThemeToggleSwitch({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    // Determine the effective brightness
+    final brightness = Theme.of(context).brightness;
+    final isLight = themeProvider.themeMode == ThemeMode.system
+        ? brightness == Brightness.light
+        : themeProvider.themeMode == ThemeMode.light;
+
+    return Switch(
+      value: isLight,
+      onChanged: (val) {
+        themeProvider.setTheme(val ? ThemeMode.light : ThemeMode.dark);
+      },
     );
   }
 }

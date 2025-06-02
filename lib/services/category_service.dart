@@ -49,7 +49,7 @@ class CategoryService {
   Future<List<Product>> fetchProductsByCategory(
       int categoryId, int page, int perPage) async {
     final String endpoint =
-        "products?category=$categoryId&page=$page&per_page=$perPage";
+        "products?category=$categoryId&page=$page&per_page=$perPage&status=publish&stock_status=instock";
     final String url = "$baseUrl$endpoint";
 
     print('⏳ [API Request] Starting to fetch products for:');
@@ -97,6 +97,7 @@ class CategoryService {
             inStock: product.inStock,
             description: cleanedDescription,
             shortDescription: cleanedShortDescription,
+            sku: product.sku,
           );
 
           return updatedProduct;

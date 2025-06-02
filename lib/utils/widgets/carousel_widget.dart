@@ -10,10 +10,10 @@ class AutoScrollCarousel extends StatefulWidget {
   });
 
   @override
-  _AutoScrollCarouselState createState() => _AutoScrollCarouselState();
+  AutoScrollCarouselState createState() => AutoScrollCarouselState();
 }
 
-class _AutoScrollCarouselState extends State<AutoScrollCarousel> {
+class AutoScrollCarouselState extends State<AutoScrollCarousel> {
   final PageController _pageController = PageController(viewportFraction: 1);
   late Timer _timer;
   int _currentPage = 0;

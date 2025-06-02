@@ -66,6 +66,10 @@ flutter:
   assets:
     - assets/images/
     - assets/fonts/
+    - assets/images/white_cat_icons/
+    - assets/images/black_cat_icons/
+    - assets/images/tdiscount_images/
+    
   fonts:
     - family: Coolvetica
       fonts:
