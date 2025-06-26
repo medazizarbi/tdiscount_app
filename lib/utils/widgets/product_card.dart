@@ -4,7 +4,8 @@ import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/viewModels/favorites_view_model.dart';
 
 class ProductCard extends StatefulWidget {
-  final String imageUrl; // Updated to match fetched product's image URL
+  final int productId; // <-- Add this line
+  final String imageUrl;
   final String name;
   final String price;
   final String? discountPercentage; // Optional discount percentage
@@ -12,6 +13,7 @@ class ProductCard extends StatefulWidget {
 
   const ProductCard({
     super.key,
+    required this.productId, // <-- Add this line
     required this.imageUrl,
     required this.name,
     required this.price,
@@ -27,7 +29,8 @@ class ProductCardState extends State<ProductCard> {
   @override
   Widget build(BuildContext context) {
     final favoritesProvider = Provider.of<FavoriteViewModel>(context);
-    bool isFavorite = favoritesProvider.isFavorite(widget.name);
+    final int productId = widget.productId; // <-- Use the real productId
+    bool isFavorite = favoritesProvider.isFavorite(productId);
 
     return Container(
       decoration: BoxDecoration(
@@ -41,125 +44,128 @@ class ProductCardState extends State<ProductCard> {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: Image.network(
-                  widget.imageUrl, // Use the fetched product's image URL
-                  width: 150,
-                  height: 150,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: IconButton(
-                  icon: Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: isFavorite
-                        ? TColors.textprice
-                        : TColors.buttonSecondary,
-                    size: 24,
-                  ),
-                  onPressed: () {
-                    favoritesProvider.toggleFavorite(widget.name);
-                  },
-                ),
-              ),
-              if (widget.discountPercentage != null)
-                Positioned(
-                  bottom: 8,
-                  left: 8,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      widget.discountPercentage!,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
           Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
+            padding: const EdgeInsets.only(top: 8.0, right: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'TND ',
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
+                // Product Image
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Image.network(
+                    widget.imageUrl,
+                    width: 150,
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                Text(
-                  widget.price,
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const Text(
+                        'TND ',
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                      Text(
+                        widget.price,
+                        style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                      if (widget.regularPrice != null &&
+                          double.tryParse(
+                                  widget.regularPrice!.replaceAll(',', '.')) !=
+                              null)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            'TND ${widget.regularPrice}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color.fromARGB(255, 109, 109, 109),
+                              decoration: TextDecoration.lineThrough,
+                              decorationColor: Colors.red,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 0.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          widget.name,
+                          style: const TextStyle(
+                              fontSize: 15,
+                              color: Color.fromARGB(255, 124, 124, 124)),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.shopping_cart,
+                          color: Colors.blue,
+                          size: 24,
+                        ),
+                        onPressed: () {
+                          // Add to cart functionality
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Heart icon at top right of the card (not just the image)
+          Positioned(
+            top: 0,
+            right: 0,
+            child: IconButton(
+              icon: Icon(
+                isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: isFavorite ? TColors.textprice : TColors.buttonSecondary,
+                size: 24,
+              ),
+              onPressed: () async {
+                await favoritesProvider.toggleFavorite(productId);
+                setState(() {}); // Refresh UI after toggling
+              },
+            ),
+          ),
+          if (widget.discountPercentage != null)
+            Positioned(
+              bottom: 8,
+              left: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  widget.discountPercentage!,
                   style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
-                if (widget.regularPrice != null &&
-                    double.tryParse(
-                            widget.regularPrice!.replaceAll(',', '.')) !=
-                        null)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Text(
-                      'TND ${widget.regularPrice}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color.fromARGB(255, 109, 109, 109),
-                        decoration: TextDecoration.lineThrough,
-                        decorationColor: Colors.red,
-                      ),
-                    ),
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
                   ),
-              ],
+                ),
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    widget.name,
-                    style: const TextStyle(
-                        fontSize: 15,
-                        color: Color.fromARGB(255, 124, 124, 124)),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.shopping_cart,
-                    color: Colors.blue,
-                    size: 24,
-                  ),
-                  onPressed: () {
-                    // Add to cart functionality
-                  },
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );

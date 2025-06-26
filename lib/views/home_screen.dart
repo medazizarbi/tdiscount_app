@@ -306,6 +306,7 @@ class HomeScreenState extends State<HomeScreen> {
                                                 );
                                               },
                                               child: ProductCard(
+                                                productId: product.id,
                                                 imageUrl: product
                                                         .imageUrls.isNotEmpty
                                                     ? product.imageUrls.first

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tdiscount_app/main.dart';
 import 'package:tdiscount_app/models/category_model.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
@@ -15,6 +16,21 @@ class CustomDrawer extends StatefulWidget {
 
 class CustomDrawerState extends State<CustomDrawer> {
   bool isCategoriesExpanded = false;
+  String displayName = "User";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDisplayName();
+  }
+
+  Future<void> _loadDisplayName() async {
+    final prefs = await SharedPreferences.getInstance();
+    final name = prefs.getString('user_display_name');
+    setState(() {
+      displayName = name != null && name.isNotEmpty ? name : "User";
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,9 +82,9 @@ class CustomDrawerState extends State<CustomDrawer> {
                     AssetImage("assets/images/logo.png"), // Profile image
                 radius: 30,
               ),
-              title: const Text(
-                "Med Aziz El Arbi",
-                style: TextStyle(fontWeight: FontWeight.bold),
+              title: Text(
+                " $displayName",
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: const Text(
                 "Mon Profile",

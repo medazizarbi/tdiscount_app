@@ -162,6 +162,7 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
       controller: _scrollController,
       child: Column(
         children: [
+          /*
           if (subCategoryDescription != null &&
               subCategoryDescription.isNotEmpty)
             Padding(
@@ -176,7 +177,7 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
                 ),
                 textAlign: TextAlign.justify,
               ),
-            ),
+            ),*/
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -215,6 +216,7 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
         ),
       ),
       child: ProductCard(
+        productId: product.id,
         imageUrl: product.imageUrls.first,
         name: product.name,
         price: product.price.toString(),

@@ -5,8 +5,8 @@ class HorizontalProductCard extends StatelessWidget {
   final String imagePath;
   final String productName;
   final int quantity;
-  final double price;
-  final double? previousPrice;
+  final String price;
+  final String? previousPrice;
   final VoidCallback onAdd;
   final VoidCallback onRemove;
   final VoidCallback onDelete;
@@ -44,83 +44,94 @@ class HorizontalProductCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Product Image
-          Image.asset(
-            imagePath,
-            width: 50,
-            height: 50,
-            fit: BoxFit.cover,
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey[200],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Image.network(
+              imagePath,
+              fit: BoxFit.cover,
+            ),
           ),
           const SizedBox(width: 12),
-          // Name and Quantity Section
+          // Details Column
           Expanded(
             flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Product Name
-                Text(
-                  productName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                // First Row: Name and Remove Button
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        productName,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: onDelete,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
-                // Quantity Controls
+                // Second Row: Quantity Controls and Prices
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.remove_circle_outline),
+                      icon: const Icon(
+                        Icons.remove_circle_outline,
+                        size: 20,
+                      ),
                       onPressed: onRemove,
                     ),
                     Text(
                       '$quantity',
-                      style: const TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 12),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.add_circle_outline),
+                      icon: const Icon(
+                        Icons.add_circle_outline,
+                        size: 20,
+                      ),
                       onPressed: onAdd,
+                    ),
+                    const SizedBox(width: 0),
+                    const Spacer(),
+                    if (previousPrice != null)
+                      Text(
+                        previousPrice!,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          decoration: TextDecoration.lineThrough,
+                          decorationColor: Colors.red,
+                          color: Colors.red,
+                        ),
+                      ),
+                    if (previousPrice != null) const SizedBox(width: 8),
+                    Text(
+                      '$price TND',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
-          ),
-          // Remove Button and Price Section
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              // Remove Button
-              IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                onPressed: onDelete,
-              ),
-              const SizedBox(height: 8),
-              // Price Row (Previous Price + Actual Price)
-              Row(
-                children: [
-                  if (previousPrice != null)
-                    Text(
-                      '\$${previousPrice!.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        decoration: TextDecoration.lineThrough,
-                        color: Colors.red,
-                      ),
-                    ),
-                  if (previousPrice != null) const SizedBox(width: 8),
-                  Text(
-                    '\$${price.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                    ),
-                  ),
-                ],
-              ),
-            ],
           ),
         ],
       ),

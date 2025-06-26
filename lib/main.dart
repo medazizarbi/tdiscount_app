@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tdiscount_app/providers/theme_provider.dart';
+import 'package:tdiscount_app/viewModels/auth_viewmodel.dart';
+import 'package:tdiscount_app/viewModels/product_viewmodel.dart';
 import 'package:tdiscount_app/viewmodels/category_viewmodel.dart';
+import 'package:tdiscount_app/views/login_screen.dart';
 import 'views/home_screen.dart';
 import 'views/recherche_screen.dart';
 import 'views/panier_screen.dart';
@@ -12,21 +16,28 @@ import 'package:tdiscount_app/viewModels/favorites_view_model.dart';
 
 final GlobalKey<_MyHomePageState> homePageKey = GlobalKey<_MyHomePageState>();
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => FavoriteViewModel()),
         ChangeNotifierProvider(create: (_) => CategoryViewModel()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => AuthViewModel()),
+        ChangeNotifierProvider(create: (_) => ProductViewModel()),
       ],
-      child: const MyApp(),
+      child: MyApp(isLoggedIn: token != null && token.isNotEmpty),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+  const MyApp({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +47,7 @@ class MyApp extends StatelessWidget {
 
       debugShowCheckedModeBanner:
           false, // Set to false to remove the debug banner
-      home: MyHomePage(key: homePageKey), // Assign the global key here
+      home: isLoggedIn ? const MyHomePage() : const LoginScreen(),
       theme: ThemeData(
         brightness: Brightness.light,
         primarySwatch: Colors.blue,

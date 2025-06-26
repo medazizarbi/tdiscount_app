@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// dont use this file directly, use the horizantal product cart instead widget in your panier_screen.dart
 class PanierProductCard extends StatelessWidget {
   final String imagePath;
   final String productName;

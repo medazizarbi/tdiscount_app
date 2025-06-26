@@ -19,6 +19,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text(
+          'Inscription',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         toolbarHeight: 30,
@@ -38,95 +47,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 40),
-
-                  // Title
-                  const Text(
-                    'Créer votre compte',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
                   const SizedBox(height: 20),
+                  Image.asset('assets/images/logo.png', height: 40),
+                  const SizedBox(height: 30),
 
-                  // Civility (Radio Buttons)
-                  // Civility (Radio Buttons)
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Civilité :',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.normal),
-                      ),
-                      const SizedBox(
-                          width: 10), // Spacing between text and radio buttons
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: RadioListTile<String>(
-                                title: const Text(
-                                  'Homme',
-                                  style: TextStyle(
-                                      fontSize: 12), // Adjust text size here
-                                ),
-                                value: 'Homme',
-                                groupValue: _selectedCivility,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedCivility = value;
-                                  });
-                                },
-                              ),
-                            ),
-                            Expanded(
-                              child: RadioListTile<String>(
-                                title: const Text(
-                                  'Femme',
-                                  style: TextStyle(
-                                      fontSize: 12), // Adjust text size here
-                                ),
-                                value: 'Femme',
-                                groupValue: _selectedCivility,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedCivility = value;
-                                  });
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-
+                  buildTextField('Nom*', Icons.person_outline_rounded),
                   const SizedBox(height: 15),
-
-                  Row(
-                    children: [
-                      Expanded(
-                          child: buildTextField(
-                              'Nom*', Icons.person_outline_rounded)),
-                      const SizedBox(width: 5), // Spacing between fields
-                      Expanded(
-                          child: buildTextField(
-                              'Prénom*', Icons.person_outline_rounded)),
-                    ],
-                  ),
-
+                  buildTextField('Prénom*', Icons.person_outline_rounded),
                   const SizedBox(height: 15),
 
                   // Email
                   buildTextField('Adresse e-mail', Icons.mail_outline),
-
-                  const SizedBox(height: 15),
-
-                  // Phone
-                  buildTextField('Numéro de téléphone*', Icons.phone_outlined),
 
                   const SizedBox(height: 15),
 
@@ -146,26 +77,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       _obscureConfirmPassword = !_obscureConfirmPassword;
                     });
                   }),
-
-                  const SizedBox(height: 15),
-
-                  // Address
-                  buildTextField('Adresse*', Icons.location_on_outlined),
-
-                  const SizedBox(height: 15),
-
-                  // City Fields (Ville & Code Postal in the same line)
-                  Row(
-                    children: [
-                      Expanded(
-                          child: buildTextField(
-                              'Ville*', Icons.location_city_outlined)),
-                      const SizedBox(width: 5), // Spacing between fields
-                      Expanded(
-                          child: buildTextField('Code Postal*',
-                              Icons.local_post_office_outlined)),
-                    ],
-                  ),
 
                   const SizedBox(height: 15),
 
@@ -220,7 +131,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
-                            const Color.fromARGB(255, 15, 112, 123),
+                            Colors.yellow, // Use your primary color
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         textStyle: const TextStyle(fontSize: 18),
                         shape: RoundedRectangleBorder(
@@ -229,7 +140,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       child: const Text('Continuer',
                           style: TextStyle(
-                              color: Color.fromARGB(255, 255, 255, 255),
+                              color: Colors.black,
                               fontWeight: FontWeight.bold)),
                     ),
                   ),

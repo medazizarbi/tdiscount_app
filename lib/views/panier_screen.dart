@@ -1,35 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/utils/widgets/custom_drawer.dart';
 import 'package:tdiscount_app/utils/widgets/horizontal_product_card.dart';
-
-class PanierProductCard extends StatelessWidget {
-  final String imagePath;
-  final String productName;
-  final int quantity;
-  final double price;
-  final double? previousPrice; // Optional previous price
-  final VoidCallback onAdd;
-  final VoidCallback onRemove;
-  final VoidCallback onDelete;
-
-  const PanierProductCard({
-    super.key,
-    required this.imagePath,
-    required this.productName,
-    required this.quantity,
-    required this.price,
-    this.previousPrice,
-    required this.onAdd,
-    required this.onRemove,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    throw UnimplementedError();
-  }
-}
+import 'package:tdiscount_app/viewModels/product_viewmodel.dart';
 
 class PanierScreen extends StatefulWidget {
   const PanierScreen({super.key});
@@ -43,27 +17,16 @@ class _PanierScreenState extends State<PanierScreen>
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
 
-  // Simulated cart data
-  final List<Map<String, dynamic>> cartItems = [
-    {
-      'imagePath': 'assets/images/produit1.jpg',
-      'productName': 'Product 1 iehg rh hui  hui hui hui hui hui hui hui hui',
-      'quantity': 2,
-      'price': 20.0,
-      'previousPrice': 25.0,
-    },
-    {
-      'imagePath': 'assets/images/prod2.jpg',
-      'productName': 'Product 2  hui  hui hui hui hui hui hui hui hui ',
-      'quantity': 1,
-      'price': 15.0,
-      'previousPrice': null,
-    },
-  ];
-
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final productViewModel =
+          Provider.of<ProductViewModel>(context, listen: false);
+      productViewModel.fetchAllCartProducts();
+    });
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
@@ -85,7 +48,12 @@ class _PanierScreenState extends State<PanierScreen>
 
   @override
   Widget build(BuildContext context) {
-    if (cartItems.isEmpty) {
+    final productViewModel = Provider.of<ProductViewModel>(context);
+
+    final cartProducts = productViewModel.cartProducts;
+    final isLoading = productViewModel.isLoading;
+
+    if (cartProducts.isEmpty) {
       _controller.forward();
     }
 
@@ -94,7 +62,7 @@ class _PanierScreenState extends State<PanierScreen>
         backgroundColor: TColors.primary,
         elevation: 0,
         title: Image.asset(
-          "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png", // Your logo path
+          "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png",
           height: 40,
           fit: BoxFit.contain,
         ),
@@ -124,63 +92,63 @@ class _PanierScreenState extends State<PanierScreen>
                     topRight: Radius.circular(25),
                   ),
                 ),
-                child: cartItems.isEmpty
-                    ? SlideTransition(
-                        position: _offsetAnimation,
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.shopping_cart_outlined,
-                                  size: 80,
-                                  color: themedColor(
-                                      context,
-                                      TColors.textPrimary,
-                                      TColors.textSecondary)),
-                              const SizedBox(height: 16),
-                              Text(
-                                "Votre panier est vide.",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    color: themedColor(
-                                        context,
-                                        TColors.textPrimary,
-                                        TColors.textSecondary)),
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : cartProducts.isEmpty
+                        ? SlideTransition(
+                            position: _offsetAnimation,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.shopping_cart_outlined,
+                                      size: 80,
+                                      color: themedColor(
+                                          context,
+                                          TColors.textPrimary,
+                                          TColors.textSecondary)),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    "Votre panier est vide.",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: themedColor(
+                                            context,
+                                            TColors.textPrimary,
+                                            TColors.textSecondary)),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: cartProducts.length,
+                            itemBuilder: (context, index) {
+                              final product = cartProducts[index];
+                              return HorizontalProductCard(
+                                imagePath: product.imageUrls.isNotEmpty
+                                    ? product.imageUrls.first
+                                    : 'assets/images/placeholder.png',
+                                productName: product.name,
+                                quantity: 1,
+                                price: product.price,
+                                previousPrice: product.regularPrice,
+                                onAdd: () {},
+                                onRemove: () {},
+                                onDelete: () async {
+                                  await productViewModel
+                                      .removeProductIdFromCart(product.id);
+                                  // Optionally, show a snackbar
+                                  // ignore: use_build_context_synchronously
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            '${product.name} retiré du panier.')),
+                                  );
+                                },
+                              );
+                            },
                           ),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: cartItems.length,
-                        itemBuilder: (context, index) {
-                          final item = cartItems[index];
-                          return HorizontalProductCard(
-                            imagePath: item['imagePath'],
-                            productName: item['productName'],
-                            quantity: item['quantity'],
-                            price: item['price'],
-                            previousPrice: item['previousPrice'],
-                            onAdd: () {
-                              setState(() {
-                                item['quantity']++;
-                              });
-                            },
-                            onRemove: () {
-                              setState(() {
-                                if (item['quantity'] > 1) {
-                                  item['quantity']--;
-                                }
-                              });
-                            },
-                            onDelete: () {
-                              setState(() {
-                                cartItems.removeAt(index);
-                              });
-                            },
-                          );
-                        },
-                      ),
               ),
             ),
           ],

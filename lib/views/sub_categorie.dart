@@ -220,6 +220,7 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
                                                       width:
                                                           200, // Set a fixed width for each ProductCard
                                                       child: ProductCard(
+                                                        productId: product.id,
                                                         imageUrl: product
                                                             .imageUrls.first,
                                                         name: product.name,

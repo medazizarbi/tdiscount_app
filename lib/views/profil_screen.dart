@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:tdiscount_app/providers/theme_provider.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/utils/widgets/custom_drawer.dart';
+import 'package:tdiscount_app/viewModels/auth_viewmodel.dart';
+import 'package:tdiscount_app/views/login_screen.dart';
 
 class ProfilScreen extends StatefulWidget {
   const ProfilScreen({super.key});
@@ -136,7 +138,40 @@ class _ProfilScreenState extends State<ProfilScreen> {
                       ),
                       const SizedBox(height: 20),
                       TextButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Déconnexion'),
+                              content: const Text(
+                                  'Voulez-vous vraiment vous déconnecter ?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(), // Cancel
+                                  child: const Text('Annuler'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    Navigator.of(context).pop(); // Close dialog
+                                    // Call logout from the viewmodel
+                                    await Provider.of<AuthViewModel>(context,
+                                            listen: false)
+                                        .logout();
+                                    // Navigate to login screen and remove all previous routes
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (_) => const LoginScreen()),
+                                      (route) => false,
+                                    );
+                                  },
+                                  child: const Text('Déconnexion',
+                                      style: TextStyle(color: Colors.red)),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                         icon: const Icon(Icons.logout, color: Colors.red),
                         label: const Text(
                           'Déconnexion',

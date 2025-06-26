@@ -4,6 +4,7 @@ import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/viewModels/favorites_view_model.dart';
 import 'package:tdiscount_app/utils/widgets/custom_drawer.dart';
 import 'package:tdiscount_app/utils/widgets/product_card.dart';
+import 'package:tdiscount_app/views/product_details_screen.dart';
 
 class FavorisScreen extends StatefulWidget {
   const FavorisScreen({super.key});
@@ -31,6 +32,11 @@ class _FavorisScreenState extends State<FavorisScreen>
       parent: _controller,
       curve: Curves.easeInOut,
     ));
+
+    // Fix: Delay loadFavorites until after build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<FavoriteViewModel>(context, listen: false).loadFavorites();
+    });
   }
 
   @override
@@ -42,22 +48,15 @@ class _FavorisScreenState extends State<FavorisScreen>
   @override
   Widget build(BuildContext context) {
     final favoritesProvider = Provider.of<FavoriteViewModel>(context);
-
-    // Filtrer les produits favoris à afficher
-    final favoriteProducts = products.where((product) {
-      return favoritesProvider.isFavorite(product['name']!);
-    }).toList();
-
-    if (favoriteProducts.isEmpty) {
-      _controller.forward();
-    }
+    final favoriteProducts = favoritesProvider.favoriteProducts;
+    final isLoading = favoritesProvider.isLoading;
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: TColors.primary,
         elevation: 0,
         title: Image.asset(
-          "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png", // Your logo path
+          "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png",
           height: 40,
           fit: BoxFit.contain,
         ),
@@ -107,9 +106,11 @@ class _FavorisScreenState extends State<FavorisScreen>
                         ],
                       ),
                     ),
-
-                    // If no favorites
-                    if (favoriteProducts.isEmpty)
+                    if (isLoading)
+                      const Expanded(
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (favoriteProducts.isEmpty)
                       Expanded(
                         child: SlideTransition(
                           position: _offsetAnimation,
@@ -148,17 +149,26 @@ class _FavorisScreenState extends State<FavorisScreen>
                             ),
                             itemBuilder: (context, index) {
                               final product = favoriteProducts[index];
-                              return AnimatedOpacity(
-                                opacity: 1.0,
-                                duration: Duration(
-                                    milliseconds: 300 +
-                                        (index * 100)), // Staggered animation
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ProductDetailsScreen(
+                                              product: product),
+                                    ),
+                                  );
+                                },
                                 child: ProductCard(
-                                  imageUrl: product['imagePath']!,
-                                  name: product['name']!,
-                                  price: product['price']!,
-                                  discountPercentage: product['discount'],
-                                  regularPrice: product['previousPrice'],
+                                  productId: product.id,
+                                  imageUrl: product.imageUrls.isNotEmpty
+                                      ? product.imageUrls.first
+                                      : 'assets/images/placeholder.png',
+                                  name: product.name,
+                                  price: product.price.toString(),
+                                  //discountPercentage: product.discountPercentage,
+                                  regularPrice: product.regularPrice,
                                 ),
                               );
                             },

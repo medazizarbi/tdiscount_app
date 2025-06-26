@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // Import Provider package
+import 'package:tdiscount_app/main.dart';
+import 'package:tdiscount_app/viewModels/auth_viewmodel.dart';
 import 'package:tdiscount_app/views/sign_up_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -11,27 +14,32 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  bool _obscurePassword = true; // For password visibility toggle
+  bool _obscurePassword = true;
+
+  // Add controllers
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final authViewModel = Provider.of<AuthViewModel>(context);
+
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context); // Handle back button press
-          },
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Center(
-          // Center all content within the body
-          child: SingleChildScrollView(
-            // Prevent overflow for smaller screens
+        body: Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Center(
+        // Center all content within the body
+        child: SingleChildScrollView(
+          // Prevent overflow for smaller screens
+          child: Form(
+            key: _formKey, // <-- Add the form key here
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -41,14 +49,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 40),
 
-                // Email Textfield
+                // Username Textfield
                 SizedBox(
                   width: 320,
                   height: 50,
                   child: TextFormField(
+                    controller: _usernameController, // <-- Add controller
                     decoration: InputDecoration(
-                      labelText: 'Adresse e-mail*',
-                      prefixIcon: const Icon(Icons.mail_outline),
+                      labelText: 'Nom d\'utilisateur*',
+                      prefixIcon: const Icon(Icons.person_outline),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(
                             12), // Rounded corners for the text field
@@ -56,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Veuillez entrer votre adresse e-mail';
+                        return 'Veuillez entrer votre nom d\'utilisateur';
                       }
                       return null;
                     },
@@ -70,6 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 320,
                   height: 50,
                   child: TextFormField(
+                    controller: _passwordController, // <-- Add controller
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       labelText: 'Mot de Passe*',
@@ -104,9 +114,30 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   width: 320, // Adjust width to match the text fields
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState?.validate() ?? false) {
-                        // Handle login
+                        final username = _usernameController.text.trim();
+                        final password = _passwordController.text;
+
+                        final success =
+                            await authViewModel.login(username, password);
+                        if (!mounted) return; // <-- Add this line
+
+                        if (success) {
+                          // Navigate to home screen and remove login from stack
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                                builder: (_) => const MyHomePage()),
+                          );
+                        } else {
+                          // Show error message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Verifiez vos identifiants'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -172,6 +203,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-    );
+    ));
   }
 }

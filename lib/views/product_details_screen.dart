@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/models/product_model.dart';
 import 'package:tdiscount_app/utils/widgets/product_images_viewer.dart';
+import 'package:tdiscount_app/viewModels/product_viewmodel.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final Product product;
@@ -21,6 +23,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
+    final productViewModel =
+        Provider.of<ProductViewModel>(context, listen: false);
 
     String? formattedShortDescription;
     if (product.shortDescription != null &&
@@ -184,11 +188,20 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               ),
                               padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
-                            onPressed: () {
+                            onPressed: () async {
+                              final added = await productViewModel
+                                  .addProductIdToCart(widget.product.id);
+
+                              if (!mounted) return;
+
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content:
-                                        Text('Produit ajouté au panier !')),
+                                SnackBar(
+                                  content: Text(
+                                    added
+                                        ? '${product.name} ajouté au panier !'
+                                        : 'Ce produit est déjà dans le panier.',
+                                  ),
+                                ),
                               );
                             },
                             child: const Text(
