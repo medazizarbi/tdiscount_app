@@ -10,6 +10,9 @@ class ProductViewModel extends ChangeNotifier {
   Product? product; // Single product
   List<Product> cartProducts = []; // Store all fetched cart products
 
+  // Add this map to track quantities
+  Map<int, int> cartQuantities = {};
+
   Future<void> fetchProductById(int productId) async {
     isLoading = true;
     notifyListeners();
@@ -24,6 +27,7 @@ class ProductViewModel extends ChangeNotifier {
     }
   }
 
+  // Call this when you add a product (default quantity = 1)
   Future<bool> addProductIdToCart(int productId) async {
     isLoading = true;
     notifyListeners();
@@ -35,16 +39,19 @@ class ProductViewModel extends ChangeNotifier {
     if (!cartIds.contains(productId.toString())) {
       cartIds.add(productId.toString());
       await prefs.setStringList('cart_product_ids', cartIds);
-      print('Product $productId added to cart.');
-      added = true; // Newly added
-    } else {
-      print('Product $productId is already in the cart.');
-      added = false; // Already in cart
+      cartQuantities[productId] = 1; // default quantity
+      added = true;
     }
-
     isLoading = false;
     notifyListeners();
     return added;
+  }
+
+  // Call this when you increment/decrement quantity
+  void updateProductQuantity(int productId, int quantity) {
+    if (quantity < 1) return;
+    cartQuantities[productId] = quantity;
+    notifyListeners();
   }
 
   Future<void> fetchAllCartProducts() async {
@@ -70,6 +77,7 @@ class ProductViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Remove quantity when removing product
   Future<void> removeProductIdFromCart(int productId) async {
     isLoading = true;
     notifyListeners();
@@ -79,14 +87,33 @@ class ProductViewModel extends ChangeNotifier {
     if (cartIds.contains(productId.toString())) {
       cartIds.remove(productId.toString());
       await prefs.setStringList('cart_product_ids', cartIds);
-      print('Product $productId removed from cart.');
-      // Optionally, remove from cartProducts as well
       cartProducts.removeWhere((prod) => prod.id == productId);
-    } else {
-      print('Product $productId is not in the cart.');
+      cartQuantities.remove(productId);
     }
-
     isLoading = false;
     notifyListeners();
+  }
+
+  // --- Add these getters for UI binding ---
+  double get totalPrice {
+    double total = 0;
+    for (final product in cartProducts) {
+      final qty = cartQuantities[product.id] ?? 1;
+      total += (double.tryParse(product.price) ?? 0) * qty;
+    }
+    return total;
+  }
+
+  double get totalEconomy {
+    double economy = 0;
+    for (final product in cartProducts) {
+      final qty = cartQuantities[product.id] ?? 1;
+      final prev = double.tryParse(product.regularPrice ?? '0') ?? 0;
+      final now = double.tryParse(product.price) ?? 0;
+      if (prev > now) {
+        economy += (prev - now) * qty;
+      }
+    }
+    return economy;
   }
 }

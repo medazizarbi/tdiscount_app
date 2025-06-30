@@ -51,6 +51,13 @@ class _FavorisScreenState extends State<FavorisScreen>
     final favoriteProducts = favoritesProvider.favoriteProducts;
     final isLoading = favoritesProvider.isLoading;
 
+    // Start or reset animation based on empty state
+    if (!isLoading && favoriteProducts.isEmpty) {
+      _controller.forward();
+    } else {
+      _controller.reset();
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: TColors.primary,
@@ -73,11 +80,11 @@ class _FavorisScreenState extends State<FavorisScreen>
         decoration: const BoxDecoration(
           color: TColors.primary,
         ),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            Expanded(
-              child: Container(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Container(
                 decoration: BoxDecoration(
                   color: themedColor(
                       context, TColors.lightContainer, TColors.darkContainer),
@@ -88,7 +95,7 @@ class _FavorisScreenState extends State<FavorisScreen>
                 ),
                 child: Column(
                   children: [
-                    // Back Button & Title Row
+                    //  Title
                     const Padding(
                       padding: EdgeInsets.symmetric(
                           horizontal: 16.0, vertical: 12.0),
@@ -107,79 +114,90 @@ class _FavorisScreenState extends State<FavorisScreen>
                       ),
                     ),
                     if (isLoading)
-                      const Expanded(
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 40),
                         child: Center(child: CircularProgressIndicator()),
                       )
                     else if (favoriteProducts.isEmpty)
-                      Expanded(
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 100),
                         child: SlideTransition(
                           position: _offsetAnimation,
-                          child: const Center(
+                          child: Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.favorite_border,
-                                    size: 80,
-                                    color: Color.fromARGB(137, 62, 62, 62)),
-                                SizedBox(height: 16),
+                                Icon(
+                                  Icons.favorite_border,
+                                  size: 80,
+                                  color: themedColor(
+                                    context,
+                                    TColors.textPrimary,
+                                    TColors.textSecondary,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
                                 Text(
-                                  "Aucun produit en favori.",
+                                  "Aucun produit en favori !",
                                   style: TextStyle(
                                       fontSize: 18,
-                                      color: Color.fromARGB(137, 62, 62, 62)),
+                                      color: themedColor(
+                                          context,
+                                          TColors.textPrimary,
+                                          TColors.textSecondary)),
                                 ),
+                                const SizedBox(height: 300),
                               ],
                             ),
                           ),
                         ),
                       )
                     else
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 12.0),
-                          child: GridView.builder(
-                            itemCount: favoriteProducts.length,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                              childAspectRatio: 0.7,
-                            ),
-                            itemBuilder: (context, index) {
-                              final product = favoriteProducts[index];
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          ProductDetailsScreen(
-                                              product: product),
-                                    ),
-                                  );
-                                },
-                                child: ProductCard(
-                                  productId: product.id,
-                                  imageUrl: product.imageUrls.isNotEmpty
-                                      ? product.imageUrls.first
-                                      : 'assets/images/placeholder.png',
-                                  name: product.name,
-                                  price: product.price.toString(),
-                                  //discountPercentage: product.discountPercentage,
-                                  regularPrice: product.regularPrice,
-                                ),
-                              );
-                            },
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 12.0),
+                        child: GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: favoriteProducts.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.7,
                           ),
+                          itemBuilder: (context, index) {
+                            final product = favoriteProducts[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ProductDetailsScreen(product: product),
+                                  ),
+                                );
+                              },
+                              child: ProductCard(
+                                productId: product.id,
+                                imageUrl: product.imageUrls.isNotEmpty
+                                    ? product.imageUrls.first
+                                    : 'assets/images/placeholder.png',
+                                name: product.name,
+                                price: product.price.toString(),
+                                //discountPercentage: product.discountPercentage,
+                                regularPrice: product.regularPrice,
+                              ),
+                            );
+                          },
                         ),
                       ),
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

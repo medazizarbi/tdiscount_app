@@ -1,27 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
 
-class HorizontalProductCard extends StatelessWidget {
+class HorizontalProductCard extends StatefulWidget {
   final String imagePath;
   final String productName;
-  final int quantity;
   final String price;
   final String? previousPrice;
-  final VoidCallback onAdd;
-  final VoidCallback onRemove;
   final VoidCallback onDelete;
 
   const HorizontalProductCard({
     super.key,
     required this.imagePath,
     required this.productName,
-    required this.quantity,
     required this.price,
     this.previousPrice,
-    required this.onAdd,
-    required this.onRemove,
     required this.onDelete,
   });
+
+  @override
+  State<HorizontalProductCard> createState() => _HorizontalProductCardState();
+}
+
+class _HorizontalProductCardState extends State<HorizontalProductCard> {
+  int quantity = 1;
+
+  void _increment() {
+    setState(() {
+      quantity += 1;
+    });
+  }
+
+  void _decrement() {
+    setState(() {
+      if (quantity > 1) quantity -= 1;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +66,7 @@ class HorizontalProductCard extends StatelessWidget {
             ),
             clipBehavior: Clip.antiAlias,
             child: Image.network(
-              imagePath,
+              widget.imagePath,
               fit: BoxFit.cover,
             ),
           ),
@@ -70,7 +83,7 @@ class HorizontalProductCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        productName,
+                        widget.productName,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -81,7 +94,7 @@ class HorizontalProductCard extends StatelessWidget {
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: onDelete,
+                      onPressed: widget.onDelete,
                     ),
                   ],
                 ),
@@ -94,7 +107,7 @@ class HorizontalProductCard extends StatelessWidget {
                         Icons.remove_circle_outline,
                         size: 20,
                       ),
-                      onPressed: onRemove,
+                      onPressed: _decrement,
                     ),
                     Text(
                       '$quantity',
@@ -105,13 +118,13 @@ class HorizontalProductCard extends StatelessWidget {
                         Icons.add_circle_outline,
                         size: 20,
                       ),
-                      onPressed: onAdd,
+                      onPressed: _increment,
                     ),
                     const SizedBox(width: 0),
                     const Spacer(),
-                    if (previousPrice != null)
+                    if (widget.previousPrice != null)
                       Text(
-                        previousPrice!,
+                        widget.previousPrice!,
                         style: const TextStyle(
                           fontSize: 14,
                           decoration: TextDecoration.lineThrough,
@@ -119,9 +132,9 @@ class HorizontalProductCard extends StatelessWidget {
                           color: Colors.red,
                         ),
                       ),
-                    if (previousPrice != null) const SizedBox(width: 8),
+                    if (widget.previousPrice != null) const SizedBox(width: 8),
                     Text(
-                      '$price TND',
+                      '${widget.price} TND',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
