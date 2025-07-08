@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tdiscount_app/providers/theme_provider.dart';
 import 'package:tdiscount_app/viewModels/auth_viewmodel.dart';
+import 'package:tdiscount_app/viewModels/order_viewmodel.dart';
 import 'package:tdiscount_app/viewModels/product_viewmodel.dart';
 import 'package:tdiscount_app/viewmodels/category_viewmodel.dart';
 import 'package:tdiscount_app/views/login_screen.dart';
@@ -29,6 +30,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
         ChangeNotifierProvider(create: (_) => ProductViewModel()),
+        ChangeNotifierProvider(create: (_) => OrderViewModel()),
       ],
       child: MyApp(isLoggedIn: token != null && token.isNotEmpty),
     ),

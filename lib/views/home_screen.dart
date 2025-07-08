@@ -73,6 +73,9 @@ class HomeScreenState extends State<HomeScreen> {
   // Default icon path
   final String defaultCategoryIcon = "assets/images/white_cat_icons/elec.png";
 
+  bool isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -103,7 +106,7 @@ class HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: null,
-      drawer: const CustomDrawer(), // Replace with your custom drawer
+      drawer: const CustomDrawer(),
       body: Column(
         children: [
           Expanded(
@@ -117,9 +120,8 @@ class HomeScreenState extends State<HomeScreen> {
                     pinned: false,
                     automaticallyImplyLeading: false,
                     toolbarHeight: 70,
-                    elevation: 0, // <-- Remove shadow
-                    shadowColor: Colors.transparent, // <-- Remove shadow color
-
+                    elevation: 0,
+                    shadowColor: Colors.transparent,
                     flexibleSpace: SafeArea(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -138,37 +140,66 @@ class HomeScreenState extends State<HomeScreen> {
                             ),
                             // Search bar (expand to fill available space)
                             Expanded(
-                              child: Container(
-                                height: 40,
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: const Color.fromARGB(
-                                        207, 255, 255, 255),
-                                    hintText: "Chercher un produit",
-                                    prefixIcon: const Icon(Icons.search,
-                                        color: Colors.grey),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                      borderSide: BorderSide.none,
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                                width: isSearching ? double.infinity : null,
+                                child: Focus(
+                                  onFocusChange: (hasFocus) {
+                                    setState(() {
+                                      isSearching = hasFocus;
+                                    });
+                                  },
+                                  child: TextField(
+                                    controller: _searchController,
+                                    decoration: InputDecoration(
+                                      filled: true,
+                                      fillColor: const Color.fromARGB(
+                                          207, 255, 255, 255),
+                                      hintText: "Chercher un produit",
+                                      prefixIcon: const Icon(Icons.search,
+                                          color: Colors.grey),
+                                      suffixIcon: isSearching
+                                          ? IconButton(
+                                              icon: const Icon(Icons.close,
+                                                  color: Colors.grey),
+                                              onPressed: () {
+                                                _searchController.clear();
+                                                FocusScope.of(context)
+                                                    .unfocus();
+                                                setState(() {
+                                                  isSearching = false;
+                                                });
+                                              },
+                                            )
+                                          : null,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        vertical: 8,
+                                        horizontal: 16,
+                                      ),
                                     ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 8,
-                                      horizontal: 16,
-                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        isSearching = true;
+                                      });
+                                    },
                                   ),
                                 ),
                               ),
                             ),
-                            // Add image (replace with your asset path)
-                            Image.asset(
-                              "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png",
-                              width: 120,
-                              height: 60, // Increase height as needed
-                              fit: BoxFit.contain, // Show the whole logo
-                            ),
+                            // Logo (hide when searching)
+                            if (!isSearching)
+                              Image.asset(
+                                "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png",
+                                width: 120,
+                                height: 60,
+                                fit: BoxFit.contain,
+                              ),
                           ],
                         ),
                       ),

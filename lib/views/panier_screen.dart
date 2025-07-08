@@ -4,6 +4,7 @@ import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/utils/widgets/custom_drawer.dart';
 import 'package:tdiscount_app/utils/widgets/horizontal_product_card.dart';
 import 'package:tdiscount_app/viewModels/product_viewmodel.dart';
+import 'package:tdiscount_app/views/order_info_screen.dart';
 
 class PanierScreen extends StatefulWidget {
   const PanierScreen({super.key});
@@ -117,8 +118,10 @@ class _PanierScreenState extends State<PanierScreen>
                       ),
                       if (isLoading)
                         const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 40),
-                          child: Center(child: CircularProgressIndicator()),
+                          padding: EdgeInsets.symmetric(vertical: 250),
+                          child: Center(
+                              child: CircularProgressIndicator(
+                                  color: TColors.primary)),
                         )
                       else if (cartProducts.isEmpty)
                         Padding(
@@ -165,6 +168,13 @@ class _PanierScreenState extends State<PanierScreen>
                               productName: product.name,
                               price: product.price,
                               previousPrice: product.regularPrice,
+                              quantity:
+                                  productViewModel.cartQuantities[product.id] ??
+                                      1,
+                              onQuantityChanged: (newQty) {
+                                productViewModel.updateProductQuantity(
+                                    product.id, newQty);
+                              },
                               onDelete: () async {
                                 await productViewModel
                                     .removeProductIdFromCart(product.id);
@@ -272,7 +282,17 @@ class _PanierScreenState extends State<PanierScreen>
                                         vertical: 14),
                                   ),
                                   onPressed: () {
-                                    // TODO: Add your order completion logic here
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => OrderInfoScreen(
+                                          products:
+                                              productViewModel.cartProducts,
+                                          quantities: Map<int, int>.from(
+                                              productViewModel.cartQuantities),
+                                        ),
+                                      ),
+                                    );
                                   },
                                   child: const Text(
                                     'Completer votre commande',

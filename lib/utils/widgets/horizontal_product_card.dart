@@ -6,6 +6,8 @@ class HorizontalProductCard extends StatefulWidget {
   final String productName;
   final String price;
   final String? previousPrice;
+  final int quantity;
+  final ValueChanged<int> onQuantityChanged;
   final VoidCallback onDelete;
 
   const HorizontalProductCard({
@@ -14,6 +16,8 @@ class HorizontalProductCard extends StatefulWidget {
     required this.productName,
     required this.price,
     this.previousPrice,
+    required this.quantity,
+    required this.onQuantityChanged,
     required this.onDelete,
   });
 
@@ -22,18 +26,36 @@ class HorizontalProductCard extends StatefulWidget {
 }
 
 class _HorizontalProductCardState extends State<HorizontalProductCard> {
-  int quantity = 1;
+  late int quantity;
+
+  @override
+  void initState() {
+    super.initState();
+    quantity = widget.quantity;
+  }
+
+  @override
+  void didUpdateWidget(covariant HorizontalProductCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.quantity != quantity) {
+      quantity = widget.quantity;
+    }
+  }
 
   void _increment() {
     setState(() {
       quantity += 1;
     });
+    widget.onQuantityChanged(quantity);
   }
 
   void _decrement() {
-    setState(() {
-      if (quantity > 1) quantity -= 1;
-    });
+    if (quantity > 1) {
+      setState(() {
+        quantity -= 1;
+      });
+      widget.onQuantityChanged(quantity);
+    }
   }
 
   @override
@@ -111,7 +133,7 @@ class _HorizontalProductCardState extends State<HorizontalProductCard> {
                     ),
                     Text(
                       '$quantity',
-                      style: const TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 13),
                     ),
                     IconButton(
                       icon: const Icon(

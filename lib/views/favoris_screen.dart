@@ -115,8 +115,10 @@ class _FavorisScreenState extends State<FavorisScreen>
                     ),
                     if (isLoading)
                       const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 40),
-                        child: Center(child: CircularProgressIndicator()),
+                        padding: EdgeInsets.symmetric(vertical: 250),
+                        child: Center(
+                            child: CircularProgressIndicator(
+                                color: TColors.primary)),
                       )
                     else if (favoriteProducts.isEmpty)
                       Padding(
