@@ -13,11 +13,93 @@ class CategoryViewModel extends ChangeNotifier {
   Map<int, List<Product>> productsBySubCategory = {};
   List<Product> trendingProducts = [];
 
+  // Add this persistent list to store category names for filters
+  List<String> categoryNamesForFilter = [];
+
   Map<int, int> currentPageByCategory = {};
   Map<int, bool> hasMoreProductsByCategory = {};
 
   late ScrollController scrollController;
   int? activeCategoryId;
+
+  // Modified method to populate and return the filter categories
+  List<String> getCategoriesForFilter() {
+    final Set<String> categoryNames = <String>{};
+
+    // Add main categories
+    for (var category in categories) {
+      categoryNames.add(category.name);
+    }
+
+    // Add subcategories
+    for (var subCategory in subCategories) {
+      categoryNames.add(subCategory.name);
+    }
+
+    // Convert to sorted list and store it
+    categoryNamesForFilter = categoryNames.toList()..sort();
+
+    // Debug print to check if data is available
+    print(
+        "📋 getCategoriesForFilter: Found ${categories.length} categories and ${subCategories.length} subcategories");
+    print(
+        "📋 Returning ${categoryNamesForFilter.length} category names: $categoryNamesForFilter");
+
+    return categoryNamesForFilter;
+  }
+
+  // Add this method to be called in initState
+  void initializeCategoryNamesForFilter() {
+    if (categories.isNotEmpty) {
+      getCategoriesForFilter();
+      print(
+          "📋 Initialized category names for filter: ${categoryNamesForFilter.length} items");
+    } else {
+      print("📋 Categories list is empty, cannot initialize filter names yet");
+    }
+  }
+
+  // Add this async version that ensures data is fetched
+  Future<List<String>> getCategoriesForFilterAsync() async {
+    // Fetch categories if empty
+    if (categories.isEmpty) {
+      print("📋 Categories list is empty, fetching...");
+      await fetchCategories();
+    }
+
+    // Return the filtered categories
+    return getCategoriesForFilter();
+  }
+
+  // Alternative: Auto-fetch version
+  List<String> getCategoriesForFilterWithAutoFetch() {
+    // If both lists are empty, trigger fetch (but don't wait for it)
+    if (categories.isEmpty && subCategories.isEmpty) {
+      print("📋 No categories available, triggering fetch...");
+      fetchCategories(); // This will update the lists and notify listeners
+      return []; // Return empty list for now, Consumer will rebuild when data arrives
+    }
+
+    final Set<String> categoryNames = <String>{};
+
+    // Add main categories
+    for (var category in categories) {
+      categoryNames.add(category.name);
+    }
+
+    // Add subcategories
+    for (var subCategory in subCategories) {
+      categoryNames.add(subCategory.name);
+    }
+
+    // Convert to sorted list to maintain consistent order
+    final List<String> sortedCategories = categoryNames.toList()..sort();
+
+    print(
+        "📋 getCategoriesForFilter: Returning ${sortedCategories.length} categories");
+
+    return sortedCategories;
+  }
 
   Future<void> fetchTrendingProducts() async {
     const trendingCategoryId = 1337; // best deals category ID

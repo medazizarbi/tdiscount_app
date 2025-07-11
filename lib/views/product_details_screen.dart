@@ -67,7 +67,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       const SizedBox(width: 8.0),
                       const Expanded(
                         child: Text(
-                          "Produit Details",
+                          "Details du Produit",
                           style: TextStyle(
                             color: TColors.textPrimary,
                             fontSize: 20.0,
