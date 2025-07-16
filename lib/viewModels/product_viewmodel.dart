@@ -13,12 +13,49 @@ class ProductViewModel extends ChangeNotifier {
   // Add this map to track quantities
   Map<int, int> cartQuantities = {};
 
+  // NEW: Cache for all fetched products to avoid refetching
+  Map<int, Product> _productCache = {};
+
+  // NEW: Related products state
+  List<Product> _relatedProducts = [];
+  bool _isLoadingRelatedProducts = false;
+  String? _relatedProductsError;
+
+  // Getters for related products
+  List<Product> get relatedProducts => _relatedProducts;
+  bool get isLoadingRelatedProducts => _isLoadingRelatedProducts;
+  String? get relatedProductsError => _relatedProductsError;
+
+  // NEW: Helper method to get product from cache or fetch if not available
+  Future<Product?> _getProductById(int productId) async {
+    // Check if product is already in cache
+    if (_productCache.containsKey(productId)) {
+      print('✅ Product $productId found in cache');
+      return _productCache[productId];
+    }
+
+    // If not in cache, fetch from API
+    try {
+      print('🔄 Fetching product $productId from API...');
+      final product = await _productService.fetchProductById(productId);
+
+      // Store in cache for future use
+      _productCache[productId] = product;
+      print('✅ Product $productId cached successfully');
+
+      return product;
+    } catch (e) {
+      print('❌ Error fetching product $productId: $e');
+      return null;
+    }
+  }
+
   Future<void> fetchProductById(int productId) async {
     isLoading = true;
     notifyListeners();
 
     try {
-      product = await _productService.fetchProductById(productId);
+      product = await _getProductById(productId);
     } catch (e) {
       print("Error fetching product: $e");
     } finally {
@@ -65,9 +102,11 @@ class ProductViewModel extends ChangeNotifier {
     for (String idStr in cartIds) {
       final int id = int.tryParse(idStr) ?? 0;
       if (id != 0 && !cartProducts.any((prod) => prod.id == id)) {
-        final fetchedProduct = await _productService.fetchProductById(id);
-        cartProducts.add(fetchedProduct);
-        print('Fetched product: ${fetchedProduct.name} (ID: $id)');
+        final fetchedProduct = await _getProductById(id); // Use cached version
+        if (fetchedProduct != null) {
+          cartProducts.add(fetchedProduct);
+          print('Fetched product: ${fetchedProduct.name} (ID: $id)');
+        }
       } else if (cartProducts.any((prod) => prod.id == id)) {
         print(
             'Product with ID $id already in cartProducts, skipping fetch.✅✅✅✅✅✅');
@@ -115,5 +154,115 @@ class ProductViewModel extends ChangeNotifier {
       }
     }
     return economy;
+  }
+
+  // NEW: Optimized method to fetch related products with caching
+  Future<void> fetchRelatedProducts(List<int> relatedIds) async {
+    if (relatedIds.isEmpty) {
+      _relatedProducts = [];
+      notifyListeners();
+      return;
+    }
+
+    _isLoadingRelatedProducts = true;
+    _relatedProductsError = null;
+    notifyListeners();
+
+    try {
+      print('🔄 Fetching ${relatedIds.length} related products...');
+
+      List<Product> fetchedRelatedProducts = [];
+      List<int> productsToFetch = [];
+
+      // First, check which products are already in cache
+      for (int relatedId in relatedIds) {
+        if (_productCache.containsKey(relatedId)) {
+          print('✅ Related product $relatedId found in cache');
+          fetchedRelatedProducts.add(_productCache[relatedId]!);
+        } else {
+          print('📥 Related product $relatedId needs to be fetched');
+          productsToFetch.add(relatedId);
+        }
+      }
+
+      // Fetch only the products that are not in cache
+      if (productsToFetch.isNotEmpty) {
+        print('🌐 Fetching ${productsToFetch.length} products from API...');
+
+        // Fetch products one by one and add to cache
+        for (int productId in productsToFetch) {
+          final product = await _getProductById(productId);
+          if (product != null) {
+            fetchedRelatedProducts.add(product);
+          }
+        }
+      }
+
+      // Sort the related products to maintain the original order from relatedIds
+      _relatedProducts = [];
+      for (int relatedId in relatedIds) {
+        final product = fetchedRelatedProducts.firstWhere(
+          (p) => p.id == relatedId,
+          orElse: () =>
+              fetchedRelatedProducts.first, // fallback, shouldn't happen
+        );
+        if (fetchedRelatedProducts.any((p) => p.id == relatedId)) {
+          _relatedProducts.add(product);
+        }
+      }
+
+      print(
+          '✅ Successfully loaded ${_relatedProducts.length} related products');
+      print('📊 Cache now contains ${_productCache.length} products');
+      _relatedProductsError = null;
+    } catch (e) {
+      print('❌ Error fetching related products: $e');
+      _relatedProductsError =
+          'Erreur lors du chargement des produits similaires';
+      _relatedProducts = [];
+    } finally {
+      _isLoadingRelatedProducts = false;
+      notifyListeners();
+    }
+  }
+
+  // NEW: Method to set related products for a specific product (useful for navigation)
+  void setRelatedProductsFor(int currentProductId, List<int> relatedIds) {
+    // Filter cached products that match the related IDs
+    _relatedProducts = relatedIds
+        .where((id) => _productCache.containsKey(id))
+        .map((id) => _productCache[id]!)
+        .toList();
+
+    print(
+        '🔧 Set ${_relatedProducts.length} related products for product $currentProductId from cache');
+    notifyListeners();
+
+    // If not all related products are in cache, fetch the missing ones
+    if (_relatedProducts.length < relatedIds.length) {
+      fetchRelatedProducts(relatedIds);
+    }
+  }
+
+  // NEW: Method to clear related products (call when leaving detail screen)
+  void clearRelatedProducts() {
+    _relatedProducts = [];
+    _isLoadingRelatedProducts = false;
+    _relatedProductsError = null;
+    notifyListeners();
+  }
+
+  // NEW: Method to get cache statistics (useful for debugging)
+  Map<String, int> getCacheStats() {
+    return {
+      'cached_products': _productCache.length,
+      'current_related_products': _relatedProducts.length,
+    };
+  }
+
+  // NEW: Method to clear cache if needed (useful for logout or memory management)
+  void clearProductCache() {
+    _productCache.clear();
+    print('🗑️ Product cache cleared');
   }
 }

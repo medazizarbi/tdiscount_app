@@ -19,8 +19,128 @@ class CategoryViewModel extends ChangeNotifier {
   Map<int, int> currentPageByCategory = {};
   Map<int, bool> hasMoreProductsByCategory = {};
 
+  // NEW: Top categories variables
+  List<Category> topCategories = [];
+  Map<int, List<Product>> topCategoriesProducts = {};
+  bool isTopCategoriesLoading = false;
+
   late ScrollController scrollController;
   int? activeCategoryId;
+
+  // NEW: Method to get top 4 categories (corrected logic)
+  void getTop4Categories() {
+    print("🔄 Getting top 4 categories from ${categories.length} categories");
+
+    if (categories.isEmpty) {
+      print("❌ Categories list is empty, cannot get top categories");
+      return;
+    }
+
+    // Filter categories with count > 0
+    final validCategories =
+        categories.where((category) => category.count > 0).toList();
+
+    // Sort by count in descending order (highest count first)
+    validCategories.sort((a, b) => b.count.compareTo(a.count));
+
+    // Take top 4 categories
+    topCategories = validCategories.take(4).toList();
+
+    // Check if "autres categories" exists in the top 4
+    final autresIndex = topCategories.indexWhere((category) =>
+        category.name.toLowerCase().contains("autres") ||
+        category.name.toLowerCase().contains("autre"));
+
+    // If "autres categories" exists in top 4 and it's not already last
+    if (autresIndex != -1 && autresIndex != topCategories.length - 1) {
+      // Remove "autres categories" from its current position
+      final autresCategory = topCategories.removeAt(autresIndex);
+      // Add it to the end
+      topCategories.add(autresCategory);
+
+      print("📱 Found 'autres categories' in top 4, moved to last position");
+    }
+
+    print(
+        "✅ Top 4 categories selected: ${topCategories.map((c) => '${c.name}(${c.count})').toList()}");
+    notifyListeners();
+  }
+
+  // NEW: Method to fetch products for top categories
+  Future<void> fetchTopCategoriesProducts() async {
+    print("🔄 Fetching products for top categories");
+
+    if (topCategories.isEmpty) {
+      print("❌ Top categories list is empty, getting top categories first");
+      getTop4Categories();
+    }
+
+    if (topCategories.isEmpty) {
+      print("❌ Still no top categories available");
+      return;
+    }
+
+    isTopCategoriesLoading = true;
+    notifyListeners();
+
+    try {
+      // Clear previous products
+      topCategoriesProducts.clear();
+
+      // Fetch 10 products for each top category
+      for (final category in topCategories) {
+        try {
+          print(
+              '🔄 Fetching 10 products for category: ${category.name} (ID: ${category.id})');
+
+          final products = await _categoryService.fetchProductsByCategory(
+            category.id,
+            1, // page 1
+            10, // 10 products per category
+          );
+
+          topCategoriesProducts[category.id] = products;
+
+          print(
+              '✅ Fetched ${products.length} products for category: ${category.name}');
+        } catch (e) {
+          print('❌ Error fetching products for category ${category.name}: $e');
+          topCategoriesProducts[category.id] = [];
+        }
+      }
+
+      print('✅ Top categories products fetch completed');
+    } catch (e) {
+      print('❌ Error in fetchTopCategoriesProducts: $e');
+    } finally {
+      isTopCategoriesLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // NEW: Method to get products for a specific top category
+  List<Product> getProductsForTopCategory(int categoryId) {
+    return topCategoriesProducts[categoryId] ?? [];
+  }
+
+  // NEW: Combined method to get top categories and fetch their products
+  Future<void> setupTopCategories() async {
+    print("🔄 Setting up top categories with products");
+
+    // Ensure we have categories first
+    if (categories.isEmpty) {
+      print("📱 Categories list is empty, fetching categories first...");
+      await fetchCategories();
+    }
+
+    // Get top 4 categories
+    getTop4Categories();
+
+    // Fetch products for top categories
+    await fetchTopCategoriesProducts();
+
+    print("✅ Top categories setup completed");
+  }
 
   // Modified method to populate and return the filter categories
   List<String> getCategoriesForFilter() {

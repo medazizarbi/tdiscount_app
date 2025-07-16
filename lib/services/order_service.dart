@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:tdiscount_app/models/product_model.dart';
 
 class OrderService {
-  final String baseUrl = "REMOVED_SECRET/";
-  final String consumerKey = "REMOVED_SECRET";
-  final String consumerSecret = "REMOVED_SECRET";
+  String get baseUrl => dotenv.env['WC_BASE_URL'] ?? "";
+  String get consumerKey => dotenv.env['WC_CONSUMER_KEY'] ?? "";
+  String get consumerSecret => dotenv.env['WC_CONSUMER_SECRET'] ?? "";
 
   Future<http.Response> createOrder({
     required String firstName,

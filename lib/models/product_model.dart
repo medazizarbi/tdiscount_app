@@ -8,6 +8,7 @@ class Product {
   final List<String> imageUrls; // Store all image URLs
   final bool inStock;
   final String? sku;
+  final List<int> relatedIds; // NEW: Store related product IDs
 
   Product({
     required this.id,
@@ -19,11 +20,10 @@ class Product {
     required this.imageUrls,
     required this.inStock,
     this.sku,
+    required this.relatedIds, // NEW: Required parameter for related IDs
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
-    // Extract the first image URL if available
-
     return Product(
       id: json['id'],
       name: json['name'],
@@ -37,6 +37,17 @@ class Product {
           [],
       inStock: json['stock_status'] == 'instock',
       sku: json['sku'] as String?,
+      // NEW: Parse related_ids from JSON
+      relatedIds: (json['related_ids'] as List<dynamic>?)
+              ?.map((id) => id as int)
+              .toList() ??
+          [], // Default to empty list if no related products
     );
   }
+
+  // NEW: Helper method to check if product has related products
+  bool get hasRelatedProducts => relatedIds.isNotEmpty;
+
+  // NEW: Helper method to get the count of related products
+  int get relatedProductsCount => relatedIds.length;
 }

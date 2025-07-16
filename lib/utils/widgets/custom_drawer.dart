@@ -75,13 +75,8 @@ class CustomDrawerState extends State<CustomDrawer> {
               color: themedColor(context, TColors.darkGrey, TColors.darkGrey),
             ),
 
-            // Profil utilisateur (left side image and profile)
+            // Profil utilisateur (without image)
             ListTile(
-              leading: const CircleAvatar(
-                backgroundImage:
-                    AssetImage("assets/images/logo.png"), // Profile image
-                radius: 30,
-              ),
               title: Text(
                 " $displayName",
                 style: const TextStyle(fontWeight: FontWeight.bold),
@@ -91,9 +86,9 @@ class CustomDrawerState extends State<CustomDrawer> {
                 //style: TextStyle(color: Colors.white70),
               ),
               onTap: () {
+                Navigator.pop(context); // Close the drawer first
                 homePageKey.currentState
-                    ?.onItemTapped(4); // Navigate to ProfilScreen
-                Navigator.pop(context); // Close the drawer
+                    ?.onItemTapped(4); // Navigate to ProfilScreen (index 4)
               },
             ),
 

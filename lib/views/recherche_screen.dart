@@ -6,7 +6,6 @@ import 'package:tdiscount_app/utils/widgets/filterbottomsheet.dart';
 import 'package:tdiscount_app/utils/widgets/product_card.dart';
 import 'package:tdiscount_app/viewModels/search_viewmodel.dart';
 import 'package:tdiscount_app/views/product_details_screen.dart';
-import 'package:tdiscount_app/viewmodels/category_viewmodel.dart';
 
 class RechercheScreen extends StatefulWidget {
   const RechercheScreen({super.key});
@@ -24,12 +23,6 @@ class _RechercheScreenState extends State<RechercheScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-
-    // Initialize category names for filter since categories are already loaded from home screen
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final categoryVM = Provider.of<CategoryViewModel>(context, listen: false);
-      categoryVM.initializeCategoryNamesForFilter();
-    });
   }
 
   void _onScroll() {
@@ -227,41 +220,62 @@ class _RechercheScreenState extends State<RechercheScreen> {
                             const SizedBox(
                                 width: 12), // Space between search and filter
                             // Filter button - Always accessible
-                            Consumer<CategoryViewModel>(
-                              builder: (context, categoryVM, child) {
-                                // Use the persistent list instead of calling the method each time
-                                final availableCategories =
-                                    categoryVM.categoryNamesForFilter;
+                            Container(
+                              decoration: BoxDecoration(
+                                color: TColors.primary,
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: IconButton(
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    builder: (context) =>
+                                        const FilterBottomSheet(),
+                                  ).then((filterData) {
+                                    if (filterData != null) {
+                                      print("Applied filters: $filterData");
 
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    color: TColors.primary,
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                  child: IconButton(
-                                    onPressed: () {
-                                      showModalBottomSheet(
-                                        context: context,
-                                        isScrollControlled: true,
-                                        backgroundColor: Colors.transparent,
-                                        builder: (context) => FilterBottomSheet(
-                                          availableCategories:
-                                              availableCategories,
-                                        ),
-                                      ).then((filterData) {
-                                        if (filterData != null) {
-                                          print("Applied filters: $filterData");
-                                        }
-                                      });
-                                    },
-                                    icon: const Icon(
-                                      Icons.filter_list_alt,
-                                      color: TColors.darkerGrey,
-                                    ),
-                                    tooltip: "Filtres",
-                                  ),
-                                );
-                              },
+                                      // Apply filters to current search or search all if no search term
+                                      final searchVM =
+                                          Provider.of<SearchViewModel>(context,
+                                              listen: false);
+                                      final searchTerm =
+                                          _searchController.text.trim();
+
+                                      if (searchTerm.isNotEmpty) {
+                                        // Apply filters to current search
+                                        searchVM.searchProducts(
+                                          searchTerm,
+                                          isNewSearch: true,
+                                          minPrice: filterData['minPrice']
+                                              ?.toDouble(),
+                                          maxPrice: filterData['maxPrice']
+                                              ?.toDouble(),
+                                          order: filterData['sortOrder'],
+                                        );
+                                      } else {
+                                        // If no search term, search with empty string to show filtered results
+                                        searchVM.searchProducts(
+                                          "",
+                                          isNewSearch: true,
+                                          minPrice: filterData['minPrice']
+                                              ?.toDouble(),
+                                          maxPrice: filterData['maxPrice']
+                                              ?.toDouble(),
+                                          order: filterData['sortOrder'],
+                                        );
+                                      }
+                                    }
+                                  });
+                                },
+                                icon: const Icon(
+                                  Icons.filter_list_alt,
+                                  color: TColors.darkerGrey,
+                                ),
+                                tooltip: "Filtres",
+                              ),
                             ),
                           ],
                         ),

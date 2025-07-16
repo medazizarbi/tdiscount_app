@@ -15,10 +15,13 @@ import 'views/favoris_screen.dart';
 import 'views/profil_screen.dart';
 import 'utils/widgets/nav_bar.dart';
 import 'package:tdiscount_app/viewModels/favorites_view_model.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+// ignore: library_private_types_in_public_api
 final GlobalKey<_MyHomePageState> homePageKey = GlobalKey<_MyHomePageState>();
 
-void main() async {
+Future<void> main() async {
+  await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token');
@@ -72,6 +75,7 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _MyHomePageState createState() => _MyHomePageState();
 
   // Expose a method to navigate to the HomeScreen

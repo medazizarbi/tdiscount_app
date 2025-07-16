@@ -120,19 +120,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              // Address
-              TextFormField(
-                controller: _addressController,
-                decoration: InputDecoration(
-                  labelText: "Adresse",
-                  border: curvedBorder,
-                  enabledBorder: curvedBorder,
-                  focusedBorder: curvedBorder,
-                ),
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Champ requis" : null,
-              ),
-              const SizedBox(height: 16),
+
               // City Picker
               DropdownButtonFormField<String>(
                 value: _selectedCity,
@@ -153,6 +141,19 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                     _selectedCity = value;
                   });
                 },
+                validator: (value) =>
+                    value == null || value.isEmpty ? "Champ requis" : null,
+              ),
+              const SizedBox(height: 16),
+              // Address
+              TextFormField(
+                controller: _addressController,
+                decoration: InputDecoration(
+                  labelText: "Adresse",
+                  border: curvedBorder,
+                  enabledBorder: curvedBorder,
+                  focusedBorder: curvedBorder,
+                ),
                 validator: (value) =>
                     value == null || value.isEmpty ? "Champ requis" : null,
               ),

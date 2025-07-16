@@ -17,9 +17,16 @@ class HomeScreen extends StatefulWidget {
   HomeScreenState createState() => HomeScreenState();
 }
 
-class HomeScreenState extends State<HomeScreen> {
+class HomeScreenState extends State<HomeScreen>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   Color get backgroundColor =>
       themedColor(context, TColors.lightContainer, TColors.darkContainer);
+
+  // Add a flag to track if data has been loaded
+  bool _dataLoaded = false;
 
   // List of items with title, description, and visibility control
   final List<Map<String, dynamic>> items = [
@@ -62,42 +69,72 @@ class HomeScreenState extends State<HomeScreen> {
     267: "assets/images/white_cat_icons/informatique.png", // informatique
     780: "assets/images/white_cat_icons/maison.png", // maison et bricolage
     407: "assets/images/white_cat_icons/printer.png", //impression
-    696:
-        "assets/images/white_cat_icons/vetement.webp", // vetement et accessoires
+    696: "assets/images/black_cat_icons/t_shirt.png", // vetement et accessoires
     753: "assets/images/white_cat_icons/ordinateur.webp", // oridnateur bureau
     401: "assets/images/white_cat_icons/autre.png", //autres categories
+    1337: "assets/images/black_cat_icons/bon-deal.png", // best deals
+    323: "assets/images/black_cat_icons/home-cinema.png", // TV images son
 
     // Add more categoryId: imagePath pairs as needed
   };
 
   // Default icon path
-  final String defaultCategoryIcon = "assets/images/white_cat_icons/elec.png";
+  final String defaultCategoryIcon = "assets/images/white_cat_icons/autre.png";
 
   bool isSearching = false;
-  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    // Only load data once when the widget is first created
+    _loadDataOnce();
+  }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final categoryViewModel =
-          Provider.of<CategoryViewModel>(context, listen: false);
-      if (categoryViewModel.categories.isEmpty &&
-          !categoryViewModel.isLoading) {
-        categoryViewModel.fetchCategories();
-      }
-      if (categoryViewModel.trendingProducts.isEmpty) {
-        categoryViewModel.fetchTrendingProducts();
-      }
-    });
+  void _loadDataOnce() {
+    if (!_dataLoaded) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final categoryViewModel =
+            Provider.of<CategoryViewModel>(context, listen: false);
+
+        try {
+          // First, fetch regular categories if empty and not loading
+          if (categoryViewModel.categories.isEmpty &&
+              !categoryViewModel.isLoading) {
+            print("🔄 Fetching categories first...");
+            await categoryViewModel.fetchCategories();
+            print(
+                "✅ Categories fetched, count: ${categoryViewModel.categories.length}");
+          }
+
+          // Then, setup top 4 categories with their products (only after categories are loaded)
+          if (categoryViewModel.topCategories.isEmpty &&
+              !categoryViewModel.isTopCategoriesLoading) {
+            print("🔄 Setting up top categories...");
+            await categoryViewModel.setupTopCategories();
+            print("✅ Top categories setup completed");
+          }
+
+          // Finally, fetch trending products
+          if (categoryViewModel.trendingProducts.isEmpty) {
+            print("🔄 Fetching trending products...");
+            await categoryViewModel.fetchTrendingProducts();
+            print("✅ Trending products fetched");
+          }
+        } catch (e) {
+          print("❌ Error in _loadDataOnce: $e");
+        } finally {
+          _dataLoaded = true;
+        }
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     final categoryViewModel = Provider.of<CategoryViewModel>(context);
-    final trendingProducts =
-        Provider.of<CategoryViewModel>(context).trendingProducts;
+    final trendingProducts = categoryViewModel.trendingProducts;
 
     // Calculate the number of columns based on screen width
     final screenWidth = MediaQuery.of(context).size.width;
@@ -138,68 +175,19 @@ class HomeScreenState extends State<HomeScreen> {
                                 },
                               ),
                             ),
-                            // Search bar (expand to fill available space)
-                            Expanded(
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                                width: isSearching ? double.infinity : null,
-                                child: Focus(
-                                  onFocusChange: (hasFocus) {
-                                    setState(() {
-                                      isSearching = hasFocus;
-                                    });
-                                  },
-                                  child: TextField(
-                                    controller: _searchController,
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: const Color.fromARGB(
-                                          207, 255, 255, 255),
-                                      hintText: "Chercher un produit",
-                                      prefixIcon: const Icon(Icons.search,
-                                          color: Colors.grey),
-                                      suffixIcon: isSearching
-                                          ? IconButton(
-                                              icon: const Icon(Icons.close,
-                                                  color: Colors.grey),
-                                              onPressed: () {
-                                                _searchController.clear();
-                                                FocusScope.of(context)
-                                                    .unfocus();
-                                                setState(() {
-                                                  isSearching = false;
-                                                });
-                                              },
-                                            )
-                                          : null,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(30),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                        vertical: 8,
-                                        horizontal: 16,
-                                      ),
-                                    ),
-                                    onTap: () {
-                                      setState(() {
-                                        isSearching = true;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
+                            // Spacer to center the logo
+                            const Spacer(),
+                            // Centered Logo
+                            Image.asset(
+                              "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png",
+                              height: 40, // Same size as FavorisScreen
+                              fit: BoxFit.contain,
                             ),
-                            // Logo (hide when searching)
-                            if (!isSearching)
-                              Image.asset(
-                                "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png",
-                                width: 120,
-                                height: 60,
-                                fit: BoxFit.contain,
-                              ),
+                            // Spacer to balance the layout
+                            const Spacer(),
+                            // Empty container to balance the drawer button space
+                            const SizedBox(
+                                width: 48), // Same width as IconButton
                           ],
                         ),
                       ),
@@ -395,42 +383,170 @@ class HomeScreenState extends State<HomeScreen> {
                                 ),
 
                                 const SizedBox(height: 8),
-
-                                // ✅ Display Category Cards
-                                const CategoryList(),
-
+// ✅ Display Top 4 Category Cards from ViewModel
+                                categoryViewModel.isTopCategoriesLoading
+                                    ? const SizedBox(
+                                        height: 170,
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            color: TColors.primary,
+                                          ),
+                                        ),
+                                      )
+                                    : CategoryList(
+                                        categories:
+                                            categoryViewModel.topCategories,
+                                      ),
                                 const SizedBox(height: 18),
 
-                                // ✅ HighlightSection Widget (Full Width)
-                                const HighlightSection(
-                                  title: "Gaming",
-                                  subtitle: "Plongez dans l'univers du gaming",
-                                  mainImage:
-                                      "assets/images/samsung.png", // Replace with real URL
-                                  products: [
-                                    {
-                                      "image": "assets/images/produit1.jpg",
-                                      "name": "Samsung"
-                                    },
-                                    {
-                                      "image": "assets/images/prod2.jpg",
-                                      "name": "Samsung "
-                                    },
-                                    {
-                                      "image": "assets/images/produit1.jpg",
-                                      "name": "Samsung"
-                                    },
-                                  ],
-                                  highlightColorBG: Color.fromARGB(
-                                      255,
-                                      173,
-                                      161,
-                                      208), // Specify the background color here
-                                ),
+                                // ✅ Display Top Categories Products
+                                ...categoryViewModel.topCategories
+                                    .map((category) {
+                                  final categoryProducts = categoryViewModel
+                                      .getProductsForTopCategory(category.id);
 
-                                const SizedBox(height: 100),
+                                  if (categoryProducts.isEmpty) {
+                                    return const SizedBox
+                                        .shrink(); // Don't show if no products
+                                  }
 
-                                //**** */
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Category Name Title
+                                      Padding(
+                                        padding: const EdgeInsets.all(16),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                category.name,
+                                                style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            // Optional "See All" button
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  PageRouteBuilder(
+                                                    pageBuilder: (context,
+                                                            animation,
+                                                            secondaryAnimation) =>
+                                                        SubCategorieScreen(
+                                                      categoryId: category.id,
+                                                      categoryName:
+                                                          category.name,
+                                                      categoryCount:
+                                                          category.count,
+                                                    ),
+                                                    transitionsBuilder:
+                                                        (context,
+                                                            animation,
+                                                            secondaryAnimation,
+                                                            child) {
+                                                      const begin =
+                                                          Offset(1.0, 0.0);
+                                                      const end = Offset.zero;
+                                                      const curve =
+                                                          Curves.easeInOut;
+
+                                                      var tween = Tween(
+                                                              begin: begin,
+                                                              end: end)
+                                                          .chain(
+                                                        CurveTween(
+                                                            curve: curve),
+                                                      );
+
+                                                      var offsetAnimation =
+                                                          animation
+                                                              .drive(tween);
+
+                                                      return SlideTransition(
+                                                        position:
+                                                            offsetAnimation,
+                                                        child: child,
+                                                      );
+                                                    },
+                                                  ),
+                                                );
+                                              },
+                                              child: Text(
+                                                "Voir tout",
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: themedColor(
+                                                      context,
+                                                      TColors.black,
+                                                      TColors.primary),
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      // Products Horizontal List
+                                      SizedBox(
+                                        height:
+                                            250, // Increased height to accommodate content
+                                        child: ListView.builder(
+                                          scrollDirection: Axis.horizontal,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16),
+                                          itemCount: categoryProducts.length,
+                                          itemBuilder: (context, index) {
+                                            final product =
+                                                categoryProducts[index];
+                                            return Container(
+                                              width:
+                                                  180, // Increased width to prevent overflow
+                                              margin: const EdgeInsets.only(
+                                                  right: 12),
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ProductDetailsScreen(
+                                                              product: product),
+                                                    ),
+                                                  );
+                                                },
+                                                child: ProductCard(
+                                                  productId: product.id,
+                                                  imageUrl: product
+                                                          .imageUrls.isNotEmpty
+                                                      ? product.imageUrls.first
+                                                      : '',
+                                                  name: product.name,
+                                                  price: product.price,
+                                                  regularPrice:
+                                                      product.regularPrice,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 20),
+                                    ],
+                                  );
+                                }).toList(),
+
+                                const SizedBox(height: 30),
                               ],
                             ),
                           ),
@@ -611,9 +727,15 @@ class HomeScreenState extends State<HomeScreen> {
                   child: SizedBox(
                     width: 45, // Adjust this value for the image size
                     height: 60,
-                    child: Image.asset(
-                      imagePath,
-                      fit: BoxFit.contain,
+                    child: ColorFiltered(
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white, // Force all icons to be white
+                        BlendMode.srcIn,
+                      ),
+                      child: Image.asset(
+                        imagePath,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                 ),

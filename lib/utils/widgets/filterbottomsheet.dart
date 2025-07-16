@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
 
 class FilterBottomSheet extends StatefulWidget {
-  final List<String> availableCategories;
-
   const FilterBottomSheet({
     super.key,
-    required this.availableCategories,
   });
 
   @override
@@ -14,41 +11,17 @@ class FilterBottomSheet extends StatefulWidget {
 }
 
 class _FilterBottomSheetState extends State<FilterBottomSheet> {
-  final TextEditingController _brandController = TextEditingController();
-
-  RangeValues _priceRange = const RangeValues(0, 3000);
+  RangeValues _priceRange = const RangeValues(0, 100000);
   String _sortOrder = 'desc';
-  final List<String> _selectedCategories = [];
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _brandController.dispose();
-    super.dispose();
-  }
-
-  void _toggleCategory(String category) {
-    setState(() {
-      if (_selectedCategories.contains(category)) {
-        _selectedCategories.remove(category);
-      } else {
-        _selectedCategories.add(category);
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return DraggableScrollableSheet(
-      initialChildSize: 0.6,
-      minChildSize: 0.6,
-      maxChildSize: 0.8,
+      initialChildSize: 0.5,
+      minChildSize: 0.4,
+      maxChildSize: 0.7,
       expand: false,
       builder: (context, scrollController) => Container(
         width: double.infinity,
@@ -73,7 +46,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 ),
               ),
 
-              // Title - Now scrollable
+              // Title
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
@@ -87,214 +60,224 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 ),
               ),
 
-              // Filter content - All in the same scrollable area
+              // Filter content
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 1. Categories Selection
-                    _buildSectionTitle("Catégories", isDark),
-                    const SizedBox(height: 12),
-
-                    // Available categories as selectable chips
-                    if (widget.availableCategories.isNotEmpty) ...[
-                      Text(
-                        "Sélectionner des catégories:",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: isDark ? TColors.grey : TColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: widget.availableCategories.map((category) {
-                          final isSelected =
-                              _selectedCategories.contains(category);
-                          return GestureDetector(
-                            onTap: () => _toggleCategory(category),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? TColors.primary
-                                        .withOpacity(0.2) // Yellow with opacity
-                                    : isDark
-                                        ? TColors.dark.withOpacity(0.5)
-                                        : Colors.grey[100]!,
-                                border: Border.all(
-                                  color: isSelected
-                                      ? TColors.primary // Yellow border
-                                      : isDark
-                                          ? TColors.grey
-                                          : Colors.grey[300]!,
-                                  width: isSelected ? 2 : 1,
-                                ),
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isSelected ? Icons.remove : Icons.add,
-                                    color: isSelected
-                                        ? Colors
-                                            .black // Black icon for readability
-                                        : isDark
-                                            ? TColors.grey
-                                            : Colors.grey[600],
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    category,
-                                    style: TextStyle(
-                                      color: isSelected
-                                          ? Colors
-                                              .black // Keep text black for readability
-                                          : isDark
-                                              ? TColors.textWhite
-                                              : TColors.textPrimary,
-                                      fontWeight: isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ] else ...[
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? TColors.dark.withOpacity(0.5)
-                              : Colors.grey[100],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isDark ? TColors.grey : Colors.grey[300]!,
-                          ),
-                        ),
-                        child: Text(
-                          "Aucune catégorie disponible",
-                          style: TextStyle(
-                            color: isDark ? TColors.grey : Colors.grey[600],
-                            fontStyle: FontStyle.italic,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 24),
-
-                    // 2. Brand Search Field
-                    _buildSectionTitle("Marque", isDark),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: _brandController,
-                      style: TextStyle(
-                        color: isDark ? TColors.textWhite : TColors.textPrimary,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: "Rechercher une marque",
-                        hintStyle: TextStyle(
-                          color: isDark ? TColors.grey : Colors.grey[600],
-                        ),
-                        prefixIcon: Icon(
-                          Icons.branding_watermark,
-                          color: isDark ? TColors.grey : Colors.grey[600],
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: isDark ? TColors.grey : Colors.grey[300]!,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: isDark ? TColors.grey : Colors.grey[300]!,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: TColors.primary, // Yellow focus border
-                            width: 2,
-                          ),
-                        ),
-                        filled: true,
-                        fillColor: isDark
-                            ? TColors.dark.withOpacity(0.5)
-                            : Colors.grey[100],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // 3. Price Range
+                    // 1. Price Range
                     _buildSectionTitle("Fourchette de prix", isDark),
                     const SizedBox(height: 12),
-                    RangeSlider(
-                      values: _priceRange,
-                      min: 0,
-                      max: 10000,
-                      divisions: 100,
-                      activeColor: TColors.primary, // Yellow for active
-                      inactiveColor: TColors.primary
-                          .withOpacity(0.3), // Yellow with opacity
-                      labels: RangeLabels(
-                        '${_priceRange.start.round()} DT',
-                        '${_priceRange.end.round()} DT',
-                      ),
-                      onChanged: (RangeValues values) {
-                        setState(() {
-                          _priceRange = values;
-                        });
+
+                    // Dynamic max value based on current selection
+                    Builder(
+                      builder: (context) {
+                        // Determine dynamic max based on current end value
+                        double dynamicMax;
+                        int divisions;
+
+                        if (_priceRange.end <= 1000) {
+                          dynamicMax = 1000;
+                          divisions = 100; // 10 DT steps
+                        } else if (_priceRange.end <= 5000) {
+                          dynamicMax = 5000;
+                          divisions = 100; // 50 DT steps
+                        } else if (_priceRange.end <= 20000) {
+                          dynamicMax = 20000;
+                          divisions = 100; // 200 DT steps
+                        } else if (_priceRange.end <= 50000) {
+                          dynamicMax = 50000;
+                          divisions = 100; // 500 DT steps
+                        } else {
+                          dynamicMax = 100000;
+                          divisions = 100; // 1000 DT steps
+                        }
+
+                        return Column(
+                          children: [
+                            RangeSlider(
+                              values: RangeValues(
+                                _priceRange.start.clamp(0, dynamicMax),
+                                _priceRange.end.clamp(0, dynamicMax),
+                              ),
+                              min: 0,
+                              max: dynamicMax,
+                              divisions: divisions,
+                              activeColor: TColors.primary,
+                              inactiveColor: TColors.primary.withOpacity(0.3),
+                              labels: RangeLabels(
+                                '${_priceRange.start.round()} DT',
+                                '${_priceRange.end.round()} DT',
+                              ),
+                              onChanged: (RangeValues values) {
+                                setState(() {
+                                  _priceRange = values;
+                                });
+                              },
+                            ),
+
+                            // Quick range buttons
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              children: [
+                                _buildQuickRangeButton("0-500", 0, 500, isDark),
+                                _buildQuickRangeButton(
+                                    "500-2K", 500, 2000, isDark),
+                                _buildQuickRangeButton(
+                                    "2K-10K", 2000, 10000, isDark),
+                                _buildQuickRangeButton(
+                                    "10K-50K", 10000, 50000, isDark),
+                                _buildQuickRangeButton(
+                                    "50K+", 50000, 100000, isDark),
+                              ],
+                            ),
+                          ],
+                        );
                       },
                     ),
-                    // Price display - Simple left and right alignment
+
+                    // Price display with manual input option
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Column(
                         children: [
-                          Text(
-                            '${_priceRange.start.round()} DT',
-                            style: TextStyle(
-                              color: isDark
-                                  ? TColors.textWhite
-                                  : TColors.textPrimary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Min: ${_priceRange.start.round()} DT',
+                                style: TextStyle(
+                                  color: isDark
+                                      ? TColors.textWhite
+                                      : TColors.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Text(
+                                'Max: ${_priceRange.end.round()} DT',
+                                style: TextStyle(
+                                  color: isDark
+                                      ? TColors.textWhite
+                                      : TColors.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            '${_priceRange.end.round()} DT',
-                            style: TextStyle(
-                              color: isDark
-                                  ? TColors.textWhite
-                                  : TColors.textPrimary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
+                          const SizedBox(height: 12),
+
+                          // Manual input fields
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  keyboardType: TextInputType.number,
+                                  style: TextStyle(
+                                    color: isDark
+                                        ? TColors.textWhite
+                                        : TColors.textPrimary,
+                                    fontSize: 14,
+                                  ),
+                                  decoration: InputDecoration(
+                                    labelText: "Prix min",
+                                    labelStyle: TextStyle(
+                                      color: isDark
+                                          ? TColors.grey
+                                          : Colors.grey[600],
+                                      fontSize: 12,
+                                    ),
+                                    suffixText: "DT",
+                                    suffixStyle: TextStyle(
+                                      color: isDark
+                                          ? TColors.grey
+                                          : Colors.grey[600],
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: const BorderSide(
+                                          color: TColors.primary),
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    final newMin = double.tryParse(value) ?? 0;
+                                    if (newMin <= _priceRange.end) {
+                                      setState(() {
+                                        _priceRange = RangeValues(
+                                            newMin, _priceRange.end);
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: TextField(
+                                  keyboardType: TextInputType.number,
+                                  style: TextStyle(
+                                    color: isDark
+                                        ? TColors.textWhite
+                                        : TColors.textPrimary,
+                                    fontSize: 14,
+                                  ),
+                                  decoration: InputDecoration(
+                                    labelText: "Prix max",
+                                    labelStyle: TextStyle(
+                                      color: isDark
+                                          ? TColors.grey
+                                          : Colors.grey[600],
+                                      fontSize: 12,
+                                    ),
+                                    suffixText: "DT",
+                                    suffixStyle: TextStyle(
+                                      color: isDark
+                                          ? TColors.grey
+                                          : Colors.grey[600],
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: const BorderSide(
+                                          color: TColors.primary),
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    final newMax =
+                                        double.tryParse(value) ?? 100000;
+                                    if (newMax >= _priceRange.start) {
+                                      setState(() {
+                                        _priceRange = RangeValues(
+                                            _priceRange.start, newMax);
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 24),
 
-                    // 4. Order Selection
+                    // 2. Order Selection
                     _buildSectionTitle("Ordre de tri", isDark),
                     const SizedBox(height: 12),
                     Container(
@@ -321,8 +304,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                             ),
                             value: 'desc',
                             groupValue: _sortOrder,
-                            activeColor:
-                                TColors.primary, // Yellow for radio buttons
+                            activeColor: TColors.primary,
                             onChanged: (value) {
                               setState(() {
                                 _sortOrder = value!;
@@ -344,8 +326,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                             ),
                             value: 'asc',
                             groupValue: _sortOrder,
-                            activeColor:
-                                TColors.primary, // Yellow for radio buttons
+                            activeColor: TColors.primary,
                             onChanged: (value) {
                               setState(() {
                                 _sortOrder = value!;
@@ -357,7 +338,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                     ),
                     const SizedBox(height: 32),
 
-                    // 5. Apply Filters Button
+                    // 3. Apply Filters Button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -365,8 +346,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                           _applyFilters();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: TColors.primary, // Yellow background
-                          foregroundColor: Colors.black, // Black text on yellow
+                          backgroundColor: TColors.primary,
+                          foregroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -378,7 +359,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black, // Black text for readability
+                            color: Colors.black,
                           ),
                         ),
                       ),
@@ -405,10 +386,36 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     );
   }
 
+  Widget _buildQuickRangeButton(
+      String label, double min, double max, bool isDark) {
+    return ElevatedButton(
+      onPressed: () {
+        setState(() {
+          _priceRange = RangeValues(min, max);
+        });
+      },
+      style: ElevatedButton.styleFrom(
+        foregroundColor: TColors.primary,
+        backgroundColor: isDark ? TColors.dark : TColors.lightContainer,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        elevation: 2,
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: isDark ? TColors.textWhite : TColors.textPrimary,
+        ),
+      ),
+    );
+  }
+
   void _applyFilters() {
     final filterData = {
-      'categories': _selectedCategories,
-      'brand': _brandController.text.trim(),
       'minPrice': _priceRange.start.round(),
       'maxPrice': _priceRange.end.round(),
       'sortOrder': _sortOrder,

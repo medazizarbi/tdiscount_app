@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../models/category_model.dart';
 import '../models/product_model.dart';
@@ -6,9 +7,9 @@ import 'package:html/parser.dart' show parse;
 import 'package:html_unescape/html_unescape.dart';
 
 class CategoryService {
-  final String baseUrl = "REMOVED_SECRET/";
-  final String consumerKey = "REMOVED_SECRET";
-  final String consumerSecret = "REMOVED_SECRET";
+  String get baseUrl => dotenv.env['WC_BASE_URL'] ?? "";
+  String get consumerKey => dotenv.env['WC_CONSUMER_KEY'] ?? "";
+  String get consumerSecret => dotenv.env['WC_CONSUMER_SECRET'] ?? "";
 
   Future<List<Category>> fetchCategories() async {
     const String endpoint =
@@ -98,6 +99,7 @@ class CategoryService {
             description: cleanedDescription,
             shortDescription: cleanedShortDescription,
             sku: product.sku,
+            relatedIds: product.relatedIds, // NEW: Include related IDs
           );
 
           return updatedProduct;

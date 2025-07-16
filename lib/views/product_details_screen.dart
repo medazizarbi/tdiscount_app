@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/models/product_model.dart';
 import 'package:tdiscount_app/utils/widgets/product_images_viewer.dart';
+import 'package:tdiscount_app/utils/widgets/product_card.dart';
 import 'package:tdiscount_app/viewModels/product_viewmodel.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
@@ -19,6 +20,41 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   bool descriptionExpanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRelatedProducts();
+  }
+
+  // Add this method to handle related products fetching
+  void _fetchRelatedProducts() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final productViewModel =
+          Provider.of<ProductViewModel>(context, listen: false);
+
+      // Always clear previous related products first
+      productViewModel.clearRelatedProducts();
+
+      if (widget.product.hasRelatedProducts) {
+        productViewModel.fetchRelatedProducts(widget.product.relatedIds);
+      }
+    });
+  }
+
+  // Helper method to check if current related products belong to this product
+  bool _areRelatedProductsForCurrentProduct(ProductViewModel viewModel) {
+    if (!widget.product.hasRelatedProducts) return false;
+    if (viewModel.relatedProducts.isEmpty) return false;
+
+    // Check if the stored related products match current product's related IDs
+    final currentRelatedIds = widget.product.relatedIds.toSet();
+    final storedRelatedIds = viewModel.relatedProducts.map((p) => p.id).toSet();
+
+    // Return true only if the stored products exactly match current product's related IDs
+    return currentRelatedIds.length == storedRelatedIds.length &&
+        currentRelatedIds.every((id) => storedRelatedIds.contains(id));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -299,6 +335,130 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             'Aucune description disponible.',
                             style: TextStyle(fontSize: 16),
                           ),
+
+                        // NEW: Related Products Section
+                        const SizedBox(height: 20),
+                        const Divider(thickness: 1, color: Colors.grey),
+                        const SizedBox(height: 20),
+
+                        // Show related products only if the product has related IDs
+                        if (widget.product.hasRelatedProducts) ...[
+                          const Text(
+                            'Produits similaires',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: TColors.primary,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Related Products List
+                          Consumer<ProductViewModel>(
+                            builder: (context, viewModel, child) {
+                              if (viewModel.isLoadingRelatedProducts) {
+                                return const SizedBox(
+                                  height: 200,
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      color: TColors.primary,
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              if (viewModel.relatedProductsError != null) {
+                                return SizedBox(
+                                  height: 100,
+                                  child: Center(
+                                    child: Text(
+                                      viewModel.relatedProductsError!,
+                                      style: const TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              // IMPORTANT: Check if stored related products belong to current product
+                              if (!_areRelatedProductsForCurrentProduct(
+                                  viewModel)) {
+                                return const SizedBox(
+                                  height: 100,
+                                  child: Center(
+                                    child: Text(
+                                      'Aucun produit similaire disponible.',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              // Display related products in horizontal list
+                              return SizedBox(
+                                height:
+                                    270, // Same height as your other product cards
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: viewModel.relatedProducts.length,
+                                  itemBuilder: (context, index) {
+                                    final relatedProduct =
+                                        viewModel.relatedProducts[index];
+                                    final screenWidth =
+                                        MediaQuery.of(context).size.width;
+                                    final cardWidth = (screenWidth - 64) / 2.2;
+
+                                    return Container(
+                                      width: cardWidth,
+                                      margin: const EdgeInsets.only(right: 12),
+                                      child: AspectRatio(
+                                        aspectRatio:
+                                            0.65, // Same as your other product cards
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            // Navigate to another product detail screen and wait for return
+                                            await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProductDetailsScreen(
+                                                  product: relatedProduct,
+                                                ),
+                                              ),
+                                            );
+
+                                            // When returning, re-fetch related products for current product
+                                            if (mounted) {
+                                              _fetchRelatedProducts();
+                                            }
+                                          },
+                                          child: ProductCard(
+                                            productId: relatedProduct.id,
+                                            imageUrl: relatedProduct
+                                                    .imageUrls.isNotEmpty
+                                                ? relatedProduct.imageUrls.first
+                                                : '',
+                                            name: relatedProduct.name,
+                                            price: relatedProduct.price,
+                                            regularPrice:
+                                                relatedProduct.regularPrice,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+
+                          const SizedBox(height: 20),
+                        ],
                       ],
                     ),
                   ),

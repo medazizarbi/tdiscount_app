@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:tdiscount_app/models/product_model.dart';
 
 class SearchService {
-  final String baseUrl = "REMOVED_SECRET/";
-  final String consumerKey = "REMOVED_SECRET";
-  final String consumerSecret = "REMOVED_SECRET";
+  String get baseUrl => dotenv.env['WC_BASE_URL'] ?? "";
+  String get consumerKey => dotenv.env['WC_CONSUMER_KEY'] ?? "";
+  String get consumerSecret => dotenv.env['WC_CONSUMER_SECRET'] ?? "";
 
   // Filter out .avif images
   List<String> filterUnsupportedImages(List<String> imageUrls) {
@@ -18,12 +19,40 @@ class SearchService {
     required String search,
     required int page,
     required int perPage,
+    double? minPrice,
+    double? maxPrice,
+    String? order, // 'asc' or 'desc'
   }) async {
-    final url = Uri.parse(
-        "${baseUrl}products?search=$search&per_page=$perPage&page=$page&status=publish&stock_status=instock");
+    // Build the query parameters
+    final queryParams = <String, String>{
+      'search': search,
+      'per_page': perPage.toString(),
+      'page': page.toString(),
+      'status': 'publish',
+      'stock_status': 'instock',
+    };
+
+    // Add filter parameters only if they are provided
+    if (minPrice != null) {
+      queryParams['min_price'] = minPrice.toString();
+    }
+
+    if (maxPrice != null) {
+      queryParams['max_price'] = maxPrice.toString();
+    }
+
+    if (order != null && order.isNotEmpty) {
+      queryParams['order'] = order;
+      queryParams['orderby'] =
+          'price'; // Order by price when order is specified
+    }
+
+    // Build the URL with query parameters
+    final uri =
+        Uri.parse("${baseUrl}products").replace(queryParameters: queryParams);
 
     final response = await http.get(
-      url,
+      uri,
       headers: {
         'Authorization':
             'Basic ${base64Encode(utf8.encode('$consumerKey:$consumerSecret'))}',
@@ -50,6 +79,7 @@ class SearchService {
           description: product.description,
           shortDescription: product.shortDescription,
           sku: product.sku,
+          relatedIds: product.relatedIds, // NEW: Include related IDs
         );
       }).where((product) {
         // Only keep products with at least one image and a name
@@ -58,7 +88,7 @@ class SearchService {
 
       // Log the number of products fetched and the page number
       print(
-          '🔎🔎🔎🔎 [SearchService] Page $page: fetched ${products.length} products.');
+          '🔎🔎🔎🔎 [SearchService] Page $page: fetched ${products.length} products with filters - min: $minPrice, max: $maxPrice, order: $order');
 
       return products;
     } else {

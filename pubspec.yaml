@@ -38,6 +38,7 @@ dependencies:
   html: ^0.15.4
   html_unescape: ^2.0.0
   shared_preferences: ^2.2.3
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +69,7 @@ flutter:
     - assets/images/white_cat_icons/
     - assets/images/black_cat_icons/
     - assets/images/tdiscount_images/
+    - .env
     
   fonts:
     - family: Coolvetica
