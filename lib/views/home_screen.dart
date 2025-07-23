@@ -100,28 +100,21 @@ class HomeScreenState extends State<HomeScreen>
           // First, fetch regular categories if empty and not loading
           if (categoryViewModel.categories.isEmpty &&
               !categoryViewModel.isLoading) {
-            print("🔄 Fetching categories first...");
             await categoryViewModel.fetchCategories();
-            print(
-                "✅ Categories fetched, count: ${categoryViewModel.categories.length}");
           }
 
           // Then, setup top 4 categories with their products (only after categories are loaded)
           if (categoryViewModel.topCategories.isEmpty &&
               !categoryViewModel.isTopCategoriesLoading) {
-            print("🔄 Setting up top categories...");
             await categoryViewModel.setupTopCategories();
-            print("✅ Top categories setup completed");
           }
 
           // Finally, fetch trending products
           if (categoryViewModel.trendingProducts.isEmpty) {
-            print("🔄 Fetching trending products...");
             await categoryViewModel.fetchTrendingProducts();
-            print("✅ Trending products fetched");
           }
         } catch (e) {
-          print("❌ Error in _loadDataOnce: $e");
+          // Handle error silently or add proper error handling
         } finally {
           _dataLoaded = true;
         }
@@ -544,7 +537,7 @@ class HomeScreenState extends State<HomeScreen>
                                       const SizedBox(height: 20),
                                     ],
                                   );
-                                }).toList(),
+                                }),
 
                                 const SizedBox(height: 30),
                               ],

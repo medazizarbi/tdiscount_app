@@ -230,6 +230,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                               if (!mounted) return;
 
+                              // ignore: use_build_context_synchronously
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
@@ -252,22 +253,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         const Divider(
                             thickness: 1,
                             color: Colors.grey), // <-- Add this line
-                        const SizedBox(height: 16),
 
-                        // Caractéristique title
-                        const Text(
-                          'Caractéristique :',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: TColors.primary,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Product Short Description (shortDescription variable)
+                        // Caractéristique (Short Description)
                         if (formattedShortDescription != null &&
-                            formattedShortDescription.isNotEmpty)
+                            formattedShortDescription.isNotEmpty) ...[
+                          Text(
+                            'Caractéristique :',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? TColors.primary
+                                  : Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
                           Text(
                             formattedShortDescription,
                             style: const TextStyle(
@@ -276,29 +277,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               fontWeight: FontWeight.w400,
                               fontStyle: FontStyle.italic,
                             ),
-                          )
-                        else
-                          const Text(
-                            'Aucune caractéristique disponible.',
-                            style: TextStyle(fontSize: 16),
                           ),
+                          const SizedBox(height: 16),
+                        ],
 
-                        const SizedBox(height: 16),
-
-                        // Description title
-                        const Text(
-                          'Description',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: TColors.primary,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-
-                        // Product Description (description variable) with "Voir plus"
+                        // Description
                         if (product.description != null &&
-                            product.description!.isNotEmpty)
+                            product.description!.isNotEmpty) ...[
+                          Text(
+                            'Description',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? TColors.primary
+                                  : Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -329,8 +326,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   ],
                                 ),
                             ],
-                          )
-                        else
+                          ),
+                        ],
+
+// Show "Aucune description disponible." only if both are empty
+                        if ((formattedShortDescription == null ||
+                                formattedShortDescription.isEmpty) &&
+                            (product.description == null ||
+                                product.description!.isEmpty))
                           const Text(
                             'Aucune description disponible.',
                             style: TextStyle(fontSize: 16),
@@ -343,12 +346,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                         // Show related products only if the product has related IDs
                         if (widget.product.hasRelatedProducts) ...[
-                          const Text(
+                          Text(
                             'Produits similaires',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: TColors.primary,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? TColors.primary
+                                  : Colors.black,
                             ),
                           ),
                           const SizedBox(height: 16),

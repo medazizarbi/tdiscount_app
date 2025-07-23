@@ -121,16 +121,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         final success =
                             await authViewModel.login(username, password);
-                        if (!mounted) return; // <-- Add this line
+                        if (!mounted) {
+                          return; // Check if widget is still mounted
+                        }
 
                         if (success) {
                           // Navigate to home screen and remove login from stack
+                          // ignore: use_build_context_synchronously
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(
                                 builder: (_) => const MyHomePage()),
                           );
                         } else {
                           // Show error message
+                          // ignore: use_build_context_synchronously
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Verifiez vos identifiants'),

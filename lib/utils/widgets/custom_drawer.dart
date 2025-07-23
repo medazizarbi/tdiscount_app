@@ -6,6 +6,7 @@ import 'package:tdiscount_app/models/category_model.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/viewmodels/category_viewmodel.dart';
 import 'package:tdiscount_app/views/sub_categorie.dart';
+import 'package:tdiscount_app/utils/widgets/logout_dialog.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -133,28 +134,12 @@ class CustomDrawerState extends State<CustomDrawer> {
               ),
             ),
 
-            // Coupons
-            ListTile(
-              leading: const Icon(Icons.card_giftcard),
-              title: const Text("Coupons"),
-              onTap: () {},
-            ),
-
-            // Suivi commande
-            ListTile(
-              leading: const Icon(Icons.local_shipping),
-              title: const Text("Suivre votre commande"),
-              onTap: () {},
-            ),
-
-            const SizedBox(height: 20),
-
             // Déconnexion
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text("Déconnexion"),
               onTap: () {
-                // Action de déconnexion ici
+                showLogoutDialog(context);
               },
             ),
 

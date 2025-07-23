@@ -16,13 +16,6 @@ class ProductService {
     };
   }
 
-  // Helper method to clean HTML content (you might need to add html package)
-  String htmlToPlainText(String htmlString) {
-    // Remove HTML tags - you might want to use a proper HTML parser
-    RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
-    return htmlString.replaceAll(exp, '').trim();
-  }
-
   // Helper method to filter unsupported images (if you have this logic)
   List<String> filterUnsupportedImages(List<String> imageUrls) {
     return imageUrls.where((url) {
@@ -33,6 +26,13 @@ class ProductService {
               url.endsWith('.png') ||
               url.endsWith('.webp'));
     }).toList();
+  }
+
+  // Utility method to strip HTML tags and handle nulls
+  String stripHtmlTags(String? htmlText) {
+    if (htmlText == null) return '';
+    final regex = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
+    return htmlText.replaceAll(regex, '').replaceAll('&nbsp;', ' ').trim();
   }
 
   Future<Product> fetchProductById(int productId) async {
@@ -58,13 +58,8 @@ class ProductService {
         final product = Product.fromJson(data);
 
         // Clean HTML content
-        final cleanedDescription = product.description != null
-            ? htmlToPlainText(product.description!)
-            : null;
-
-        final cleanedShortDescription = product.shortDescription != null
-            ? htmlToPlainText(product.shortDescription!)
-            : null;
+        final cleanedDescription = stripHtmlTags(product.description);
+        final cleanedShortDescription = stripHtmlTags(product.shortDescription);
 
         // Filter image URLs
         final filteredImageUrls = filterUnsupportedImages(product.imageUrls);
@@ -159,13 +154,9 @@ class ProductService {
           final product = Product.fromJson(json);
 
           // Clean HTML content
-          final cleanedDescription = product.description != null
-              ? htmlToPlainText(product.description!)
-              : null;
-
-          final cleanedShortDescription = product.shortDescription != null
-              ? htmlToPlainText(product.shortDescription!)
-              : null;
+          final cleanedDescription = stripHtmlTags(product.description);
+          final cleanedShortDescription =
+              stripHtmlTags(product.shortDescription);
 
           // Filter image URLs
           final filteredImageUrls = filterUnsupportedImages(product.imageUrls);

@@ -14,7 +14,7 @@ class ProductViewModel extends ChangeNotifier {
   Map<int, int> cartQuantities = {};
 
   // NEW: Cache for all fetched products to avoid refetching
-  Map<int, Product> _productCache = {};
+  final Map<int, Product> _productCache = {};
 
   // NEW: Related products state
   List<Product> _relatedProducts = [];
@@ -30,22 +30,18 @@ class ProductViewModel extends ChangeNotifier {
   Future<Product?> _getProductById(int productId) async {
     // Check if product is already in cache
     if (_productCache.containsKey(productId)) {
-      print('✅ Product $productId found in cache');
       return _productCache[productId];
     }
 
     // If not in cache, fetch from API
     try {
-      print('🔄 Fetching product $productId from API...');
       final product = await _productService.fetchProductById(productId);
 
       // Store in cache for future use
       _productCache[productId] = product;
-      print('✅ Product $productId cached successfully');
 
       return product;
     } catch (e) {
-      print('❌ Error fetching product $productId: $e');
       return null;
     }
   }
@@ -57,7 +53,7 @@ class ProductViewModel extends ChangeNotifier {
     try {
       product = await _getProductById(productId);
     } catch (e) {
-      print("Error fetching product: $e");
+      // Handle error silently
     } finally {
       isLoading = false;
       notifyListeners();
@@ -105,11 +101,7 @@ class ProductViewModel extends ChangeNotifier {
         final fetchedProduct = await _getProductById(id); // Use cached version
         if (fetchedProduct != null) {
           cartProducts.add(fetchedProduct);
-          print('Fetched product: ${fetchedProduct.name} (ID: $id)');
         }
-      } else if (cartProducts.any((prod) => prod.id == id)) {
-        print(
-            'Product with ID $id already in cartProducts, skipping fetch.✅✅✅✅✅✅');
       }
     }
     isLoading = false;
@@ -169,26 +161,20 @@ class ProductViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      print('🔄 Fetching ${relatedIds.length} related products...');
-
       List<Product> fetchedRelatedProducts = [];
       List<int> productsToFetch = [];
 
       // First, check which products are already in cache
       for (int relatedId in relatedIds) {
         if (_productCache.containsKey(relatedId)) {
-          print('✅ Related product $relatedId found in cache');
           fetchedRelatedProducts.add(_productCache[relatedId]!);
         } else {
-          print('📥 Related product $relatedId needs to be fetched');
           productsToFetch.add(relatedId);
         }
       }
 
       // Fetch only the products that are not in cache
       if (productsToFetch.isNotEmpty) {
-        print('🌐 Fetching ${productsToFetch.length} products from API...');
-
         // Fetch products one by one and add to cache
         for (int productId in productsToFetch) {
           final product = await _getProductById(productId);
@@ -211,12 +197,8 @@ class ProductViewModel extends ChangeNotifier {
         }
       }
 
-      print(
-          '✅ Successfully loaded ${_relatedProducts.length} related products');
-      print('📊 Cache now contains ${_productCache.length} products');
       _relatedProductsError = null;
     } catch (e) {
-      print('❌ Error fetching related products: $e');
       _relatedProductsError =
           'Erreur lors du chargement des produits similaires';
       _relatedProducts = [];
@@ -234,8 +216,6 @@ class ProductViewModel extends ChangeNotifier {
         .map((id) => _productCache[id]!)
         .toList();
 
-    print(
-        '🔧 Set ${_relatedProducts.length} related products for product $currentProductId from cache');
     notifyListeners();
 
     // If not all related products are in cache, fetch the missing ones
@@ -263,6 +243,5 @@ class ProductViewModel extends ChangeNotifier {
   // NEW: Method to clear cache if needed (useful for logout or memory management)
   void clearProductCache() {
     _productCache.clear();
-    print('🗑️ Product cache cleared');
   }
 }

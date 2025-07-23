@@ -43,7 +43,7 @@ class TestableCategoryService {
 
   Map<String, String> _getAuthHeaders() {
     final basicAuth =
-        'Basic ' + base64Encode(utf8.encode('$consumerKey:$consumerSecret'));
+        'Basic ${base64Encode(utf8.encode('$consumerKey:$consumerSecret'))}';
     return {
       'Authorization': basicAuth,
       'Content-Type': 'application/json',

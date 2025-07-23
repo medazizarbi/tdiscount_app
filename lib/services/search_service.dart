@@ -68,7 +68,11 @@ class SearchService {
         // Filter images
         final filteredImageUrls = filterUnsupportedImages(product.imageUrls);
 
-        // Return a new Product with filtered images
+        // Clean descriptions
+        final cleanDescription = stripHtmlTags(product.description);
+        final cleanShortDescription = stripHtmlTags(product.shortDescription);
+
+        // Return a new Product with filtered images and cleaned descriptions
         return Product(
           id: product.id,
           name: product.name,
@@ -76,10 +80,10 @@ class SearchService {
           regularPrice: product.regularPrice,
           imageUrls: filteredImageUrls,
           inStock: product.inStock,
-          description: product.description,
-          shortDescription: product.shortDescription,
+          description: cleanDescription,
+          shortDescription: cleanShortDescription,
           sku: product.sku,
-          relatedIds: product.relatedIds, // NEW: Include related IDs
+          relatedIds: product.relatedIds,
         );
       }).where((product) {
         // Only keep products with at least one image and a name
@@ -94,5 +98,12 @@ class SearchService {
     } else {
       throw Exception("Erreur lors de la recherche des produits");
     }
+  }
+
+  // Add this utility function in your service or a utils file
+  String stripHtmlTags(String? htmlText) {
+    if (htmlText == null) return '';
+    final regex = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
+    return htmlText.replaceAll(regex, '').replaceAll('&nbsp;', ' ').trim();
   }
 }

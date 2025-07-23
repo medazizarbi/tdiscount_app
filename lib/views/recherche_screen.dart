@@ -235,8 +235,6 @@ class _RechercheScreenState extends State<RechercheScreen> {
                                         const FilterBottomSheet(),
                                   ).then((filterData) {
                                     if (filterData != null) {
-                                      print("Applied filters: $filterData");
-
                                       // Apply filters to current search or search all if no search term
                                       final searchVM =
                                           Provider.of<SearchViewModel>(context,

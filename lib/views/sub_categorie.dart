@@ -20,6 +20,7 @@ class SubCategorieScreen extends StatefulWidget {
   });
 
   @override
+  // ignore: library_private_types_in_public_api
   _SubCategorieScreenState createState() => _SubCategorieScreenState();
 }
 
@@ -93,9 +94,6 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Add the banner at the top
-                      const SingleImageBanner(
-                          imagePath: 'assets/images/banner_example.png'),
                       const SizedBox(
                           height: 20), // Add spacing below the banner
 
