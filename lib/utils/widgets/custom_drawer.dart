@@ -56,7 +56,7 @@ class CustomDrawerState extends State<CustomDrawer> {
                   // Use different logo for light/dark theme
                   Image.asset(
                     Theme.of(context).brightness == Brightness.dark
-                        ? "assets/images/tdiscount_images/Logo-Tdiscount-market-blanc.png" // White logo for dark theme
+                        ? "assets/images/tdiscount_images/Logo-Tdiscount-market-2.0.png" // White logo for dark theme
                         : "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png", // Black logo for light theme
                     width: 120,
                     height: 40,

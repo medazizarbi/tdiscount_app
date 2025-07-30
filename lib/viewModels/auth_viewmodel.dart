@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/user_auth_service.dart';
 
 class AuthViewModel extends ChangeNotifier {
@@ -33,5 +34,46 @@ class AuthViewModel extends ChangeNotifier {
     userData = null;
     isLoading = false;
     notifyListeners();
+  }
+
+  Future<bool> updateUserInfo({
+    String? name,
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? password,
+  }) async {
+    isLoading = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      final updatedData = await _authService.updateUserInfo(
+        name: name,
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+      );
+      userData = updatedData;
+      isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      errorMessage = e.toString();
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<Map<String, String>> getUserInfoFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'first_name': prefs.getString('user_first_name') ?? '',
+      'last_name': prefs.getString('user_last_name') ?? '',
+      'display_name': prefs.getString('user_display_name') ?? '',
+      'email': prefs.getString('user_email') ?? '',
+    };
   }
 }

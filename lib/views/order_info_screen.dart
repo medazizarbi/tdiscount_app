@@ -55,213 +55,280 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
     "Kebili"
   ];
 
-  final OutlineInputBorder curvedBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(20),
-    borderSide: const BorderSide(color: Colors.grey),
+  final OutlineInputBorder curvedBorder = const OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(30)),
+    borderSide: BorderSide(color: Colors.grey),
   );
+
+  int _noteMaxLines = 2;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: TColors.primary,
-        elevation: 0,
-        title: const Text(
-          "Informations de commande",
-          style: TextStyle(
-            color: TColors.black,
-            fontWeight: FontWeight.bold,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            backgroundColor: TColors.primary,
+            elevation: 0,
+            centerTitle: true,
+            floating: true, // <-- makes the app bar float
+            pinned: false, // <-- not pinned
+            title: Image.asset(
+              "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png",
+              height: 40,
+              fit: BoxFit.contain,
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: TColors.black),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            automaticallyImplyLeading: false,
           ),
-        ),
-        iconTheme: const IconThemeData(color: TColors.black),
-      ),
-      body: Container(
-        color:
-            themedColor(context, TColors.lightContainer, TColors.darkContainer),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              const SizedBox(height: 24),
-
-              // First and Last Name
-              Row(
+          SliverToBoxAdapter(
+            child: Container(
+              color: TColors.primary,
+              child: ListView(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                 children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _firstNameController,
-                      decoration: InputDecoration(
-                        labelText: "Prénom",
-                        border: curvedBorder,
-                        enabledBorder: curvedBorder,
-                        focusedBorder: curvedBorder,
+                  const SizedBox(height: 20),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: themedColor(context, TColors.lightContainer,
+                          TColors.darkContainer),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(25),
+                        topRight: Radius.circular(25),
                       ),
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Champ requis"
-                          : null,
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _lastNameController,
-                      decoration: InputDecoration(
-                        labelText: "Nom",
-                        border: curvedBorder,
-                        enabledBorder: curvedBorder,
-                        focusedBorder: curvedBorder,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 24),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Center(
+                            child: Text(
+                              "Informations de commande",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // First and Last Name
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _firstNameController,
+                                  decoration: InputDecoration(
+                                    labelText: "Prénom",
+                                    border: curvedBorder,
+                                    enabledBorder: curvedBorder,
+                                    focusedBorder: curvedBorder,
+                                  ),
+                                  validator: (value) =>
+                                      value == null || value.trim().isEmpty
+                                          ? "Champ requis"
+                                          : null,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _lastNameController,
+                                  decoration: InputDecoration(
+                                    labelText: "Nom",
+                                    border: curvedBorder,
+                                    enabledBorder: curvedBorder,
+                                    focusedBorder: curvedBorder,
+                                  ),
+                                  validator: (value) =>
+                                      value == null || value.trim().isEmpty
+                                          ? "Champ requis"
+                                          : null,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+
+                          // City Picker
+                          DropdownButtonFormField<String>(
+                            value: _selectedCity,
+                            decoration: InputDecoration(
+                              labelText: "Ville",
+                              border: curvedBorder,
+                              enabledBorder: curvedBorder,
+                              focusedBorder: curvedBorder,
+                            ),
+                            items: _tunisiaCities
+                                .map((city) => DropdownMenuItem(
+                                      value: city,
+                                      child: Text(city),
+                                    ))
+                                .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedCity = value;
+                              });
+                            },
+                            validator: (value) => value == null || value.isEmpty
+                                ? "Champ requis"
+                                : null,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Address
+                          TextFormField(
+                            controller: _addressController,
+                            decoration: InputDecoration(
+                              labelText: "Adresse",
+                              border: curvedBorder,
+                              enabledBorder: curvedBorder,
+                              focusedBorder: curvedBorder,
+                            ),
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty
+                                    ? "Champ requis"
+                                    : null,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Phone Number
+                          TextFormField(
+                            controller: _phoneController,
+                            keyboardType: TextInputType.number,
+                            maxLength: 8,
+                            decoration: InputDecoration(
+                              labelText: "Numéro de téléphone",
+                              prefixText: "+216 ",
+                              border: curvedBorder,
+                              enabledBorder: curvedBorder,
+                              focusedBorder: curvedBorder,
+                              counterText: "", // Hide the counter text
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return "Champ requis";
+                              }
+                              if (!RegExp(r'^[0-9]{8}$')
+                                  .hasMatch(value.trim())) {
+                                return "Numéro invalide";
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Note
+                          TextFormField(
+                            controller: _noteController,
+                            minLines: 2,
+                            maxLines: _noteMaxLines,
+                            onChanged: (value) {
+                              final lineCount =
+                                  '\n'.allMatches(value).length + 1;
+                              setState(() {
+                                _noteMaxLines = lineCount < 2 ? 2 : lineCount;
+                              });
+                            },
+                            decoration: InputDecoration(
+                              labelText: "Note (optionnel)",
+                              border: curvedBorder,
+                              enabledBorder: curvedBorder,
+                              focusedBorder: curvedBorder,
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: Consumer<OrderViewModel>(
+                              builder: (context, orderViewModel, child) {
+                                return ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: TColors.primary,
+                                    foregroundColor: TColors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                  ),
+                                  onPressed: orderViewModel.isLoading
+                                      ? null
+                                      : () async {
+                                          if (_formKey.currentState!
+                                              .validate()) {
+                                            final success = await orderViewModel
+                                                .createOrdersOneByOne(
+                                              firstName:
+                                                  _firstNameController.text,
+                                              lastName:
+                                                  _lastNameController.text,
+                                              address1: _addressController.text,
+                                              city: _selectedCity ?? "",
+                                              phone:
+                                                  "+216${_phoneController.text}",
+                                              note: _noteController.text,
+                                              products: widget.products,
+                                              quantities: widget.quantities,
+                                            );
+
+                                            if (!mounted) return;
+                                            if (success) {
+                                              // ignore: use_build_context_synchronously
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                    content: Text(
+                                                        "Commande envoyée !")),
+                                              );
+                                              // Optionally: Navigator.pop(context);
+                                            } else {
+                                              // ignore: use_build_context_synchronously
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(orderViewModel
+                                                          .errorMessage ??
+                                                      "Erreur inconnue"),
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        },
+                                  child: orderViewModel.isLoading
+                                      ? const CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  TColors.black),
+                                        )
+                                      : const Text(
+                                          "Terminer la commande",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Champ requis"
-                          : null,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-
-              // City Picker
-              DropdownButtonFormField<String>(
-                value: _selectedCity,
-                decoration: InputDecoration(
-                  labelText: "Ville",
-                  border: curvedBorder,
-                  enabledBorder: curvedBorder,
-                  focusedBorder: curvedBorder,
-                ),
-                items: _tunisiaCities
-                    .map((city) => DropdownMenuItem(
-                          value: city,
-                          child: Text(city),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedCity = value;
-                  });
-                },
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Champ requis" : null,
-              ),
-              const SizedBox(height: 16),
-              // Address
-              TextFormField(
-                controller: _addressController,
-                decoration: InputDecoration(
-                  labelText: "Adresse",
-                  border: curvedBorder,
-                  enabledBorder: curvedBorder,
-                  focusedBorder: curvedBorder,
-                ),
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Champ requis" : null,
-              ),
-              const SizedBox(height: 16),
-              // Phone Number
-              TextFormField(
-                controller: _phoneController,
-                keyboardType: TextInputType.number,
-                maxLength: 8,
-                decoration: InputDecoration(
-                  labelText: "Numéro de téléphone",
-                  prefixText: "+216 ",
-                  border: curvedBorder,
-                  enabledBorder: curvedBorder,
-                  focusedBorder: curvedBorder,
-                  counterText: "", // Hide the counter text
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Champ requis";
-                  }
-                  if (!RegExp(r'^[0-9]{8}$').hasMatch(value)) {
-                    return "Numéro invalide";
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              // Note
-              TextFormField(
-                controller: _noteController,
-                decoration: InputDecoration(
-                  labelText: "Note (optionnel)",
-                  border: curvedBorder,
-                  enabledBorder: curvedBorder,
-                  focusedBorder: curvedBorder,
-                ),
-                maxLines: 2,
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: Consumer<OrderViewModel>(
-                  builder: (context, orderViewModel, child) {
-                    return ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: TColors.primary,
-                        foregroundColor: TColors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      onPressed: orderViewModel.isLoading
-                          ? null
-                          : () async {
-                              if (_formKey.currentState!.validate()) {
-                                final success =
-                                    await orderViewModel.createOrdersOneByOne(
-                                  firstName: _firstNameController.text,
-                                  lastName: _lastNameController.text,
-                                  address1: _addressController.text,
-                                  city: _selectedCity ?? "",
-                                  phone: "+216${_phoneController.text}",
-                                  note: _noteController.text,
-                                  products: widget.products,
-                                  quantities: widget.quantities,
-                                );
-
-                                if (!mounted) return;
-                                if (success) {
-                                  // ignore: use_build_context_synchronously
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text("Commande envoyée !")),
-                                  );
-                                  // Optionally: Navigator.pop(context);
-                                } else {
-                                  // ignore: use_build_context_synchronously
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          orderViewModel.errorMessage ??
-                                              "Erreur inconnue"),
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                      child: orderViewModel.isLoading
-                          ? const CircularProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(TColors.black),
-                            )
-                          : const Text(
-                              "Terminer la commande",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                    );
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

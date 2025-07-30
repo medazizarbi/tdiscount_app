@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
-import 'package:tdiscount_app/utils/widgets/single_image_banner.dart';
 import 'package:tdiscount_app/utils/widgets/product_card.dart';
 import 'package:tdiscount_app/utils/widgets/view_more_btn.dart';
 import '../viewmodels/category_viewmodel.dart';

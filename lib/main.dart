@@ -16,6 +16,7 @@ import 'views/profil_screen.dart';
 import 'utils/widgets/nav_bar.dart';
 import 'package:tdiscount_app/viewModels/favorites_view_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'utils/widgets/connectivity_checker.dart'; // Add this import
 
 // ignore: library_private_types_in_public_api
 final GlobalKey<_MyHomePageState> homePageKey = GlobalKey<_MyHomePageState>();
@@ -51,21 +52,20 @@ class MyApp extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       themeMode: themeProvider.themeMode,
-
-      debugShowCheckedModeBanner:
-          false, // Set to false to remove the debug banner
-      home: isLoggedIn ? const MyHomePage() : const LoginScreen(),
+      debugShowCheckedModeBanner: false,
+      home: ConnectivityChecker(
+        // <-- Wrap home with ConnectivityChecker
+        child: isLoggedIn ? const MyHomePage() : const LoginScreen(),
+      ),
       theme: ThemeData(
         brightness: Brightness.light,
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.white,
-        // Add other light theme customizations here
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.black,
-        // Add other dark theme customizations here
       ),
     );
   }

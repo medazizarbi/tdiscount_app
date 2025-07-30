@@ -35,9 +35,21 @@ class ProductImagesViewerState extends State<ProductImagesViewer> {
           margin: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            image: DecorationImage(
-              image: NetworkImage(displayedImageUrl),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              displayedImageUrl,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: Colors.grey[200],
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.broken_image,
+                  size: 64,
+                  color: Colors.grey,
+                ),
+              ),
             ),
           ),
         ),
@@ -62,11 +74,23 @@ class ProductImagesViewerState extends State<ProductImagesViewer> {
                     ),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Image.network(
-                    url,
-                    height: 60,
-                    width: 60,
-                    fit: BoxFit.cover,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      url,
+                      height: 60,
+                      width: 60,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[200],
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.broken_image,
+                          size: 24,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               );

@@ -5,7 +5,7 @@ import 'package:tdiscount_app/services/produit_service.dart';
 
 class FavoriteViewModel extends ChangeNotifier {
   List<int> _favoriteProductIds = [];
-  List<Product> _favoriteProducts = [];
+  final List<Product> _favoriteProducts = [];
   final ProductService _productService = ProductService();
 
   bool _isLoading = false;

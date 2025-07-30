@@ -85,8 +85,7 @@ class PanierProductCard extends StatelessWidget {
                     icon: const Icon(Icons.add_circle_outline),
                     onPressed: onAdd,
                   ),
-                  const SizedBox(
-                      width: 12), // Spacing between quantity and price
+                  // Spacing between quantity and price
                   // Price Row (Previous Price + Actual Price)
                   if (previousPrice != null)
                     Text(

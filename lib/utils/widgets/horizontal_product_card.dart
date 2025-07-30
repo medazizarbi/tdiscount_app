@@ -90,6 +90,15 @@ class _HorizontalProductCardState extends State<HorizontalProductCard> {
             child: Image.network(
               widget.imagePath,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: Colors.grey[200],
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.broken_image,
+                  size: 40,
+                  color: Colors.grey,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -123,44 +132,67 @@ class _HorizontalProductCardState extends State<HorizontalProductCard> {
                 const SizedBox(height: 8),
                 // Second Row: Quantity Controls and Prices
                 Row(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.center, // <-- Center vertically
                   children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.remove_circle_outline,
-                        size: 20,
+                    // Quantity controls (attached to the left)
+                    SizedBox(
+                      height: 36, // Ensures vertical alignment
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.remove_circle_outline,
+                              size: 20,
+                            ),
+                            onPressed: _decrement,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                          Text(
+                            '$quantity',
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.add_circle_outline,
+                              size: 20,
+                            ),
+                            onPressed: _increment,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
                       ),
-                      onPressed: _decrement,
                     ),
-                    Text(
-                      '$quantity',
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.add_circle_outline,
-                        size: 20,
-                      ),
-                      onPressed: _increment,
-                    ),
-                    const SizedBox(width: 0),
-                    const Spacer(),
-                    if (widget.previousPrice != null)
-                      Text(
-                        widget.previousPrice!,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          decoration: TextDecoration.lineThrough,
-                          decorationColor: Colors.red,
-                          color: Colors.red,
-                        ),
-                      ),
-                    if (widget.previousPrice != null) const SizedBox(width: 8),
-                    Text(
-                      '${widget.price} TND',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                    const SizedBox(width: 12),
+
+                    // Prices stacked vertically and right-aligned
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          if (widget.previousPrice != null)
+                            Text(
+                              widget.previousPrice!,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                decoration: TextDecoration.lineThrough,
+                                decorationColor: Colors.red,
+                                color: Colors.red,
+                              ),
+                            ),
+                          Text(
+                            '${widget.price} TND',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

@@ -39,10 +39,13 @@ dependencies:
   html_unescape: ^2.0.0
   shared_preferences: ^2.2.3
   flutter_dotenv: ^5.1.0
+  connectivity_plus: 6.1.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -134,3 +137,19 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_icons/app_icon.png" # Your main icon
+  adaptive_icon_background: "#FFFFFF" # Solid color or transparent background for adaptive icon
+  adaptive_icon_foreground: "assets/images/app_icons/app_icon.png" # For Android adaptive icon
+  min_sdk_android: 21
+
+flutter_native_splash:
+  color: "#000000" # Your primary color or any hex code
+  image: assets/images/app_icons/app_icon_dark.png # Your logo
+  android: true
+  ios: true
+  branding: assets/images/app_icons/app_icon.png # Optional: for a branding image at the bottom
+  branding_mode: bottom # Center the branding image (logo)

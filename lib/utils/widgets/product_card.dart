@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/viewModels/favorites_view_model.dart';
+import 'package:tdiscount_app/viewModels/product_viewmodel.dart';
 
 class ProductCard extends StatefulWidget {
   final int productId; // <-- Add this line
@@ -59,6 +60,16 @@ class ProductCardState extends State<ProductCard> {
                     width: 150,
                     height: 150,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: 150,
+                      height: 150,
+                      color: Colors.grey[200],
+                      child: const Icon(
+                        Icons.broken_image,
+                        size: 48,
+                        color: Colors.grey,
+                      ),
+                    ),
                   ),
                 ),
                 Padding(
@@ -120,8 +131,26 @@ class ProductCardState extends State<ProductCard> {
                           color: Colors.blue,
                           size: 24,
                         ),
-                        onPressed: () {
-                          // Add to cart functionality
+                        onPressed: () async {
+                          // Access your ProductViewModel
+                          final productViewModel =
+                              Provider.of<ProductViewModel>(context,
+                                  listen: false);
+                          final added = await productViewModel
+                              .addProductIdToCart(widget.productId);
+
+                          if (!mounted) return;
+
+                          // ignore: use_build_context_synchronously
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                added
+                                    ? '${widget.name} ajouté au panier !'
+                                    : 'Ce produit est déjà dans le panier.',
+                              ),
+                            ),
+                          );
                         },
                       ),
                     ],

@@ -73,406 +73,403 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     }
 
     return Scaffold(
-      body: SingleChildScrollView(
-        // Make the entire page scrollable
-        child: Stack(
-          children: [
-            // Blue background
-            Container(
-              height: MediaQuery.of(context)
-                  .size
-                  .height, // Ensure it covers the full screen
-              color: TColors.primary,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            backgroundColor: TColors.primary,
+            elevation: 0,
+            centerTitle: true,
+            floating: true, // <-- makes the app bar float
+            pinned: false, // <-- not pinned
+            title: Image.asset(
+              "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png",
+              height: 40,
+              fit: BoxFit.contain,
             ),
-            // Content
-            Column(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: TColors.black),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            automaticallyImplyLeading: false,
+          ),
+          SliverToBoxAdapter(
+            child: Stack(
               children: [
-                // Top section with back button and "Produit Details" title
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 20.0),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back,
-                            color: TColors.textPrimary),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      const SizedBox(width: 8.0),
-                      const Expanded(
-                        child: Text(
-                          "Details du Produit",
-                          style: TextStyle(
-                            color: TColors.textPrimary,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // White container with curved borders
                 Container(
-                  decoration: BoxDecoration(
-                    color: themedColor(
-                      context,
-                      TColors.lightContainer,
-                      TColors.darkContainer,
-                    ),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20.0),
-                      topRight: Radius.circular(20.0),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Product Image
-                        // ignore: unnecessary_null_comparison
-                        const SizedBox(height: 16),
-
-                        product.imageUrls.isNotEmpty
-                            ? ProductImagesViewer(imageUrls: product.imageUrls)
-                            : const Placeholder(
-                                fallbackHeight: 200,
-                                fallbackWidth: double.infinity,
-                              ),
-
-                        const SizedBox(height: 16),
-
-                        // Product Name
-                        Text(
-                          product.name,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.normal,
-                          ),
+                  height: MediaQuery.of(context).size.height,
+                  color: TColors.primary,
+                ),
+                Column(
+                  children: [
+                    const SizedBox(height: 20), // <-- Add this line for spacing
+                    // White container with curved borders
+                    Container(
+                      decoration: BoxDecoration(
+                        color: themedColor(
+                          context,
+                          TColors.lightContainer,
+                          TColors.darkContainer,
                         ),
-                        const SizedBox(height: 16),
-
-                        // Product Price
-                        Row(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Product Image
+                            // ignore: unnecessary_null_comparison
+                            const SizedBox(height: 16),
+
+                            product.imageUrls.isNotEmpty
+                                ? ProductImagesViewer(
+                                    imageUrls: product.imageUrls)
+                                : const Placeholder(
+                                    fallbackHeight: 200,
+                                    fallbackWidth: double.infinity,
+                                  ),
+
+                            const SizedBox(height: 16),
+
+                            // Product Name
                             Text(
-                              '${product.price} DT',
+                              product.name,
                               style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: TColors.textprice,
+                                fontSize: 22,
+                                fontWeight: FontWeight.normal,
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            if (product.regularPrice != null)
-                              Text(
-                                ' ${product.regularPrice} DT',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                  decoration: TextDecoration.lineThrough,
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 8), // Add some spacing
-// SKU
-                        if (product.sku != null && product.sku!.isNotEmpty)
-                          Text.rich(
-                            TextSpan(
+                            const SizedBox(height: 16),
+
+                            // Product Price
+                            Row(
                               children: [
-                                TextSpan(
-                                  text: 'SKU: ',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontStyle: FontStyle.italic,
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.dark
-                                        ? Colors.white
-                                        : Colors.black,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: product.sku,
+                                Text(
+                                  '${product.price} DT',
                                   style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.normal,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                    color: TColors.textprice,
                                   ),
                                 ),
+                                const SizedBox(width: 8),
+                                if (product.regularPrice != null)
+                                  Text(
+                                    ' ${product.regularPrice} DT',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                      decoration: TextDecoration.lineThrough,
+                                    ),
+                                  ),
                               ],
                             ),
-                          ),
-                        const SizedBox(height: 16),
-
-// Ajouter au panier button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: TColors.primary,
-                              foregroundColor: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                            ),
-                            onPressed: () async {
-                              final added = await productViewModel
-                                  .addProductIdToCart(widget.product.id);
-
-                              if (!mounted) return;
-
-                              // ignore: use_build_context_synchronously
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    added
-                                        ? '${product.name} ajouté au panier !'
-                                        : 'Ce produit est déjà dans le panier.',
-                                  ),
-                                ),
-                              );
-                            },
-                            child: const Text(
-                              'Ajouter au panier',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 16),
-                        const Divider(
-                            thickness: 1,
-                            color: Colors.grey), // <-- Add this line
-
-                        // Caractéristique (Short Description)
-                        if (formattedShortDescription != null &&
-                            formattedShortDescription.isNotEmpty) ...[
-                          Text(
-                            'Caractéristique :',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? TColors.primary
-                                  : Colors.black,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            formattedShortDescription,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Coolvetica',
-                              fontWeight: FontWeight.w400,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                        ],
-
-                        // Description
-                        if (product.description != null &&
-                            product.description!.isNotEmpty) ...[
-                          Text(
-                            'Description',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? TColors.primary
-                                  : Colors.black,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                product.description!,
-                                maxLines: descriptionExpanded ? null : 4,
-                                overflow: descriptionExpanded
-                                    ? TextOverflow.visible
-                                    : TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'Poppins',
-                                  fontStyle: FontStyle.normal,
-                                ),
-                              ),
-                              if (!descriptionExpanded)
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                            const SizedBox(height: 8), // Add some spacing
+// SKU
+                            if (product.sku != null && product.sku!.isNotEmpty)
+                              Text.rich(
+                                TextSpan(
                                   children: [
-                                    TextButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          descriptionExpanded = true;
-                                        });
-                                      },
-                                      child: const Text('Voir plus'),
+                                    TextSpan(
+                                      text: 'SKU: ',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontStyle: FontStyle.italic,
+                                        color: Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white
+                                            : Colors.black,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: product.sku,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                        fontStyle: FontStyle.italic,
+                                        fontWeight: FontWeight.normal,
+                                      ),
                                     ),
                                   ],
                                 ),
+                              ),
+                            const SizedBox(height: 16),
+
+// Ajouter au panier button
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: TColors.primary,
+                                  foregroundColor: Colors.black,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 14),
+                                ),
+                                onPressed: () async {
+                                  final added = await productViewModel
+                                      .addProductIdToCart(widget.product.id);
+
+                                  if (!mounted) return;
+
+                                  // ignore: use_build_context_synchronously
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        added
+                                            ? '${product.name} ajouté au panier !'
+                                            : 'Ce produit est déjà dans le panier.',
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  'Ajouter au panier',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 16),
+                            const Divider(
+                                thickness: 1,
+                                color: Colors.grey), // <-- Add this line
+
+                            // Caractéristique (Short Description)
+                            if (formattedShortDescription != null &&
+                                formattedShortDescription.isNotEmpty) ...[
+                              Text(
+                                'Caractéristique :',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? TColors.primary
+                                      : Colors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                formattedShortDescription,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Coolvetica',
+                                  fontWeight: FontWeight.w400,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
                             ],
-                          ),
-                        ],
+
+                            // Description
+                            if (product.description != null &&
+                                product.description!.isNotEmpty) ...[
+                              Text(
+                                'Description',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? TColors.primary
+                                      : Colors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    product.description!,
+                                    maxLines: descriptionExpanded ? null : 4,
+                                    overflow: descriptionExpanded
+                                        ? TextOverflow.visible
+                                        : TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'Poppins',
+                                      fontStyle: FontStyle.normal,
+                                    ),
+                                  ),
+                                  if (!descriptionExpanded)
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              descriptionExpanded = true;
+                                            });
+                                          },
+                                          child: const Text('Voir plus'),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            ],
 
 // Show "Aucune description disponible." only if both are empty
-                        if ((formattedShortDescription == null ||
-                                formattedShortDescription.isEmpty) &&
-                            (product.description == null ||
-                                product.description!.isEmpty))
-                          const Text(
-                            'Aucune description disponible.',
-                            style: TextStyle(fontSize: 16),
-                          ),
+                            if ((formattedShortDescription == null ||
+                                    formattedShortDescription.isEmpty) &&
+                                (product.description == null ||
+                                    product.description!.isEmpty))
+                              const Text(
+                                'Aucune description disponible.',
+                                style: TextStyle(fontSize: 16),
+                              ),
 
-                        // NEW: Related Products Section
-                        const SizedBox(height: 20),
-                        const Divider(thickness: 1, color: Colors.grey),
-                        const SizedBox(height: 20),
+                            // NEW: Related Products Section
+                            const SizedBox(height: 20),
+                            const Divider(thickness: 1, color: Colors.grey),
+                            const SizedBox(height: 20),
 
-                        // Show related products only if the product has related IDs
-                        if (widget.product.hasRelatedProducts) ...[
-                          Text(
-                            'Produits similaires',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? TColors.primary
-                                  : Colors.black,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
+                            // Show related products only if the product has related IDs
+                            if (widget.product.hasRelatedProducts) ...[
+                              Text(
+                                'Produits similaires',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? TColors.primary
+                                      : Colors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
 
-                          // Related Products List
-                          Consumer<ProductViewModel>(
-                            builder: (context, viewModel, child) {
-                              if (viewModel.isLoadingRelatedProducts) {
-                                return const SizedBox(
-                                  height: 200,
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      color: TColors.primary,
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              if (viewModel.relatedProductsError != null) {
-                                return SizedBox(
-                                  height: 100,
-                                  child: Center(
-                                    child: Text(
-                                      viewModel.relatedProductsError!,
-                                      style: const TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 16,
+                              // Related Products List
+                              Consumer<ProductViewModel>(
+                                builder: (context, viewModel, child) {
+                                  if (viewModel.isLoadingRelatedProducts) {
+                                    return const SizedBox(
+                                      height: 200,
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          color: TColors.primary,
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                );
-                              }
+                                    );
+                                  }
 
-                              // IMPORTANT: Check if stored related products belong to current product
-                              if (!_areRelatedProductsForCurrentProduct(
-                                  viewModel)) {
-                                return const SizedBox(
-                                  height: 100,
-                                  child: Center(
-                                    child: Text(
-                                      'Aucun produit similaire disponible.',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              // Display related products in horizontal list
-                              return SizedBox(
-                                height:
-                                    270, // Same height as your other product cards
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: viewModel.relatedProducts.length,
-                                  itemBuilder: (context, index) {
-                                    final relatedProduct =
-                                        viewModel.relatedProducts[index];
-                                    final screenWidth =
-                                        MediaQuery.of(context).size.width;
-                                    final cardWidth = (screenWidth - 64) / 2.2;
-
-                                    return Container(
-                                      width: cardWidth,
-                                      margin: const EdgeInsets.only(right: 12),
-                                      child: AspectRatio(
-                                        aspectRatio:
-                                            0.65, // Same as your other product cards
-                                        child: GestureDetector(
-                                          onTap: () async {
-                                            // Navigate to another product detail screen and wait for return
-                                            await Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ProductDetailsScreen(
-                                                  product: relatedProduct,
-                                                ),
-                                              ),
-                                            );
-
-                                            // When returning, re-fetch related products for current product
-                                            if (mounted) {
-                                              _fetchRelatedProducts();
-                                            }
-                                          },
-                                          child: ProductCard(
-                                            productId: relatedProduct.id,
-                                            imageUrl: relatedProduct
-                                                    .imageUrls.isNotEmpty
-                                                ? relatedProduct.imageUrls.first
-                                                : '',
-                                            name: relatedProduct.name,
-                                            price: relatedProduct.price,
-                                            regularPrice:
-                                                relatedProduct.regularPrice,
+                                  if (viewModel.relatedProductsError != null) {
+                                    return SizedBox(
+                                      height: 100,
+                                      child: Center(
+                                        child: Text(
+                                          viewModel.relatedProductsError!,
+                                          style: const TextStyle(
+                                            color: Colors.red,
+                                            fontSize: 16,
                                           ),
                                         ),
                                       ),
                                     );
-                                  },
-                                ),
-                              );
-                            },
-                          ),
+                                  }
 
-                          const SizedBox(height: 20),
-                        ],
-                      ],
+                                  // IMPORTANT: Check if stored related products belong to current product
+                                  if (!_areRelatedProductsForCurrentProduct(
+                                      viewModel)) {
+                                    return const SizedBox(
+                                      height: 100,
+                                      child: Center(
+                                        child: Text(
+                                          'Aucun produit similaire disponible.',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  // Display related products in horizontal list
+                                  return SizedBox(
+                                    height:
+                                        270, // Same height as your other product cards
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount:
+                                          viewModel.relatedProducts.length,
+                                      itemBuilder: (context, index) {
+                                        final relatedProduct =
+                                            viewModel.relatedProducts[index];
+                                        final screenWidth =
+                                            MediaQuery.of(context).size.width;
+                                        final cardWidth =
+                                            (screenWidth - 64) / 2.2;
+
+                                        return Container(
+                                          width: cardWidth,
+                                          margin:
+                                              const EdgeInsets.only(right: 12),
+                                          child: AspectRatio(
+                                            aspectRatio:
+                                                0.65, // Same as your other product cards
+                                            child: GestureDetector(
+                                              onTap: () async {
+                                                // Navigate to another product detail screen and wait for return
+                                                await Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ProductDetailsScreen(
+                                                      product: relatedProduct,
+                                                    ),
+                                                  ),
+                                                );
+
+                                                // When returning, re-fetch related products for current product
+                                                if (mounted) {
+                                                  _fetchRelatedProducts();
+                                                }
+                                              },
+                                              child: ProductCard(
+                                                productId: relatedProduct.id,
+                                                imageUrl: relatedProduct
+                                                        .imageUrls.isNotEmpty
+                                                    ? relatedProduct
+                                                        .imageUrls.first
+                                                    : '',
+                                                name: relatedProduct.name,
+                                                price: relatedProduct.price,
+                                                regularPrice:
+                                                    relatedProduct.regularPrice,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+
+                              const SizedBox(height: 20),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
