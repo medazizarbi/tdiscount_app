@@ -5,7 +5,7 @@ class TColors {
   static const Color cardlight = Color.fromARGB(255, 255, 255, 255);
   static const Color carddark = Color.fromARGB(255, 54, 54, 54);
   // App theme colors
-  static const Color primary = Color.fromARGB(255, 251, 255, 0);
+  static const Color primary = Color.fromARGB(255, 255, 215, 0);
   static const Color secondary = Color.fromARGB(255, 255, 15, 0);
   static const Color accent = Color(0xFFb0c7ff);
 

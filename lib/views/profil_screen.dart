@@ -66,12 +66,13 @@ class _ProfilScreenState extends State<ProfilScreen> {
                           // Centered Profile Email
                           const Center(
                             child: Text(
-                              'Paramètres',
+                              'Profile',
                               style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.w400,
-                                  //color: TColors.primary,
-                                  fontSize: 20),
+                                fontFamily: 'Poppins',
+                                fontWeight:
+                                    FontWeight.bold, // <-- Make it medium
+                                fontSize: 20,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -96,26 +97,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
                             title: 'Thème',
                             trailing: ThemeToggleSwitch(),
                           ),
-                          SettingTile(
-                            icon: Icons.language,
-                            title: 'Language',
-                            subtitle: 'Français (FR)',
-                            onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                      'Autres langues seront bientôt disponibles'),
-                                  duration: Duration(seconds: 2),
-                                  backgroundColor: Colors.grey,
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(16)), // Curved borders
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+
                           const SectionTitle(title: 'Service'),
                           SettingTile(
                             icon: Icons.lock,
@@ -244,14 +226,20 @@ class SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(top: 24, bottom: 8),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-          color: Colors.grey,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 16,
+            color: isDark
+                ? TColors.textSecondary
+                : TColors.darkerGrey, // <-- Black or white
+          ),
         ),
       ),
     );
@@ -276,13 +264,17 @@ class SettingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
       color: Colors.transparent, // Keep background transparent
       child: InkWell(
         onTap: onTap,
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(vertical: 4),
-          leading: Icon(icon, color: Colors.teal),
+          leading: Icon(
+            icon,
+            color: isDark ? Colors.white : Colors.black, // <-- Icon color
+          ),
           title: Text(title),
           subtitle: subtitle != null ? Text(subtitle!) : null,
           trailing: trailing ?? const Icon(Icons.arrow_forward_ios, size: 16),
