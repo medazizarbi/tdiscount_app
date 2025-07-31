@@ -151,5 +151,5 @@ flutter_native_splash:
   image: assets/images/app_icons/app_icon_dark.png # Your logo
   android: true
   ios: true
-  branding: assets/images/app_icons/app_icon.png # Optional: for a branding image at the bottom
+  branding: assets/images/tdiscount_images/logo-Tdiscount-market-2.0.png # Optional: for a branding image at the bottom
   branding_mode: bottom # Center the branding image (logo)

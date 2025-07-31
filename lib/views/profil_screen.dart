@@ -126,8 +126,19 @@ class _ProfilScreenState extends State<ProfilScreen> {
                                 MaterialPageRoute(
                                   builder: (context) => const StaticInfoScreen(
                                     title: 'Confidentialité & Sécurité',
-                                    content:
-                                        "Vos données sont protégées. Nous ne partageons jamais vos informations personnelles sans votre consentement.",
+                                    content: '''
+Chez Tdiscount, la sécurité de vos données est notre priorité.
+
+- Toutes vos informations personnelles sont stockées de manière sécurisée et ne sont jamais partagées sans votre consentement.
+
+- Paiement à la livraison pour plus de sérénité.
+
+- Retour et échange facilités.
+
+- Consultez notre politique de confidentialité et nos conditions d’utilisation pour en savoir plus.
+
+Pour toute question, contactez notre service client au +216 71 205 105 ou par email à contact@tdiscount.tn.
+''',
                                   ),
                                 ),
                               );
@@ -142,8 +153,23 @@ class _ProfilScreenState extends State<ProfilScreen> {
                                 MaterialPageRoute(
                                   builder: (context) => const StaticInfoScreen(
                                     title: 'Aide',
-                                    content:
-                                        "Pour toute question ou problème, contactez notre support à support@tdiscount.com.",
+                                    content: '''
+Bienvenue sur Tdiscount Marketplace, la référence de la vente en ligne en Tunisie !
+
+**FAQ Tdiscount**
+
+- Qu’est-ce que Tdiscount ? Une marketplace réunissant de nombreux vendeurs et catégories pour tous vos besoins.
+
+- Quel est le délai de livraison ? Livraison rapide partout en Tunisie.
+
+- Livrez-vous en dehors de la Tunisie ? Non, la livraison est uniquement disponible en Tunisie.
+
+- Comment contacter le service client ? Par téléphone au +216 71 205 105 ou par email à contact@tdiscount.tn.
+
+- Tdiscount propose-t-il des offres spéciales ? Oui, profitez de promotions exclusives toute l’année !
+
+Pour plus d’aide, consultez notre blog ou contactez-nous directement.
+''',
                                   ),
                                 ),
                               );
@@ -158,8 +184,29 @@ class _ProfilScreenState extends State<ProfilScreen> {
                                 MaterialPageRoute(
                                   builder: (context) => const StaticInfoScreen(
                                     title: 'À propos',
-                                    content:
-                                        "TDiscount App\nVersion 1.0.0\n\nApplication développée pour faciliter vos achats et offres.",
+                                    content: '''
+Tdiscount Marketplace
+
+Bienvenue sur Tdiscount, la marketplace de référence pour la vente en ligne en Tunisie !
+
+Tdiscount évolue pour mieux vous servir ! Anciennement un site e-commerce, nous sommes aujourd’hui une marketplace incontournable réunissant une multitude de vendeurs et de catégories.
+
+Notre mission ? Vous offrir une expérience d’achat fluide et sécurisée, avec des offres exclusives et les meilleurs prix en Tunisie.
+
+📦 Livraison rapide
+💳 Paiement à la livraison
+🔄 Retour et échange facilités
+📞 Service client réactif : +216 71 205 105
+
+Retrouvez-nous sur :
+- www.tdiscount.com
+- Facebook, Instagram, Tiktok : @tdiscount.tn
+
+Adresse :
+78, Rue des minéraux 8603 Z.I de la Charguia 1 2035 Tunis - Tunisie
+
+Copyright © 2025 | Tous droits réservés - By iTrend
+''',
                                   ),
                                 ),
                               );
@@ -282,6 +329,9 @@ class StaticInfoScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
+        backgroundColor: TColors.primary, // <-- Set your primary color
+        foregroundColor: Colors.black, // <-- Optional: set text/icon color
+        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

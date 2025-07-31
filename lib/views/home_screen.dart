@@ -28,40 +28,6 @@ class HomeScreenState extends State<HomeScreen>
   // Add a flag to track if data has been loaded
   bool _dataLoaded = false;
 
-  // List of items with title, description, and visibility control
-  final List<Map<String, dynamic>> items = [
-    {
-      'title': 'LIVRAISON RAPIDE',
-      'description':
-          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenant! Ne manquez pas cette offre exceptionnelle pour faire des économies sur vos achats!',
-      'showDescription': false,
-    },
-    {
-      'title': 'GARANTIE',
-      'description':
-          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenant! Ne manquez pas cette offre exceptionnelle pour faire des économies sur vos achats!',
-      'showDescription': false,
-    },
-    {
-      'title': 'SERVICE CLIENT',
-      'description':
-          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenant! Ne manquez pas cette offre exceptionnelle pour faire des économies sur vos achats!',
-      'showDescription': false,
-    },
-    {
-      'title': 'SAV',
-      'description':
-          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenant! Ne manquez pas cette offre exceptionnelle pour faire des économies sur vos achats!',
-      'showDescription': false,
-    },
-    {
-      'title': 'CONTACTEZ-NOUS',
-      'description':
-          'Offrez-vous la livraison gratuite pour toutes vos commandes en ligne des maintenant! Ne manquez pas cette offre exceptionnelle pour faire des économies sur vos achats!',
-      'showDescription': false,
-    },
-  ];
-
   // icons list
   final Map<int, String> categoryIcons = {
     347: "assets/images/white_cat_icons/tel.webp", // tel et tablettes
@@ -547,110 +513,74 @@ class HomeScreenState extends State<HomeScreen>
 
                         const SizedBox(height: 40),
 
-                        // ✅ Display Titles with Buttons and Descriptions
-                        ...items.map((item) {
-                          return Column(
+                        // Nouveau footer Tdiscount
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 16),
+                          color: TColors.primary,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 16),
-                                color: TColors.primary,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    // Title
-                                    Text(
-                                      item['title'],
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        color: TColors.black,
-                                      ),
-                                    ),
-
-                                    // Button to toggle description
-                                    IconButton(
-                                      icon: Icon(
-                                        item['showDescription']
-                                            ? Icons.keyboard_arrow_up_rounded
-                                            : Icons.keyboard_arrow_down_rounded,
-                                        color: TColors.black,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          item['showDescription'] =
-                                              !item['showDescription'];
-                                        });
-                                      },
-                                    ),
-                                  ],
+                              const Text(
+                                "Tdiscount Marketplace",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: TColors.black,
                                 ),
                               ),
-
-                              // Description (visible only if showDescription is true)
-                              if (item['showDescription'])
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 8, horizontal: 16),
-                                  color: TColors.primary,
-                                  child: Text(
-                                    item['description'],
-                                    style: const TextStyle(
-                                      fontSize: 14,
+                              const SizedBox(height: 8),
+                              const Text(
+                                "Bienvenue sur Tdiscount, la marketplace de référence pour la vente en ligne en Tunisie !\n\n"
+                                "📦 Livraison rapide   💳 Paiement à la livraison   🔄 Retour et échange facilités\n"
+                                "📞 Service client : +216 71 205 105",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: TColors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                "Adresse : 78, Rue des minéraux 8603 Z.I de la Charguia 1 2035 Tunis - Tunisie",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: TColors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    "Tdiscount © 2025 - Tous droits réservés | by ",
+                                    style: TextStyle(
+                                      fontSize: 13,
                                       color: TColors.black,
                                     ),
                                   ),
-                                ),
-
-                              // Divider
-                              const Divider(
-                                color: Color.fromARGB(86, 255, 255, 255),
-                                thickness: 1,
-                                height: 1,
-                              ),
-                            ],
-                          );
-                        }),
-
-                        const SizedBox(height: 20), // Extra space at bottom
-                        // ✅ Centered Image at the Bottom
-                        const Center(
-                          child: Text(
-                            "Tdiscount", // Replace with your desired text
-                            style: TextStyle(
-                              fontSize: 20, // Adjust the font size as needed
-                              fontWeight: FontWeight
-                                  .bold, // You can adjust the font weight
-                              color: TColors
-                                  .black, // You can adjust the color of the text
-                            ),
-                          ),
-                        ),
-                        Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                "Tdiscount © 2025 - Tous droits réservés | by ",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: TColors
-                                      .black, // Adjust the color for the non-clickable part
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  // Add your custom action here when "trend" is tapped
-                                },
-                                child: const Text(
-                                  "Trend", // The clickable word
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Color.fromARGB(255, 180, 0,
-                                        0), // The yellow color for "trend"
-                                    fontWeight: FontWeight.bold,
+                                  GestureDetector(
+                                    onTap: () {
+                                      // Add your custom action here when "iTrend" is tapped
+                                    },
+                                    child: const Text(
+                                      "iTrend",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Color.fromARGB(255, 180, 0, 0),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                "contact@tdiscount.tn",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: TColors.black,
                                 ),
                               ),
                             ],

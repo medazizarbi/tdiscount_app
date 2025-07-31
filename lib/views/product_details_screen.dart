@@ -27,13 +27,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     _fetchRelatedProducts();
   }
 
-  // Add this method to handle related products fetching
   void _fetchRelatedProducts() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final productViewModel =
           Provider.of<ProductViewModel>(context, listen: false);
 
-      // Always clear previous related products first
       productViewModel.clearRelatedProducts();
 
       if (widget.product.hasRelatedProducts) {
@@ -42,16 +40,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     });
   }
 
-  // Helper method to check if current related products belong to this product
   bool _areRelatedProductsForCurrentProduct(ProductViewModel viewModel) {
     if (!widget.product.hasRelatedProducts) return false;
     if (viewModel.relatedProducts.isEmpty) return false;
 
-    // Check if the stored related products match current product's related IDs
     final currentRelatedIds = widget.product.relatedIds.toSet();
     final storedRelatedIds = viewModel.relatedProducts.map((p) => p.id).toSet();
 
-    // Return true only if the stored products exactly match current product's related IDs
     return currentRelatedIds.length == storedRelatedIds.length &&
         currentRelatedIds.every((id) => storedRelatedIds.contains(id));
   }
@@ -79,8 +74,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             backgroundColor: TColors.primary,
             elevation: 0,
             centerTitle: true,
-            floating: true, // <-- makes the app bar float
-            pinned: false, // <-- not pinned
+            floating: true, // makes the app bar float
+            pinned: false, // not pinned
             title: Image.asset(
               "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png",
               height: 40,
@@ -101,8 +96,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
                 Column(
                   children: [
-                    const SizedBox(height: 20), // <-- Add this line for spacing
-                    // White container with curved borders
+                    const SizedBox(
+                        height: 20), // Space between app bar and white widget
                     Container(
                       decoration: BoxDecoration(
                         color: themedColor(
@@ -120,10 +115,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Product Image
-                            // ignore: unnecessary_null_comparison
                             const SizedBox(height: 16),
-
                             product.imageUrls.isNotEmpty
                                 ? ProductImagesViewer(
                                     imageUrls: product.imageUrls)
@@ -131,10 +123,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     fallbackHeight: 200,
                                     fallbackWidth: double.infinity,
                                   ),
-
                             const SizedBox(height: 16),
-
-                            // Product Name
                             Text(
                               product.name,
                               style: const TextStyle(
@@ -143,8 +132,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               ),
                             ),
                             const SizedBox(height: 16),
-
-                            // Product Price
                             Row(
                               children: [
                                 Text(
@@ -167,8 +154,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   ),
                               ],
                             ),
-                            const SizedBox(height: 8), // Add some spacing
-// SKU
+                            const SizedBox(height: 8),
                             if (product.sku != null && product.sku!.isNotEmpty)
                               Text.rich(
                                 TextSpan(
@@ -198,8 +184,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 ),
                               ),
                             const SizedBox(height: 16),
-
-// Ajouter au panier button
                             SizedBox(
                               width: double.infinity,
                               height: 50,
@@ -238,13 +222,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 ),
                               ),
                             ),
-
                             const SizedBox(height: 16),
-                            const Divider(
-                                thickness: 1,
-                                color: Colors.grey), // <-- Add this line
-
-                            // Caractéristique (Short Description)
+                            const Divider(thickness: 1, color: Colors.grey),
                             if (formattedShortDescription != null &&
                                 formattedShortDescription.isNotEmpty) ...[
                               Text(
@@ -270,8 +249,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               ),
                               const SizedBox(height: 16),
                             ],
-
-                            // Description
                             if (product.description != null &&
                                 product.description!.isNotEmpty) ...[
                               Text(
@@ -319,8 +296,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 ],
                               ),
                             ],
-
-// Show "Aucune description disponible." only if both are empty
                             if ((formattedShortDescription == null ||
                                     formattedShortDescription.isEmpty) &&
                                 (product.description == null ||
@@ -329,13 +304,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 'Aucune description disponible.',
                                 style: TextStyle(fontSize: 16),
                               ),
-
-                            // NEW: Related Products Section
                             const SizedBox(height: 20),
                             const Divider(thickness: 1, color: Colors.grey),
                             const SizedBox(height: 20),
-
-                            // Show related products only if the product has related IDs
                             if (widget.product.hasRelatedProducts) ...[
                               Text(
                                 'Produits similaires',
@@ -349,8 +320,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-
-                              // Related Products List
                               Consumer<ProductViewModel>(
                                 builder: (context, viewModel, child) {
                                   if (viewModel.isLoadingRelatedProducts) {
@@ -363,7 +332,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       ),
                                     );
                                   }
-
                                   if (viewModel.relatedProductsError != null) {
                                     return SizedBox(
                                       height: 100,
@@ -378,8 +346,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       ),
                                     );
                                   }
-
-                                  // IMPORTANT: Check if stored related products belong to current product
                                   if (!_areRelatedProductsForCurrentProduct(
                                       viewModel)) {
                                     return const SizedBox(
@@ -395,11 +361,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       ),
                                     );
                                   }
-
-                                  // Display related products in horizontal list
                                   return SizedBox(
-                                    height:
-                                        270, // Same height as your other product cards
+                                    height: 270,
                                     child: ListView.builder(
                                       scrollDirection: Axis.horizontal,
                                       itemCount:
@@ -417,11 +380,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                           margin:
                                               const EdgeInsets.only(right: 12),
                                           child: AspectRatio(
-                                            aspectRatio:
-                                                0.65, // Same as your other product cards
+                                            aspectRatio: 0.65,
                                             child: GestureDetector(
                                               onTap: () async {
-                                                // Navigate to another product detail screen and wait for return
                                                 await Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
@@ -431,8 +392,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                     ),
                                                   ),
                                                 );
-
-                                                // When returning, re-fetch related products for current product
                                                 if (mounted) {
                                                   _fetchRelatedProducts();
                                                 }
@@ -457,7 +416,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   );
                                 },
                               ),
-
                               const SizedBox(height: 20),
                             ],
                           ],
