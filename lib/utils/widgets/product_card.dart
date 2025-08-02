@@ -53,27 +53,31 @@ class ProductCardState extends State<ProductCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Product Image
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.network(
-                    widget.imageUrl,
-                    width: 150,
-                    height: 150,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
+                Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Image.network(
+                      widget.imageUrl,
                       width: 150,
                       height: 150,
-                      color: Colors.grey[200],
-                      child: const Icon(
-                        Icons.broken_image,
-                        size: 48,
-                        color: Colors.grey,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: 150,
+                        height: 150,
+                        color: Colors.grey[200],
+                        child: const Icon(
+                          Icons.broken_image,
+                          size: 48,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
                   ),
                 ),
+                // Prices row
                 Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
+                  padding: const EdgeInsets.only(
+                      top: 8.0, left: 12.0), // <-- Added left padding
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -110,50 +114,23 @@ class ProductCardState extends State<ProductCard> {
                     ],
                   ),
                 ),
+                // Name row
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 0.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.name,
-                          style: const TextStyle(
-                              fontSize: 15,
-                              color: Color.fromARGB(255, 124, 124, 124)),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.shopping_cart,
-                          color: Colors.blue,
-                          size: 24,
-                        ),
-                        onPressed: () async {
-                          // Access your ProductViewModel
-                          final productViewModel =
-                              Provider.of<ProductViewModel>(context,
-                                  listen: false);
-                          final added = await productViewModel
-                              .addProductIdToCart(widget.productId);
-
-                          if (!mounted) return;
-
-                          // ignore: use_build_context_synchronously
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                added
-                                    ? '${widget.name} ajouté au panier !'
-                                    : 'Ce produit est déjà dans le panier.',
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                  padding: const EdgeInsets.only(
+                    left: 12.0,
+                    right:
+                        30.0, // Reserve space for the cart icon (icon size + margin)
+                    top: 0.0,
+                    bottom: 0.0,
+                  ),
+                  child: Text(
+                    widget.name,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: Color.fromARGB(255, 124, 124, 124),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
                 ),
               ],
@@ -172,6 +149,37 @@ class ProductCardState extends State<ProductCard> {
               onPressed: () async {
                 await favoritesProvider.toggleFavorite(productId);
                 setState(() {}); // Refresh UI after toggling
+              },
+            ),
+          ),
+          // Panier (cart) icon at bottom right
+          Positioned(
+            bottom: 8,
+            right: 0,
+            child: IconButton(
+              icon: const Icon(
+                Icons.shopping_cart,
+                color: Colors.blue,
+                size: 24,
+              ),
+              onPressed: () async {
+                final productViewModel =
+                    Provider.of<ProductViewModel>(context, listen: false);
+                final added =
+                    await productViewModel.addProductIdToCart(widget.productId);
+
+                if (!mounted) return;
+
+                // ignore: use_build_context_synchronously
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      added
+                          ? '${widget.name} ajouté au panier !'
+                          : 'Ce produit est déjà dans le panier.',
+                    ),
+                  ),
+                );
               },
             ),
           ),

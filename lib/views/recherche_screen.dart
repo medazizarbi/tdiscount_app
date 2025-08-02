@@ -107,7 +107,6 @@ class _RechercheScreenState extends State<RechercheScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Spacer(),
                           ],
                         ),
                       ),
@@ -148,20 +147,20 @@ class _RechercheScreenState extends State<RechercheScreen> {
                                       hintStyle: TextStyle(
                                         color: themedColor(
                                           context,
-                                          TColors
-                                              .textPrimary, // Light theme hint color
-                                          TColors
-                                              .textPrimary, // Dark theme hint color
+                                          TColors.textPrimary.withOpacity(
+                                              0.5), // Light theme hint color with opacity
+                                          TColors.textPrimary.withOpacity(
+                                              0.5), // Dark theme hint color with opacity
                                         ),
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 16,
                                       ),
                                       prefixIcon: Icon(
                                         Icons.search,
                                         color: themedColor(
                                           context,
-                                          TColors
-                                              .textPrimary, // Light theme icon color
-                                          TColors
-                                              .textPrimary, // Dark theme icon color
+                                          TColors.textPrimary.withOpacity(0.7),
+                                          TColors.textPrimary.withOpacity(0.7),
                                         ),
                                       ),
                                       suffixIcon: isSearching
@@ -235,7 +234,6 @@ class _RechercheScreenState extends State<RechercheScreen> {
                                         const FilterBottomSheet(),
                                   ).then((filterData) {
                                     if (filterData != null) {
-                                      // Apply filters to current search or search all if no search term
                                       final searchVM =
                                           Provider.of<SearchViewModel>(context,
                                               listen: false);
@@ -243,7 +241,7 @@ class _RechercheScreenState extends State<RechercheScreen> {
                                           _searchController.text.trim();
 
                                       if (searchTerm.isNotEmpty) {
-                                        // Apply filters to current search
+                                        // Only apply filters if search is not empty
                                         searchVM.searchProducts(
                                           searchTerm,
                                           isNewSearch: true,
@@ -254,15 +252,14 @@ class _RechercheScreenState extends State<RechercheScreen> {
                                           order: filterData['sortOrder'],
                                         );
                                       } else {
-                                        // If no search term, search with empty string to show filtered results
-                                        searchVM.searchProducts(
-                                          "",
-                                          isNewSearch: true,
-                                          minPrice: filterData['minPrice']
-                                              ?.toDouble(),
-                                          maxPrice: filterData['maxPrice']
-                                              ?.toDouble(),
-                                          order: filterData['sortOrder'],
+                                        // Optionally show a message to the user
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                "Veuillez entrer un terme de recherche."),
+                                            duration: Duration(seconds: 2),
+                                          ),
                                         );
                                       }
                                     }

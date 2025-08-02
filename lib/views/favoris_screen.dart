@@ -100,7 +100,8 @@ class _FavorisScreenState extends State<FavorisScreen>
                       padding: EdgeInsets.symmetric(
                           horizontal: 16.0, vertical: 12.0),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment:
+                            MainAxisAlignment.center, // Center the title
                         children: [
                           Text(
                             "Mes Favoris",
@@ -109,7 +110,6 @@ class _FavorisScreenState extends State<FavorisScreen>
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Spacer(),
                         ],
                       ),
                     ),

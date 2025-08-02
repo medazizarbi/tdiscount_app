@@ -62,17 +62,21 @@ class _ProfilScreenState extends State<ProfilScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
                         children: [
-                          const SizedBox(height: 36),
-                          // Centered Profile Email
-                          const Center(
-                            child: Text(
-                              'Profile',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontWeight:
-                                    FontWeight.bold, // <-- Make it medium
-                                fontSize: 20,
-                              ),
+                          // Title Row
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 12.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Mon Profile",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 16),

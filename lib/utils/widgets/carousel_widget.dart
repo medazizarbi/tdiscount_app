@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:tdiscount_app/utils/constants/colors.dart';
 
 class AutoScrollCarousel extends StatefulWidget {
   final Function(int) onPageChanged; // Callback to update the current page
@@ -155,8 +156,12 @@ class IndicatorDots extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 4.0),
           child: Icon(
             index == currentPage ? Icons.circle : Icons.circle_outlined,
-            size: 10, // Adjust the size of the icons
-            color: index == currentPage ? Colors.blue : Colors.grey,
+            size: 10,
+            color: index == currentPage
+                ? (Theme.of(context).brightness == Brightness.dark
+                    ? TColors.white
+                    : TColors.black)
+                : Colors.grey,
           ),
         );
       }),

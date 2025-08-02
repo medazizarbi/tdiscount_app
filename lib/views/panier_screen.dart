@@ -113,7 +113,6 @@ class _PanierScreenState extends State<PanierScreen>
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Spacer(),
                           ],
                         ),
                       ),
