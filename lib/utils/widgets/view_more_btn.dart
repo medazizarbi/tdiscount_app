@@ -18,11 +18,15 @@ class ViewMoreButton extends StatelessWidget {
         minimumSize: const Size(0, 0), // Remove minimum size constraints
         tapTargetSize: MaterialTapTargetSize.shrinkWrap, // Shrink tap area
       ),
-      child: const Text('Voir Plus',
+      child: Text('Voir Plus',
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.bold,
-            color: TColors.buttonPrimary, // Set the text color to blue
+            color: themedColor(
+              context,
+              TColors.black, // Blue for light mode
+              TColors.primary, // White for dark mode
+            ),
           )),
     );
   }

@@ -186,10 +186,11 @@ class _HorizontalProductCardState extends State<HorizontalProductCard> {
                             ),
                           Text(
                             '${widget.price} TND',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.green,
+                              color: themedColor(context, TColors.textPrimary,
+                                  TColors.textWhite),
                             ),
                           ),
                         ],

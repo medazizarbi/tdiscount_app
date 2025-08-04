@@ -5,6 +5,7 @@ import 'package:tdiscount_app/main.dart';
 import 'package:tdiscount_app/models/category_model.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/viewmodels/category_viewmodel.dart';
+import 'package:tdiscount_app/viewModels/auth_viewmodel.dart';
 import 'package:tdiscount_app/views/sub_categorie.dart';
 import 'package:tdiscount_app/utils/widgets/logout_dialog.dart';
 
@@ -38,6 +39,9 @@ class CustomDrawerState extends State<CustomDrawer> {
     // Access the categories list from the CategoryViewModel
     final categoryViewModel = Provider.of<CategoryViewModel>(context);
     final categories = categoryViewModel.categories;
+
+    // In your build method, get isLoggedIn from AuthViewModel
+    final isLoggedIn = Provider.of<AuthViewModel>(context).isLoggedIn;
 
     return Drawer(
       backgroundColor: themedColor(
@@ -135,13 +139,14 @@ class CustomDrawerState extends State<CustomDrawer> {
             ),
 
             // Déconnexion
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text("Déconnexion"),
-              onTap: () {
-                showLogoutDialog(context);
-              },
-            ),
+            if (isLoggedIn)
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text("Déconnexion"),
+                onTap: () {
+                  showLogoutDialog(context);
+                },
+              ),
 
             const SizedBox(height: 20),
           ],

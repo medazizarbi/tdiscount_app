@@ -1,7 +1,7 @@
-import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
+import 'package:tdiscount_app/services/category_service.dart';
+import 'package:mockito/mockito.dart';
 
 // ===== Your Category Model =====
 
@@ -28,71 +28,35 @@ class Category {
   }
 }
 
-// ===== Testable Service =====
-
-class TestableCategoryService {
-  final http.Client client;
-  final String consumerKey;
-  final String consumerSecret;
-
-  TestableCategoryService({
-    required this.client,
-    required this.consumerKey,
-    required this.consumerSecret,
-  });
-
-  Map<String, String> _getAuthHeaders() {
-    final basicAuth =
-        'Basic ${base64Encode(utf8.encode('$consumerKey:$consumerSecret'))}';
-    return {
-      'Authorization': basicAuth,
-      'Content-Type': 'application/json',
-    };
-  }
-
-  Future<List<Category>> fetchCategories() async {
-    final url =
-        Uri.parse('https://fakeapi.com/wp-json/wc/v3/products/categories');
-    final response = await client.get(url, headers: _getAuthHeaders());
-
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonList = json.decode(response.body);
-      return jsonList.map((jsonItem) => Category.fromJson(jsonItem)).toList();
-    } else {
-      throw Exception('Failed to load categories');
-    }
-  }
-}
+// Create a MockClient using the Mockito package.
+class MockClient extends Mock implements http.Client {}
 
 // ===== Test =====
 
 void main() {
-  test('Category count is parsed and stored correctly', () async {
-    final mockClient = MockClient((request) async {
-      return http.Response(
-          jsonEncode([
-            {
-              "id": 1,
-              "name": "Fitness",
-              "count": 25,
-              "description": "All fitness products"
-            }
-          ]),
-          200);
+  group('CategoryService', () {
+    late CategoryService categoryService;
+
+    setUp(() {
+      categoryService = CategoryService();
     });
 
-    final service = TestableCategoryService(
-      client: mockClient,
-      consumerKey: "egzersgge",
-      consumerSecret: "dqfffffff",
-    );
+    test('filterUnsupportedImages filters .avif images', () {
+      final urls = [
+        'https://example.com/image1.jpg',
+        'https://example.com/image2.avif',
+        'https://example.com/image3.png',
+      ];
+      final filtered = categoryService.filterUnsupportedImages(urls);
+      expect(filtered, contains('https://example.com/image1.jpg'));
+      expect(filtered, contains('https://example.com/image3.png'));
+      expect(filtered, isNot(contains('https://example.com/image2.avif')));
+    });
 
-    final categories = await service.fetchCategories();
-
-    expect(categories, isNotEmpty);
-    expect(categories.first.id, 1);
-    expect(categories.first.name, "Fitness");
-    expect(categories.first.count, 25);
-    expect(categories.first.description, "All fitness products");
+    test('htmlToPlainText removes HTML tags and decodes entities', () {
+      const html = '<p>Hello&nbsp;World &amp; everyone!</p>';
+      final plain = categoryService.htmlToPlainText(html);
+      expect(plain, 'Hello World & everyone!');
+    });
   });
 }

@@ -125,6 +125,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                             children: [
                               Expanded(
                                 child: TextFormField(
+                                  key: const Key('order_first_name'),
                                   controller: _firstNameController,
                                   decoration: InputDecoration(
                                     labelText: "Prénom",
@@ -141,6 +142,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: TextFormField(
+                                  key: const Key('order_last_name'),
                                   controller: _lastNameController,
                                   decoration: InputDecoration(
                                     labelText: "Nom",
@@ -160,6 +162,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
 
                           // City Picker
                           DropdownButtonFormField<String>(
+                            key: const Key('order_city'),
                             value: _selectedCity,
                             decoration: InputDecoration(
                               labelText: "Ville",
@@ -186,6 +189,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
 
                           // Address
                           TextFormField(
+                            key: const Key('order_address'),
                             controller: _addressController,
                             decoration: InputDecoration(
                               labelText: "Adresse",
@@ -202,6 +206,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
 
                           // Phone Number
                           TextFormField(
+                            key: const Key('order_phone'),
                             controller: _phoneController,
                             keyboardType: TextInputType.number,
                             maxLength: 8,
@@ -228,6 +233,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
 
                           // Note
                           TextFormField(
+                            key: const Key('order_note'),
                             controller: _noteController,
                             minLines: 2,
                             maxLines: _noteMaxLines,
@@ -253,6 +259,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                             child: Consumer<OrderViewModel>(
                               builder: (context, orderViewModel, child) {
                                 return ElevatedButton(
+                                  key: const Key('order_submit'),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: TColors.primary,
                                     foregroundColor: TColors.black,

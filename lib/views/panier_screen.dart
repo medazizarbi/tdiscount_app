@@ -236,10 +236,13 @@ class _PanierScreenState extends State<PanierScreen>
                                   ),
                                   Text(
                                     "${productViewModel.totalPrice.toStringAsFixed(3)} TND",
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.green,
+                                      color: themedColor(
+                                          context,
+                                          TColors.textPrimary,
+                                          TColors.textWhite),
                                     ),
                                   ),
                                 ],

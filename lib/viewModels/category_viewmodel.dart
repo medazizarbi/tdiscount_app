@@ -29,13 +29,6 @@ class CategoryViewModel extends ChangeNotifier {
 
   // NEW: Method to get top 4 categories (corrected logic)
   void getTop4Categories() {
-    print("🔄 Getting top 4 categories from ${categories.length} categories");
-
-    if (categories.isEmpty) {
-      print("❌ Categories list is empty, cannot get top categories");
-      return;
-    }
-
     // Filter categories with count > 0
     final validCategories =
         categories.where((category) => category.count > 0).toList();
@@ -57,27 +50,15 @@ class CategoryViewModel extends ChangeNotifier {
       final autresCategory = topCategories.removeAt(autresIndex);
       // Add it to the end
       topCategories.add(autresCategory);
-
-      print("📱 Found 'autres categories' in top 4, moved to last position");
     }
 
-    print(
-        "✅ Top 4 categories selected: ${topCategories.map((c) => '${c.name}(${c.count})').toList()}");
     notifyListeners();
   }
 
   // NEW: Method to fetch products for top categories
   Future<void> fetchTopCategoriesProducts() async {
-    print("🔄 Fetching products for top categories");
-
     if (topCategories.isEmpty) {
-      print("❌ Top categories list is empty, getting top categories first");
       getTop4Categories();
-    }
-
-    if (topCategories.isEmpty) {
-      print("❌ Still no top categories available");
-      return;
     }
 
     isTopCategoriesLoading = true;
@@ -90,9 +71,6 @@ class CategoryViewModel extends ChangeNotifier {
       // Fetch 10 products for each top category
       for (final category in topCategories) {
         try {
-          print(
-              '🔄 Fetching 10 products for category: ${category.name} (ID: ${category.id})');
-
           final products = await _categoryService.fetchProductsByCategory(
             category.id,
             1, // page 1
@@ -100,18 +78,12 @@ class CategoryViewModel extends ChangeNotifier {
           );
 
           topCategoriesProducts[category.id] = products;
-
-          print(
-              '✅ Fetched ${products.length} products for category: ${category.name}');
         } catch (e) {
-          print('❌ Error fetching products for category ${category.name}: $e');
           topCategoriesProducts[category.id] = [];
         }
       }
-
-      print('✅ Top categories products fetch completed');
     } catch (e) {
-      print('❌ Error in fetchTopCategoriesProducts: $e');
+      // Handle error if needed
     } finally {
       isTopCategoriesLoading = false;
       notifyListeners();
@@ -125,11 +97,8 @@ class CategoryViewModel extends ChangeNotifier {
 
   // NEW: Combined method to get top categories and fetch their products
   Future<void> setupTopCategories() async {
-    print("🔄 Setting up top categories with products");
-
     // Ensure we have categories first
     if (categories.isEmpty) {
-      print("📱 Categories list is empty, fetching categories first...");
       await fetchCategories();
     }
 
@@ -138,8 +107,6 @@ class CategoryViewModel extends ChangeNotifier {
 
     // Fetch products for top categories
     await fetchTopCategoriesProducts();
-
-    print("✅ Top categories setup completed");
   }
 
   // Modified method to populate and return the filter categories
@@ -159,12 +126,6 @@ class CategoryViewModel extends ChangeNotifier {
     // Convert to sorted list and store it
     categoryNamesForFilter = categoryNames.toList()..sort();
 
-    // Debug print to check if data is available
-    print(
-        "📋 getCategoriesForFilter: Found ${categories.length} categories and ${subCategories.length} subcategories");
-    print(
-        "📋 Returning ${categoryNamesForFilter.length} category names: $categoryNamesForFilter");
-
     return categoryNamesForFilter;
   }
 
@@ -172,10 +133,6 @@ class CategoryViewModel extends ChangeNotifier {
   void initializeCategoryNamesForFilter() {
     if (categories.isNotEmpty) {
       getCategoriesForFilter();
-      print(
-          "📋 Initialized category names for filter: ${categoryNamesForFilter.length} items");
-    } else {
-      print("📋 Categories list is empty, cannot initialize filter names yet");
     }
   }
 
@@ -183,7 +140,6 @@ class CategoryViewModel extends ChangeNotifier {
   Future<List<String>> getCategoriesForFilterAsync() async {
     // Fetch categories if empty
     if (categories.isEmpty) {
-      print("📋 Categories list is empty, fetching...");
       await fetchCategories();
     }
 
@@ -195,7 +151,6 @@ class CategoryViewModel extends ChangeNotifier {
   List<String> getCategoriesForFilterWithAutoFetch() {
     // If both lists are empty, trigger fetch (but don't wait for it)
     if (categories.isEmpty && subCategories.isEmpty) {
-      print("📋 No categories available, triggering fetch...");
       fetchCategories(); // This will update the lists and notify listeners
       return []; // Return empty list for now, Consumer will rebuild when data arrives
     }
@@ -215,9 +170,6 @@ class CategoryViewModel extends ChangeNotifier {
     // Convert to sorted list to maintain consistent order
     final List<String> sortedCategories = categoryNames.toList()..sort();
 
-    print(
-        "📋 getCategoriesForFilter: Returning ${sortedCategories.length} categories");
-
     return sortedCategories;
   }
 
@@ -229,7 +181,6 @@ class CategoryViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchCategories() async {
-    print("🔄 viewmodel :  Fetching categories");
     isLoading = true;
     notifyListeners();
 
@@ -242,7 +193,6 @@ class CategoryViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchProductsByCategory(int categoryId) async {
-    print("🔄 viewmodel :  Fetching products for category: $categoryId");
     if (activeCategoryId != categoryId) {
       activeCategoryId = categoryId;
       currentPageByCategory[categoryId] = 2;
@@ -272,9 +222,6 @@ class CategoryViewModel extends ChangeNotifier {
 
       const int perPage = 10;
 
-      print(
-          "🔄 Fetching products: category=$categoryId, page=$currentPage, per_page=$perPage");
-
       final newProducts = await _categoryService.fetchProductsByCategory(
         categoryId,
         currentPage,
@@ -302,27 +249,15 @@ class CategoryViewModel extends ChangeNotifier {
         }
       }
 
-      if (duplicates.isNotEmpty) {
-        print("⚠️ Skipped ${duplicates.length} duplicated products:");
-        for (var dup in duplicates) {
-          print("❌ Duplicate ID: ${dup.id}, Name: ${dup.name}");
-        }
-      }
-
       productsBySubCategory[categoryId]!.addAll(uniqueProducts);
 
-// ✅ Log current count of products and total expected count
-      print(
-          "📦📦📦📦 Fetched ${productsBySubCategory[categoryId]!.length} / ${category.count} products for category $categoryId");
-
-      // ✅ Check against category count
+      // ✅ Log current count of products and total expected count
       if (productsBySubCategory[categoryId]!.length >= category.count) {
         hasMoreProductsByCategory[categoryId] = false;
       }
 
       currentPageByCategory[categoryId] = currentPage + 1;
     } catch (e) {
-      print('❌ Error fetching products: $e');
       rethrow;
     } finally {
       isLoading = false;
@@ -365,8 +300,6 @@ class CategoryViewModel extends ChangeNotifier {
     try {
       subCategories = await _categoryService.fetchSubCategories(
           parentCategoryId, parentCategoryName);
-      print(
-          "Fetched subCategories: ${subCategories.map((c) => '${c.id}:${c.name}:${c.count}').toList()}");
     } finally {
       isLoading = false;
       notifyListeners();

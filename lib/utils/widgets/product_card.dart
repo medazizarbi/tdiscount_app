@@ -102,7 +102,7 @@ class ProductCardState extends State<ProductCard> {
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0),
                           child: Text(
-                            'TND ${widget.regularPrice}',
+                            '${widget.regularPrice}',
                             style: const TextStyle(
                               fontSize: 12,
                               color: Color.fromARGB(255, 109, 109, 109),
@@ -141,6 +141,7 @@ class ProductCardState extends State<ProductCard> {
             top: 0,
             right: 0,
             child: IconButton(
+              key: Key('favorite_btn_${widget.productId}'), // <-- Add this line
               icon: Icon(
                 isFavorite ? Icons.favorite : Icons.favorite_border,
                 color: isFavorite ? TColors.textprice : TColors.buttonSecondary,
@@ -157,6 +158,8 @@ class ProductCardState extends State<ProductCard> {
             bottom: 8,
             right: 0,
             child: IconButton(
+              key: Key(
+                  'add_to_cart_btn_${widget.productId}'), // <-- Add this line
               icon: const Icon(
                 Icons.shopping_cart,
                 color: Colors.blue,

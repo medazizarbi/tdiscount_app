@@ -1,17 +1,15 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserAuthService {
-  final String baseUrl =
-      "https://tdiscount.tn/wp-json/"; // Replace with your API base URL
+  String get baseUrl => dotenv.env['WC_BASE_URL'] ?? "";
 
   /// Logs in a user with the provided username and password.
   Future<Map<String, dynamic>> login(String username, String password) async {
     const String endpoint = "jwt-auth/v1/token"; // Adjust endpoint if needed
     final String url = "$baseUrl$endpoint";
-
-    print('🔑 [LOGIN] Called with username: $username, password: $password');
 
     final response = await http.post(
       Uri.parse(url),
@@ -24,9 +22,6 @@ class UserAuthService {
       }),
     );
 
-    print('🔑 [LOGIN] Response status: ${response.statusCode}');
-    print('🔑 [LOGIN] Response body: ${response.body}');
-
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
 
@@ -37,13 +32,6 @@ class UserAuthService {
       await prefs.setString('user_nicename', data['user_nicename'] ?? '');
       await prefs.setString(
           'user_display_name', data['user_display_name'] ?? '');
-
-      // Console log to see the prefs data
-      print('🔒 [PREFS] token: ${prefs.getString('token')}');
-      print('🔒 [PREFS] user_email: ${prefs.getString('user_email')}');
-      print('🔒 [PREFS] user_nicename: ${prefs.getString('user_nicename')}');
-      print(
-          '🔒 [PREFS] user_display_name: ${prefs.getString('user_display_name')}');
 
       // Fetch and store first_name and last_name after login
       await getUserInfo();
@@ -61,9 +49,8 @@ class UserAuthService {
     await prefs.remove('user_email');
     await prefs.remove('user_nicename');
     await prefs.remove('user_display_name');
-
-    // Console log to confirm removal
-    print('🔒 [LOGOUT] User data cleared from SharedPreferences');
+    await prefs.remove('user_first_name');
+    await prefs.remove('user_last_name');
   }
 
   /// Updates the authenticated user's information.
@@ -93,8 +80,6 @@ class UserAuthService {
     if (email != null) body['email'] = email;
     if (password != null) body['password'] = password;
 
-    print('📝 [UPDATE USER] Sending: $body');
-
     final response = await http.post(
       Uri.parse(url),
       headers: {
@@ -103,9 +88,6 @@ class UserAuthService {
       },
       body: jsonEncode(body),
     );
-
-    print('📝 [UPDATE USER] Response status: ${response.statusCode}');
-    print('📝 [UPDATE USER] Response body: ${response.body}');
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -151,9 +133,6 @@ class UserAuthService {
       },
     );
 
-    print('👤 [GET USER] Response status: ${response.statusCode}');
-    print('👤 [GET USER] Response body: ${response.body}');
-
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
 
@@ -164,11 +143,6 @@ class UserAuthService {
       if (data['last_name'] != null) {
         await prefs.setString('user_last_name', data['last_name']);
       }
-
-      // Console log to see the prefs data
-      print(
-          '👤 [PREFS] user_first_name: ${prefs.getString('user_first_name')}');
-      print('👤 [PREFS] user_last_name: ${prefs.getString('user_last_name')}');
 
       return data;
     } else {

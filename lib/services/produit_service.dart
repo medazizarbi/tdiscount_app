@@ -40,18 +40,12 @@ class ProductService {
     final String url = "$baseUrl$endpoint";
 
     try {
-      print("Fetching product with ID: $productId");
-
       final response = await http.get(
         Uri.parse(url),
         headers: _getAuthHeaders(),
       );
 
-      print("Response status code: ${response.statusCode}");
-
       if (response.statusCode == 200) {
-        print("Response body: ${response.body}");
-
         final Map<String, dynamic> data = json.decode(response.body);
 
         // Map the data to a Product object
@@ -80,19 +74,11 @@ class ProductService {
           relatedIds: product.relatedIds, // NEW: Include related IDs
         );
 
-        print(
-            "Product ID: ${updatedProduct.id}, Name: ${updatedProduct.name}, Price: ${updatedProduct.price}, Regular Price: ${updatedProduct.regularPrice}, Image URL: ${updatedProduct.imageUrls}");
-        print(
-            "Related IDs: ${updatedProduct.relatedIds}"); // NEW: Log related IDs
-
         return updatedProduct;
       } else {
-        print("Failed to load product. Status code: ${response.statusCode}");
-        print("Response body: ${response.body}");
         throw Exception("Failed to load product: ${response.statusCode}");
       }
     } catch (e) {
-      print("Error fetching product: $e");
       throw Exception("Error fetching product: $e");
     }
   }
@@ -100,11 +86,8 @@ class ProductService {
   // NEW: Method to fetch multiple related products by their IDs
   Future<List<Product>> fetchRelatedProducts(List<int> relatedIds) async {
     if (relatedIds.isEmpty) {
-      print("No related product IDs provided");
       return [];
     }
-
-    print('⏳ Fetching ${relatedIds.length} related products');
 
     List<Product> relatedProducts = [];
 
@@ -112,21 +95,17 @@ class ProductService {
       try {
         final product = await fetchProductById(relatedId);
         relatedProducts.add(product);
-        print('✅ Fetched related product: ${product.name}');
       } catch (e) {
-        print('❌ Error fetching related product $relatedId: $e');
         // Continue with other products even if one fails
       }
     }
 
-    print('✅ Successfully fetched ${relatedProducts.length} related products');
     return relatedProducts;
   }
 
   // NEW: More efficient bulk fetch method using WooCommerce include parameter
   Future<List<Product>> fetchProductsByIds(List<int> productIds) async {
     if (productIds.isEmpty) {
-      print("No product IDs provided");
       return [];
     }
 
@@ -136,19 +115,14 @@ class ProductService {
         "products?include=$idsString&per_page=${productIds.length}";
     final String url = "$baseUrl$endpoint";
 
-    print('⏳ Bulk fetching products by IDs: $idsString');
-
     try {
       final response = await http.get(
         Uri.parse(url),
         headers: _getAuthHeaders(),
       );
 
-      print('✅ Bulk fetch response: ${response.statusCode}');
-
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        print('📦 Bulk fetched ${data.length} products');
 
         final products = data.map((json) {
           final product = Product.fromJson(json);
@@ -181,14 +155,12 @@ class ProductService {
           return isValid;
         }).toList();
 
-        print('✅ Processed ${products.length} valid products');
         return products;
       } else {
         throw Exception(
             "Failed to bulk fetch products: ${response.statusCode}");
       }
     } catch (e) {
-      print('❌ Error in bulk fetch: $e');
       throw Exception("Error bulk fetching products: $e");
     }
   }
@@ -196,11 +168,8 @@ class ProductService {
   // NEW: Convenience method to get related products for a specific product
   Future<List<Product>> getRelatedProductsFor(Product product) async {
     if (!product.hasRelatedProducts) {
-      print("Product ${product.name} has no related products");
       return [];
     }
-
-    print("Getting related products for: ${product.name}");
 
     // Use the more efficient bulk fetch method
     return await fetchProductsByIds(product.relatedIds);

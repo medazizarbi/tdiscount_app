@@ -48,36 +48,23 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
     final categoryViewModel = Provider.of<CategoryViewModel>(context);
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: TColors.primary,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: TColors.textPrimary),
+          onPressed: () => Navigator.pop(context),
+        ),
+        centerTitle: true,
+        title: Image.asset(
+          "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png",
+          height: 36,
+        ),
+      ),
       body: Container(
         color: TColors.primary, // Set the background color
         child: Column(
           children: [
-            // AppBar-like section with back button and title
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-              color: TColors.primary,
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back,
-                        color: TColors.textPrimary),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  const SizedBox(width: 8.0),
-                  Text(
-                    widget.categoryName,
-                    style: const TextStyle(
-                      color: TColors.textPrimary,
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
             // White container for content
             Expanded(
               child: Container(
@@ -99,13 +86,16 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
                       // Display the category name
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          widget.categoryName,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: themedColor(context, TColors.textPrimary,
-                                TColors.textWhite),
+                        child: Center(
+                          child: Text(
+                            widget.categoryName,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: themedColor(context, TColors.textPrimary,
+                                  TColors.textWhite),
+                            ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
@@ -114,10 +104,13 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
 
                       // Display subcategories
                       categoryViewModel.isLoading
-                          ? const Center(
-                              child: CircularProgressIndicator(
-                                color: TColors.primary,
-                              ), // Show loading indicator
+                          ? const Padding(
+                              padding: EdgeInsets.only(top: 100.0),
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  color: TColors.primary,
+                                ),
+                              ),
                             )
                           : categoryViewModel.subCategories.isEmpty
                               ? const Center(

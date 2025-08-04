@@ -41,7 +41,7 @@ class FavoriteViewModel extends ChangeNotifier {
         final product = await _productService.fetchProductById(id);
         _favoriteProducts.add(product);
       } catch (e) {
-        print("Error fetching product with id $id: $e");
+        // Error fetching product, ignore or handle as needed
       }
     }
 
@@ -53,17 +53,13 @@ class FavoriteViewModel extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     if (_favoriteProductIds.contains(productId)) {
       _favoriteProductIds.remove(productId);
-      print('Removed $productId from favorites');
     } else {
       _favoriteProductIds.add(productId);
-      print('Added $productId to favorites');
     }
     await prefs.setStringList(
       'favorite_product_ids',
       _favoriteProductIds.map((id) => id.toString()).toList(),
     );
-    print(
-        'Current favorites in SharedPreferences: ${prefs.getStringList('favorite_product_ids')}');
     notifyListeners();
   }
 

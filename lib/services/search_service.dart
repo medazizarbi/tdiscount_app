@@ -90,10 +90,6 @@ class SearchService {
         return product.imageUrls.isNotEmpty && product.name.isNotEmpty;
       }).toList();
 
-      // Log the number of products fetched and the page number
-      print(
-          '🔎🔎🔎🔎 [SearchService] Page $page: fetched ${products.length} products with filters - min: $minPrice, max: $maxPrice, order: $order');
-
       return products;
     } else {
       throw Exception("Erreur lors de la recherche des produits");

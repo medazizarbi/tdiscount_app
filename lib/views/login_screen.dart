@@ -54,6 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 320,
                   height: 50,
                   child: TextFormField(
+                    key: const Key('login_email'),
                     controller: _usernameController, // <-- Add controller
                     decoration: InputDecoration(
                       labelText: 'Nom d\'utilisateur*',
@@ -79,6 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 320,
                   height: 50,
                   child: TextFormField(
+                    key: const Key('login_password'),
                     controller: _passwordController, // <-- Add controller
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
@@ -114,6 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   width: 320, // Adjust width to match the text fields
                   child: ElevatedButton(
+                    key: const Key('login_submit'),
                     onPressed: () async {
                       if (_formKey.currentState?.validate() ?? false) {
                         final username = _usernameController.text.trim();

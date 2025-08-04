@@ -42,10 +42,6 @@ class SearchViewModel extends ChangeNotifier {
     errorMessage = null;
     notifyListeners();
 
-    // Log when the method is called and the page value with filters
-    print(
-        '🔎 [SearchViewModel] searchProducts called: page=$currentPage, isNewSearch=$isNewSearch, search="$search", minPrice=$minPrice, maxPrice=$maxPrice, order=$order');
-
     try {
       final products = await _searchService.searchProducts(
         search: search,

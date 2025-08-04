@@ -62,8 +62,6 @@ class OrderService {
       body: jsonEncode(body),
     );
 
-    print('Order POST status: ${response.statusCode}');
-    print('Order POST body: ${response.body}');
     return response;
   }
 

@@ -7,7 +7,6 @@ import 'package:tdiscount_app/utils/widgets/custom_drawer.dart'; // Import the c
 import 'package:tdiscount_app/utils/widgets/carousel_widget.dart'; // Import the carousel widget
 import 'package:tdiscount_app/utils/widgets/product_card.dart'; // Import the product card widget
 import 'package:tdiscount_app/utils/widgets/category_card.dart'; // Import the category card widget
-import 'package:tdiscount_app/utils/widgets/highlight_section.dart';
 import '../viewmodels/category_viewmodel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -219,20 +218,51 @@ class HomeScreenState extends State<HomeScreen>
                                 const SizedBox(height: 0),
 
                                 // ✅ "Meilleures Ventes" Section
-                                const Padding(
-                                  padding: EdgeInsets.only(
+                                Padding(
+                                  padding: const EdgeInsets.only(
                                       top: 8, left: 16, right: 16),
-                                  child: Text(
-                                    "Meilleures Ventes",
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      // color: Colors.black,
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 0, vertical: 0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 12),
+                                    decoration: BoxDecoration(
+                                      color: backgroundColor,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: themedColor(
+                                            context,
+                                            Colors.black.withOpacity(
+                                                0.3), // Light mode shadow
+                                            Colors.white.withOpacity(
+                                                0.3), // Dark mode shadow
+                                          ),
+                                          blurRadius: 10,
+                                          spreadRadius: 2,
+                                          offset: const Offset(0, 6),
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            "Meilleures Ventes",
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-
-                                const SizedBox(height: 0),
 
                                 // ✅ Dynamic GridView for Products
                                 Padding(
@@ -302,60 +332,65 @@ class HomeScreenState extends State<HomeScreen>
 
                                 const SizedBox(height: 8),
 
-                                // ✅ HighlightSection Widget (Full Width)
-                                const HighlightSection(
-                                  title: "Nouveautés",
-                                  subtitle:
-                                      "Découvrez les derniers produits - SAMSUNG",
-                                  mainImage:
-                                      "assets/images/samsung.png", // Replace with real URL
-                                  products: [
-                                    {
-                                      "image": "assets/images/produit1.jpg",
-                                      "name": "Samsung"
-                                    },
-                                    {
-                                      "image": "assets/images/prod2.jpg",
-                                      "name": "Samsung "
-                                    },
-                                    {
-                                      "image": "assets/images/produit1.jpg",
-                                      "name": "Samsung"
-                                    },
-                                  ],
-                                  highlightColorBG: Colors
-                                      .yellow, // Specify the background color here
-                                ),
-
-                                const SizedBox(height: 8),
-
                                 // ✅ "Top Categories" Section
-                                const Padding(
-                                  padding: EdgeInsets.all(16),
-                                  child: Text(
-                                    "Top Categories",
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      vertical: 0), // No horizontal margin
+                                  decoration: BoxDecoration(
+                                    color:
+                                        backgroundColor, // Same as the screen background
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: themedColor(
+                                          context,
+                                          Colors.black.withOpacity(
+                                              0.3), // Light mode shadow
+                                          Colors.white.withOpacity(
+                                              0.3), // Dark mode shadow
+                                        ),
+                                        blurRadius: 5,
+                                        offset: const Offset(0,
+                                            1), // More pronounced shadow on sides/bottom
+                                      ),
+                                    ],
                                   ),
-                                ),
-
-                                const SizedBox(height: 8),
-// ✅ Display Top 4 Category Cards from ViewModel
-                                categoryViewModel.isTopCategoriesLoading
-                                    ? const SizedBox(
-                                        height: 170,
-                                        child: Center(
-                                          child: CircularProgressIndicator(
-                                            color: TColors.primary,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.only(
+                                            top: 16,
+                                            left: 16,
+                                            right: 16,
+                                            bottom: 0),
+                                        child: Text(
+                                          "Top Categories",
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                      )
-                                    : CategoryList(
-                                        categories:
-                                            categoryViewModel.topCategories,
                                       ),
+                                      const SizedBox(height: 8),
+                                      categoryViewModel.isTopCategoriesLoading
+                                          ? const SizedBox(
+                                              height: 170,
+                                              child: Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color: TColors.primary,
+                                                ),
+                                              ),
+                                            )
+                                          : CategoryList(
+                                              categories: categoryViewModel
+                                                  .topCategories,
+                                            ),
+                                    ],
+                                  ),
+                                ),
                                 const SizedBox(height: 18),
 
                                 // ✅ Display Top Categories Products
@@ -374,8 +409,30 @@ class HomeScreenState extends State<HomeScreen>
                                         CrossAxisAlignment.start,
                                     children: [
                                       // Category Name Title
-                                      Padding(
-                                        padding: const EdgeInsets.all(16),
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 0, vertical: 12),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16, vertical: 12),
+                                        decoration: BoxDecoration(
+                                          color: backgroundColor,
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: themedColor(
+                                                context,
+                                                Colors.black.withOpacity(
+                                                    0.3), // Light mode shadow
+                                                Colors.white.withOpacity(
+                                                    0.3), // Dark mode shadow
+                                              ),
+                                              blurRadius: 10,
+                                              spreadRadius: 2,
+                                              offset: const Offset(0, 6),
+                                            ),
+                                          ],
+                                        ),
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -391,7 +448,6 @@ class HomeScreenState extends State<HomeScreen>
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
-                                            // Optional "See All" button
                                             GestureDetector(
                                               onTap: () {
                                                 Navigator.push(

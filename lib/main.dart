@@ -7,7 +7,7 @@ import 'package:tdiscount_app/viewModels/order_viewmodel.dart';
 import 'package:tdiscount_app/viewModels/product_viewmodel.dart';
 import 'package:tdiscount_app/viewModels/search_viewmodel.dart';
 import 'package:tdiscount_app/viewmodels/category_viewmodel.dart';
-import 'package:tdiscount_app/views/login_screen.dart';
+import 'package:tdiscount_app/views/welcome_page.dart';
 import 'views/home_screen.dart';
 import 'views/recherche_screen.dart';
 import 'views/panier_screen.dart';
@@ -49,13 +49,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Ensure checkLoginStatus is called at startup
+    Provider.of<AuthViewModel>(context, listen: false).checkLoginStatus();
+
     final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       themeMode: themeProvider.themeMode,
       debugShowCheckedModeBanner: false,
       home: ConnectivityChecker(
         // <-- Wrap home with ConnectivityChecker
-        child: isLoggedIn ? const MyHomePage() : const LoginScreen(),
+        child: isLoggedIn ? const MyHomePage() : const WelcomePage(),
       ),
       theme: ThemeData(
         brightness: Brightness.light,

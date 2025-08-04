@@ -9,6 +9,20 @@ class AuthViewModel extends ChangeNotifier {
   String? errorMessage;
   Map<String, dynamic>? userData;
 
+  bool _isLoggedIn = false;
+  bool get isLoggedIn => _isLoggedIn;
+
+  AuthViewModel() {
+    checkLoginStatus();
+  }
+
+  Future<void> checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    _isLoggedIn = token != null && token.isNotEmpty;
+    notifyListeners();
+  }
+
   Future<bool> login(String username, String password) async {
     isLoading = true;
     errorMessage = null;
@@ -75,5 +89,11 @@ class AuthViewModel extends ChangeNotifier {
       'display_name': prefs.getString('user_display_name') ?? '',
       'email': prefs.getString('user_email') ?? '',
     };
+  }
+
+  // Call this after login/logout to update state
+  Future<void> setLoggedIn(bool value) async {
+    _isLoggedIn = value;
+    notifyListeners();
   }
 }

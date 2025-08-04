@@ -4,6 +4,8 @@ import 'package:tdiscount_app/providers/theme_provider.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/utils/widgets/custom_drawer.dart';
 import 'package:tdiscount_app/utils/widgets/logout_dialog.dart';
+import 'package:tdiscount_app/viewModels/auth_viewmodel.dart';
+import 'package:tdiscount_app/views/login_screen.dart';
 import 'package:tdiscount_app/views/update_userinfo_screen.dart';
 
 class ProfilScreen extends StatefulWidget {
@@ -17,6 +19,8 @@ class ProfilScreen extends StatefulWidget {
 class _ProfilScreenState extends State<ProfilScreen> {
   @override
   Widget build(BuildContext context) {
+    final isLoggedIn = Provider.of<AuthViewModel>(context).isLoggedIn;
+
     return Scaffold(
       drawer: const CustomDrawer(),
       body: Container(
@@ -81,19 +85,35 @@ class _ProfilScreenState extends State<ProfilScreen> {
                           ),
                           const SizedBox(height: 16),
                           const SectionTitle(title: 'Compte'),
-                          SettingTile(
-                            icon: Icons.person,
-                            title: 'Information Personnelle',
-                            subtitle: 'Modifier votre profile',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const UpdateUserInfoScreen()),
-                              );
-                            },
-                          ),
+                          isLoggedIn
+                              ? SettingTile(
+                                  icon: Icons.person,
+                                  title: 'Information Personnelle',
+                                  subtitle: 'Modifier votre profile',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const UpdateUserInfoScreen(),
+                                      ),
+                                    );
+                                  },
+                                )
+                              : SettingTile(
+                                  icon: Icons.login,
+                                  title: 'Se connecter',
+                                  subtitle: 'Créer un compte',
+                                  onTap: () {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LoginScreen(),
+                                      ),
+                                    );
+                                  },
+                                ),
 
                           const SectionTitle(title: 'Interface'),
                           const SettingTile(
@@ -199,16 +219,17 @@ Copyright © 2025 | Tous droits réservés - By iTrend
                             },
                           ),
                           const SizedBox(height: 20),
-                          TextButton.icon(
-                            onPressed: () {
-                              showLogoutDialog(context);
-                            },
-                            icon: const Icon(Icons.logout, color: Colors.red),
-                            label: const Text(
-                              'Déconnexion',
-                              style: TextStyle(color: Colors.red),
+                          if (isLoggedIn)
+                            TextButton.icon(
+                              onPressed: () {
+                                showLogoutDialog(context);
+                              },
+                              icon: const Icon(Icons.logout, color: Colors.red),
+                              label: const Text(
+                                'Déconnexion',
+                                style: TextStyle(color: Colors.red),
+                              ),
                             ),
-                          ),
                           const SizedBox(height: 20),
                         ],
                       ),
@@ -294,21 +315,92 @@ class ThemeToggleSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-
-    // Determine the effective brightness
     final brightness = Theme.of(context).brightness;
     final isLight = themeProvider.themeMode == ThemeMode.system
         ? brightness == Brightness.light
         : themeProvider.themeMode == ThemeMode.light;
 
-    return Switch(
-      value: isLight,
-      onChanged: (val) {
-        themeProvider.setTheme(val ? ThemeMode.light : ThemeMode.dark);
+    final Color bgColor = isLight ? Colors.grey.shade200 : Colors.grey.shade800;
+    final Color textColor = isLight ? Colors.black : Colors.white;
+
+    return GestureDetector(
+      onTap: () {
+        themeProvider.setTheme(isLight ? ThemeMode.dark : ThemeMode.light);
       },
-      activeColor: const Color.fromARGB(255, 58, 58, 58), // Color when ON
-      inactiveThumbColor: const Color.fromARGB(255, 58, 58, 58), // Color OFF
-      inactiveTrackColor: Colors.grey.shade300, // Track color when OFF
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        width: 100,
+        height: 38,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Place the text on the opposite side of the toggle
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (!isLight)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(
+                      "Nuit",
+                      style: TextStyle(
+                        color: textColor.withOpacity(0.7),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox(width: 22),
+                if (isLight)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Text(
+                      "Jour",
+                      style: TextStyle(
+                        color: textColor.withOpacity(0.7),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox(width: 22),
+              ],
+            ),
+            // The toggle button (circle) overlays the text
+            AnimatedAlign(
+              duration: const Duration(milliseconds: 250),
+              alignment: isLight ? Alignment.centerLeft : Alignment.centerRight,
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  isLight ? Icons.wb_sunny : Icons.nightlight_round,
+                  color: isLight ? Colors.black : Colors.black,
+                  size: 20,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

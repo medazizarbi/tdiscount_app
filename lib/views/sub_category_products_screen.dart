@@ -81,16 +81,28 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
     );
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: TColors.primary,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: TColors.textPrimary),
+          onPressed: () => Navigator.pop(context),
+        ),
+        centerTitle: true,
+        title: Image.asset(
+          "assets/images/tdiscount_images/Logo-Tdiscount-market-noire.png",
+          height: 36,
+        ),
+      ),
       body: Container(
         color: TColors.primary,
         child: Column(
           children: [
-            _buildAppBar(),
             Expanded(
               child: Container(
                 decoration: _whiteContainerDecoration(),
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                   child: _buildContent(
                     viewModel,
                     products,
@@ -102,30 +114,6 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildAppBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-      color: TColors.primary,
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: TColors.textPrimary),
-            onPressed: () => Navigator.pop(context),
-          ),
-          const SizedBox(width: 8.0),
-          Text(
-            widget.subCategoryName,
-            style: const TextStyle(
-              color: TColors.textPrimary,
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -161,7 +149,26 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
     return SingleChildScrollView(
       controller: _scrollController,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Center(
+              child: Text(
+                widget.subCategoryName,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: themedColor(
+                    context,
+                    TColors.textPrimary, // Black for light
+                    TColors.textWhite, // White for dark
+                  ),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
           /*
           if (subCategoryDescription != null &&
               subCategoryDescription.isNotEmpty)
@@ -177,7 +184,8 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
                 ),
                 textAlign: TextAlign.justify,
               ),
-            ),*/
+            ),
+          */
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
