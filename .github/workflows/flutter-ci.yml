@@ -1,0 +1,95 @@
+name: Flutter CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.1'
+
+      - name: Export Secrets
+        run: |
+          echo "API_KEY=$API_KEY" >> $GITHUB_ENV
+          echo "BASE_URL=$BASE_URL" >> $GITHUB_ENV
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Install Dart Code Metrics
+        run: dart pub global activate dart_code_metrics
+
+      - name: Analyze Dart code (Dart Code Metrics)
+        run: |
+          dart pub global run dart_code_metrics:metrics analyze lib
+          dart pub global run dart_code_metrics:metrics check-unused-files lib
+          dart pub global run dart_code_metrics:metrics check-unused-code lib
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload artifact (APK)
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Push APK to Second Repo
+        env:
+          WC_CONSUMER_KEY: ${{ secrets.WC_CONSUMER_KEY }}
+          WC_SECRET_KEY: ${{ secrets.WC_SECRET_KEY }}
+          WC_BASE_URL: ${{ secrets.WC_BASE_URL }}
+          
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          git clone https://x-access-token:${TOKEN}@github.com/your-username/your-apk-repo.git apk-repo
+          cp build/app/outputs/flutter-apk/app-release.apk apk-repo/app-release-$(date +%Y%m%d%H%M).apk
+          cd apk-repo
+          git add .
+          git commit -m "Add new APK build from CI"
+          git push
+
+  sonarqube:
+    name: SonarQube
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.1'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build (for SonarQube)
+        run: flutter build apk --debug
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} # Add this secret in your repo settings

@@ -27,7 +27,7 @@ void main() {
     });
 
     test('stripHtmlTags removes HTML tags and decodes entities', () {
-      final html = '<p>Hello&nbsp;World</p>';
+      const html = '<p>Hello&nbsp;World</p>';
       final plain = productService.stripHtmlTags(html);
       expect(plain, 'Hello World');
     });
