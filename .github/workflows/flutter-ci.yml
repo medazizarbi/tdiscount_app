@@ -49,21 +49,26 @@ jobs:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
-      - name: Push APK to Second Repo
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
-          WC_CONSUMER_KEY: ${{ secrets.WC_CONSUMER_KEY }}
-          WC_SECRET_KEY: ${{ secrets.WC_SECRET_KEY }}
-          WC_BASE_URL: ${{ secrets.WC_BASE_URL }}
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
+          draft: false
+          prerelease: false
 
-          git clone https://x-access-token:${TOKEN}@github.com/your-username/your-apk-repo.git apk-repo
-          cp build/app/outputs/flutter-apk/app-release.apk apk-repo/app-release-$(date +%Y%m%d%H%M).apk
-          cd apk-repo
-          git add .
-          git commit -m "Add new APK build from CI"
-          git push
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/app/outputs/flutter-apk/app-release.apk
+          asset_name: app-release.apk
+          asset_content_type: application/vnd.android.package-archive
 
   sonarqube:
     name: SonarQube

@@ -6,7 +6,7 @@ import 'package:tdiscount_app/viewModels/auth_viewmodel.dart';
 import 'package:tdiscount_app/viewModels/order_viewmodel.dart';
 import 'package:tdiscount_app/viewModels/product_viewmodel.dart';
 import 'package:tdiscount_app/viewModels/search_viewmodel.dart';
-import 'package:tdiscount_app/viewmodels/category_viewmodel.dart';
+import 'package:tdiscount_app/viewModels/category_viewmodel.dart';
 import 'package:tdiscount_app/views/welcome_page.dart';
 import 'views/home_screen.dart';
 import 'views/recherche_screen.dart';
