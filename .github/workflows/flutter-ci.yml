@@ -42,6 +42,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Analyze Dart code (flutter analyze)
+        run: flutter analyze
+
       - name: Install Dart Code Metrics
         run: dart pub global activate dart_code_metrics
 
@@ -66,25 +69,42 @@ jobs:
       - name: Create Release
         id: create_release
         if: github.event_name == 'push'
-        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.run_number }}
-          release_name: Release ${{ github.run_number }}
-          draft: false
-          prerelease: false
+        run: |
+          gh release create "${{ github.run_number }}" build/app/outputs/flutter-apk/app-release.apk \
+            --title "Release ${{ github.run_number }}" \
+            --notes "Automated release by GitHub Actions"
+        shell: bash
 
       - name: Upload Release Asset
         if: github.event_name == 'push'
-        uses: actions/upload-release-asset@v1
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'build/app/outputs/flutter-apk/app-release.apk';
+            const release = await github.rest.repos.getRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: (await github.rest.repos.listReleases({
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              })).data.find(r => r.tag_name === `${{ github.run_number }}`).id
+            });
+            await github.rest.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.data.id,
+              name: 'app-release.apk',
+              data: fs.readFileSync(path),
+              headers: {
+                'content-type': 'application/vnd.android.package-archive',
+                'content-length': fs.statSync(path).size
+              }
+            });
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/app/outputs/flutter-apk/app-release.apk
-          asset_name: app-release.apk
-          asset_content_type: application/vnd.android.package-archive
 
   sonarqube:
     name: SonarQube
@@ -118,6 +138,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Analyze Dart code (flutter analyze)
+        run: flutter analyze
 
       - name: Build (for SonarQube)
         run: flutter build apk --debug
