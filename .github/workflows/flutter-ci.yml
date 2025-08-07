@@ -96,7 +96,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               release_id: release.data.id,
-              name: 'app-release.apk',
+              name: `app-release-${{ github.run_number }}.apk`,
               data: fs.readFileSync(path),
               headers: {
                 'content-type': 'application/vnd.android.package-archive',
