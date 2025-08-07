@@ -233,6 +233,7 @@ class _RechercheScreenState extends State<RechercheScreen> {
                                     builder: (context) =>
                                         const FilterBottomSheet(),
                                   ).then((filterData) {
+                                    if (!mounted) return;
                                     if (filterData != null) {
                                       final searchVM =
                                           Provider.of<SearchViewModel>(context,
@@ -253,6 +254,8 @@ class _RechercheScreenState extends State<RechercheScreen> {
                                         );
                                       } else {
                                         // Optionally show a message to the user
+                                        if (!mounted)
+                                          return; // <-- Add this line before using context again
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(
