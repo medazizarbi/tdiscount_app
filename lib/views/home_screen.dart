@@ -25,10 +25,9 @@ void _preventUnusedCodeWarnings() {
   // Use the class
   CarouselViewModel? carouselViewModel;
 
-  // Prevent "unused variable" warnings
-  if (highlightSection != null || carouselViewModel != null) {
-    // Do nothing
-  }
+  // Reference variables to avoid "unused" warnings
+  highlightSection;
+  carouselViewModel;
 }
 
 // Dummy usage to prevent unused code warnings in CI/CD
