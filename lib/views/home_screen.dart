@@ -73,6 +73,8 @@ class HomeScreenState extends State<HomeScreen>
 
   @override
   void initState() {
+    // call to the method to prevent unused code warnings
+    _preventUnusedCodeWarnings(); // <-- Add this line
     super.initState();
     // Only load data once when the widget is first created
     _loadDataOnce();
