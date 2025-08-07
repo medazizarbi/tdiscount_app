@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:tdiscount_app/models/product_model.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
 import 'package:tdiscount_app/utils/widgets/product_card.dart';
-import '../viewmodels/category_viewmodel.dart';
+import 'package:tdiscount_app/viewModels/category_viewmodel.dart';
 import 'product_details_screen.dart';
 
 class SubCategoryProductsScreen extends StatefulWidget {

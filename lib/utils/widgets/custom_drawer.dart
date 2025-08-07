@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tdiscount_app/main.dart';
 import 'package:tdiscount_app/models/category_model.dart';
 import 'package:tdiscount_app/utils/constants/colors.dart';
-import 'package:tdiscount_app/viewmodels/category_viewmodel.dart';
+import 'package:tdiscount_app/viewModels/category_viewmodel.dart';
 import 'package:tdiscount_app/viewModels/auth_viewmodel.dart';
 import 'package:tdiscount_app/views/sub_categorie.dart';
 import 'package:tdiscount_app/utils/widgets/logout_dialog.dart';
