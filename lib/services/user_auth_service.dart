@@ -4,17 +4,20 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserAuthService {
+  static const String contentTypeHeader = 'Content-Type';
+  static const String contentTypeJson =
+      'application/json'; // <-- Added constant
   String get baseUrl => dotenv.env['WC_BASE_URL'] ?? "";
 
   /// Logs in a user with the provided username and password.
   Future<Map<String, dynamic>> login(String username, String password) async {
-    const String endpoint = "jwt-auth/v1/token"; // Adjust endpoint if needed
+    const String endpoint = "jwt-auth/v1/token";
     final String url = "$baseUrl$endpoint";
 
     final response = await http.post(
       Uri.parse(url),
       headers: {
-        'Content-Type': 'application/json',
+        contentTypeHeader: contentTypeJson, // <-- Use constant
       },
       body: jsonEncode({
         'username': username,
@@ -83,7 +86,7 @@ class UserAuthService {
     final response = await http.post(
       Uri.parse(url),
       headers: {
-        'Content-Type': 'application/json',
+        contentTypeHeader: contentTypeJson,
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode(body),
@@ -92,19 +95,17 @@ class UserAuthService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
 
-      // Update prefs with all user fields if present
-      if (data['name'] != null) {
-        await prefs.setString('user_display_name', data['name']);
+      // Helper to update a field if present
+      Future<void> updatePref(String key, String? value) async {
+        if (value != null) {
+          await prefs.setString(key, value);
+        }
       }
-      if (data['email'] != null) {
-        await prefs.setString('user_email', data['email']);
-      }
-      if (data['first_name'] != null) {
-        await prefs.setString('user_first_name', data['first_name']);
-      }
-      if (data['last_name'] != null) {
-        await prefs.setString('user_last_name', data['last_name']);
-      }
+
+      await updatePref('user_display_name', data['name']);
+      await updatePref('user_email', data['email']);
+      await updatePref('user_first_name', data['first_name']);
+      await updatePref('user_last_name', data['last_name']);
 
       return data;
     } else {
@@ -128,7 +129,7 @@ class UserAuthService {
     final response = await http.post(
       Uri.parse(url),
       headers: {
-        'Content-Type': 'application/json',
+        contentTypeHeader: contentTypeJson, // <-- Use constant
         'Authorization': 'Bearer $token',
       },
     );

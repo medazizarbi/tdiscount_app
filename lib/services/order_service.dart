@@ -9,18 +9,12 @@ class OrderService {
   String get consumerSecret => dotenv.env['WC_CONSUMER_SECRET'] ?? "";
 
   Future<http.Response> createOrder({
-    required String firstName,
-    required String lastName,
-    required String address1,
-    required String city,
-    required String phone,
-    required String note,
+    required OrderInfo orderInfo,
     required List<Product> products,
     required Map<int, int> quantities,
   }) async {
     final url = Uri.parse('${baseUrl}orders');
 
-    // Build line_items from products and quantities
     final List<Map<String, dynamic>> lineItems = products.map((prod) {
       return {
         "product_id": prod.id,
@@ -33,20 +27,20 @@ class OrderService {
 
     final Map<String, dynamic> body = {
       "billing": {
-        "first_name": firstName,
-        "last_name": lastName,
-        "address_1": address1,
-        "city": city,
-        "phone": phone,
+        "first_name": orderInfo.firstName,
+        "last_name": orderInfo.lastName,
+        "address_1": orderInfo.address1,
+        "city": orderInfo.city,
+        "phone": orderInfo.phone,
       },
       "shipping": {
-        "first_name": firstName,
-        "last_name": lastName,
-        "address_1": address1,
-        "city": city,
-        "phone": phone,
+        "first_name": orderInfo.firstName,
+        "last_name": orderInfo.lastName,
+        "address_1": orderInfo.address1,
+        "city": orderInfo.city,
+        "phone": orderInfo.phone,
       },
-      "customer_note": note,
+      "customer_note": orderInfo.note,
       "line_items": lineItems,
     };
 
@@ -66,29 +60,37 @@ class OrderService {
   }
 
   Future<List<http.Response>> createOrdersOneByOne({
-    required String firstName,
-    required String lastName,
-    required String address1,
-    required String city,
-    required String phone,
-    required String note,
+    required OrderInfo orderInfo,
     required List<Product> products,
     required Map<int, int> quantities,
   }) async {
     List<http.Response> responses = [];
     for (final prod in products) {
       final response = await createOrder(
-        firstName: firstName,
-        lastName: lastName,
-        address1: address1,
-        city: city,
-        phone: phone,
-        note: note,
-        products: [prod], // Only one product per order
+        orderInfo: orderInfo,
+        products: [prod],
         quantities: {prod.id: quantities[prod.id] ?? 1},
       );
       responses.add(response);
     }
     return responses;
   }
+}
+
+class OrderInfo {
+  final String firstName;
+  final String lastName;
+  final String address1;
+  final String city;
+  final String phone;
+  final String note;
+
+  OrderInfo({
+    required this.firstName,
+    required this.lastName,
+    required this.address1,
+    required this.city,
+    required this.phone,
+    required this.note,
+  });
 }

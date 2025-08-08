@@ -23,13 +23,16 @@ class OrderViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await OrderService().createOrder(
+      final orderInfo = OrderInfo(
         firstName: firstName,
         lastName: lastName,
         address1: address1,
         city: city,
         phone: phone,
         note: note,
+      );
+      final response = await OrderService().createOrder(
+        orderInfo: orderInfo,
         products: products,
         quantities: quantities,
       );
@@ -67,13 +70,16 @@ class OrderViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final responses = await OrderService().createOrdersOneByOne(
+      final orderInfo = OrderInfo(
         firstName: firstName,
         lastName: lastName,
         address1: address1,
         city: city,
         phone: phone,
         note: note,
+      );
+      final responses = await OrderService().createOrdersOneByOne(
+        orderInfo: orderInfo,
         products: products,
         quantities: quantities,
       );

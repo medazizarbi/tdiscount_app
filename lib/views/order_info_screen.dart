@@ -289,17 +289,18 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
 
                                             if (!mounted) return;
                                             if (success) {
-                                              // ignore: use_build_context_synchronously
-                                              ScaffoldMessenger.of(context)
+                                              ScaffoldMessenger.of(this.context)
                                                   .showSnackBar(
                                                 const SnackBar(
                                                     content: Text(
                                                         "Commande envoyée !")),
                                               );
-                                              // Optionally: Navigator.pop(context);
+                                              await Future.delayed(
+                                                  const Duration(seconds: 1));
+                                              if (!mounted) return;
+                                              Navigator.of(this.context).pop();
                                             } else {
-                                              // ignore: use_build_context_synchronously
-                                              ScaffoldMessenger.of(context)
+                                              ScaffoldMessenger.of(this.context)
                                                   .showSnackBar(
                                                 SnackBar(
                                                   content: Text(orderViewModel

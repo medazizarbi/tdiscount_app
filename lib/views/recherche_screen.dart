@@ -254,8 +254,7 @@ class _RechercheScreenState extends State<RechercheScreen> {
                                         );
                                       } else {
                                         // Optionally show a message to the user
-                                        if (!mounted)
-                                          return; // <-- Add this line before using context again
+                                        if (!mounted) return;
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(
