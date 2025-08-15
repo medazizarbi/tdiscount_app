@@ -106,6 +106,52 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Get Release Download URL
+        if: github.event_name == 'push'
+        id: get_download_url
+        run: |
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.run_number }}/app-release-${{ github.run_number }}.apk"
+          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+          echo "Download URL: $DOWNLOAD_URL"
+
+      - name: Generate QR Code
+        if: github.event_name == 'push'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qrencode
+          qrencode -s 10 -o qr_code.png "${{ steps.get_download_url.outputs.download_url }}"
+          echo "QR Code generated successfully"
+
+      - name: Send Email with QR Code
+        if: github.event_name == 'push'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: "🚀 New App Release ${{ github.run_number }} - QR Code Download"
+          to: ${{ secrets.EMAIL_RECIPIENT }}
+          from: ${{ secrets.GMAIL_USERNAME }}
+          html_body: |
+            <h2>🎉 New Release Available!</h2>
+            <p><strong>Release:</strong> ${{ github.run_number }}</p>
+            <p><strong>Repository:</strong> ${{ github.repository }}</p>
+            <p><strong>Commit:</strong> ${{ github.sha }}</p>
+            <p><strong>Branch:</strong> ${{ github.ref_name }}</p>
+            
+            <h3>📱 Download APK</h3>
+            <p>Scan the QR code below or click the direct link to download:</p>
+            
+            <p><a href="${{ steps.get_download_url.outputs.download_url }}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Download APK</a></p>
+            
+            <h3>📊 QR Code</h3>
+            <p>Scan this QR code with your phone to download the APK:</p>
+            
+            <hr>
+            <p><em>This is an automated email from GitHub Actions CI/CD pipeline.</em></p>
+          attachments: qr_code.png
+
   sonarqube:
     name: SonarQube
     runs-on: ubuntu-latest
