@@ -23,12 +23,11 @@ class AutoScrollCarouselState extends State<AutoScrollCarousel> {
 
   // List of images (hardcoded for now, will be replaced with server data later)
   final List<String> images = [
-    "assets/images/tdiscount16.jpg",
-    "assets/images/tdiscount16.jpg",
-    "assets/images/tdiscount16.jpg",
-    "assets/images/tdiscount16.jpg",
-    "assets/images/tdiscount16.jpg",
-    "assets/images/tdiscount16.jpg",
+    "assets/images/carousel_imgs/img1.webp",
+    "assets/images/carousel_imgs/img2.webp",
+    "assets/images/carousel_imgs/img3.webp",
+    "assets/images/carousel_imgs/img4.webp",
+    "assets/images/carousel_imgs/img5.webp",
   ];
 
   // Original aspect ratio (1132 / 490)

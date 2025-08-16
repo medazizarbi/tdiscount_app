@@ -8,12 +8,11 @@ class CarouselViewModel extends ChangeNotifier {
   bool _isScrollingForward = true;
 
   final List<String> images = [
-    "assets/tdiscount16.jpg",
-    "assets/tdiscount16.jpg",
-    "assets/tdiscount16.jpg",
-    "assets/tdiscount16.jpg",
-    "assets/tdiscount16.jpg",
-    "assets/tdiscount16.jpg",
+    "assets/images/carousel_imgs/img1.webp",
+    "assets/images/carousel_imgs/img2.webp",
+    "assets/images/carousel_imgs/img3.webp",
+    "assets/images/carousel_imgs/img4.webp",
+    "assets/images/carousel_imgs/img5.webp",
   ];
 
   int get currentPage => _currentPage;
