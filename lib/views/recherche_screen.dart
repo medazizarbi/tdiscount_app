@@ -259,7 +259,7 @@ class _RechercheScreenState extends State<RechercheScreen> {
                                             .showSnackBar(
                                           const SnackBar(
                                             content: Text(
-                                                "Veuillez entrer un terme de recherche."),
+                                                "Veuillez entrer un terme de recherche avant d'appliquer les filtres."),
                                             duration: Duration(seconds: 2),
                                           ),
                                         );

@@ -272,8 +272,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                                       : () async {
                                           if (_formKey.currentState!
                                               .validate()) {
-                                            final success = await orderViewModel
-                                                .createOrdersOneByOne(
+                                            final request = CreateOrderRequest(
                                               firstName:
                                                   _firstNameController.text,
                                               lastName:
@@ -286,6 +285,9 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                                               products: widget.products,
                                               quantities: widget.quantities,
                                             );
+
+                                            final success = await orderViewModel
+                                                .createOrdersOneByOne(request);
 
                                             if (!mounted) return;
                                             if (success) {

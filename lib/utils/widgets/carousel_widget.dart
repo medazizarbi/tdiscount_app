@@ -43,35 +43,58 @@ class AutoScrollCarouselState extends State<AutoScrollCarousel> {
   void _startAutoScroll() {
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (!_isUserInteracting) {
-        if (_isScrollingForward) {
-          // Scroll forward
-          if (_currentPage < images.length - 1) {
-            _currentPage++;
-          } else {
-            // Reverse direction when reaching the last image
-            _isScrollingForward = false;
-            _currentPage--;
-          }
-        } else {
-          // Scroll backward
-          if (_currentPage > 0) {
-            _currentPage--;
-          } else {
-            // Reverse direction when reaching the first image
-            _isScrollingForward = true;
-            _currentPage++;
-          }
-        }
-
-        if (mounted && _currentPage >= 0 && _currentPage < images.length) {
-          _pageController.animateToPage(
-            _currentPage,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-        }
+        _updateCurrentPage();
+        _animateToCurrentPage();
       }
     });
+  }
+
+  void _updateCurrentPage() {
+    if (_isScrollingForward) {
+      _handleForwardScrolling();
+    } else {
+      _handleBackwardScrolling();
+    }
+  }
+
+  void _handleForwardScrolling() {
+    if (_currentPage < images.length - 1) {
+      _currentPage++;
+    } else {
+      _reverseToBackward();
+    }
+  }
+
+  void _handleBackwardScrolling() {
+    if (_currentPage > 0) {
+      _currentPage--;
+    } else {
+      _reverseToForward();
+    }
+  }
+
+  void _reverseToBackward() {
+    _isScrollingForward = false;
+    _currentPage--;
+  }
+
+  void _reverseToForward() {
+    _isScrollingForward = true;
+    _currentPage++;
+  }
+
+  void _animateToCurrentPage() {
+    if (_shouldAnimateToPage()) {
+      _pageController.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  bool _shouldAnimateToPage() {
+    return mounted && _currentPage >= 0 && _currentPage < images.length;
   }
 
   @override
@@ -149,6 +172,12 @@ class IndicatorDots extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+    final Color activeColor = isDarkTheme ? TColors.white : TColors.black;
+    final Color inactiveColor = isDarkTheme
+        ? TColors.white.withOpacity(0.3)
+        : TColors.black.withOpacity(0.3);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(totalPages, (index) {
@@ -157,11 +186,7 @@ class IndicatorDots extends StatelessWidget {
           child: Icon(
             index == currentPage ? Icons.circle : Icons.circle_outlined,
             size: 10,
-            color: index == currentPage
-                ? (Theme.of(context).brightness == Brightness.dark
-                    ? TColors.white
-                    : TColors.black)
-                : Colors.grey,
+            color: index == currentPage ? activeColor : inactiveColor,
           ),
         );
       }),

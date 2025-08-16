@@ -114,51 +114,65 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // Continue Button
                 SizedBox(
-                  width: 320, // Adjust width to match the text fields
+                  width: 320,
                   child: ElevatedButton(
                     key: const Key('login_submit'),
-                    onPressed: () async {
-                      if (_formKey.currentState?.validate() ?? false) {
-                        final username = _usernameController.text.trim();
-                        final password = _passwordController.text;
+                    onPressed: authViewModel.isLoading
+                        ? null // Disable button when loading
+                        : () async {
+                            if (_formKey.currentState?.validate() ?? false) {
+                              final username = _usernameController.text.trim();
+                              final password = _passwordController.text;
 
-                        final success =
-                            await authViewModel.login(username, password);
-                        if (!mounted) {
-                          return; // Check if widget is still mounted
-                        }
+                              final success =
+                                  await authViewModel.login(username, password);
 
-                        if (success) {
-                          // Navigate to home screen and remove login from stack
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                                builder: (_) => const MyHomePage()),
-                          );
-                        } else {
-                          // Show error message
-                          // ignore: use_build_context_synchronously
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Verifiez vos identifiants'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      }
-                    },
+                              if (!mounted) {
+                                return;
+                              }
+
+                              if (success) {
+                                Navigator.of(this.context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (_) => const MyHomePage()),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(this.context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Verifiez vos identifiants'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            }
+                          },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.yellow,
+                      backgroundColor: authViewModel.isLoading
+                          ? Colors.grey[300]
+                          : Colors.yellow,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       textStyle: const TextStyle(fontSize: 18),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            50), // Rounded corners for the button
+                        borderRadius: BorderRadius.circular(50),
                       ),
                     ),
-                    child: const Text('Continuer',
-                        style: TextStyle(
-                            color: Colors.black, fontWeight: FontWeight.bold)),
+                    child: authViewModel.isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.black54),
+                            ),
+                          )
+                        : const Text(
+                            'Continuer',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
 

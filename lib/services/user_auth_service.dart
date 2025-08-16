@@ -5,43 +5,52 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UserAuthService {
   static const String contentTypeHeader = 'Content-Type';
-  static const String contentTypeJson =
-      'application/json'; // <-- Added constant
-  String get baseUrl => dotenv.env['WC_BASE_URL'] ?? "";
+  static const String contentTypeJson = 'application/json';
+  String get baseUrl => dotenv.env['LOGIN'] ?? "";
 
   /// Logs in a user with the provided username and password.
   Future<Map<String, dynamic>> login(String username, String password) async {
     const String endpoint = "jwt-auth/v1/token";
     final String url = "$baseUrl$endpoint";
 
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {
-        contentTypeHeader: contentTypeJson, // <-- Use constant
-      },
-      body: jsonEncode({
-        'username': username,
-        'password': password,
-      }),
-    );
+    final requestBody = {
+      'username': username,
+      'password': password,
+    };
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          contentTypeHeader: contentTypeJson,
+        },
+        body: jsonEncode(requestBody),
+      );
 
-      // Store data in SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', data['token'] ?? '');
-      await prefs.setString('user_email', data['user_email'] ?? '');
-      await prefs.setString('user_nicename', data['user_nicename'] ?? '');
-      await prefs.setString(
-          'user_display_name', data['user_display_name'] ?? '');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
 
-      // Fetch and store first_name and last_name after login
-      await getUserInfo();
+        // Store data in SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', data['token'] ?? '');
+        await prefs.setString('user_email', data['user_email'] ?? '');
+        await prefs.setString('user_nicename', data['user_nicename'] ?? '');
+        await prefs.setString(
+            'user_display_name', data['user_display_name'] ?? '');
 
-      return data;
-    } else {
-      throw Exception('Failed to login: ${response.body}');
+        // Fetch and store first_name and last_name after login
+        try {
+          await getUserInfo();
+        } catch (userInfoError) {
+          // Don't throw here, login was successful
+        }
+
+        return data;
+      } else {
+        throw Exception('Failed to login: ${response.body}');
+      }
+    } catch (e) {
+      rethrow;
     }
   }
 
@@ -129,7 +138,7 @@ class UserAuthService {
     final response = await http.post(
       Uri.parse(url),
       headers: {
-        contentTypeHeader: contentTypeJson, // <-- Use constant
+        contentTypeHeader: contentTypeJson,
         'Authorization': 'Bearer $token',
       },
     );
