@@ -152,6 +152,102 @@ jobs:
             <p><em>This is an automated email from GitHub Actions CI/CD pipeline.</em></p>
           attachments: qr_code.png
 
+  build-ios:
+    runs-on: macos-latest
+    needs: build
+    outputs:
+      ipa_path: ${{ steps.build_ipa.outputs.ipa_path }}
+      diawi_link: ${{ steps.upload_diawi.outputs.diawi_link }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create .env file
+        run: |
+          echo "WC_CONSUMER_KEY=${{ secrets.WC_CONSUMER_KEY }}" > .env
+          echo "WC_SECRET_KEY=${{ secrets.WC_SECRET_KEY }}" >> .env
+          echo "WC_BASE_URL=${{ secrets.WC_BASE_URL }}" >> .env
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.1'
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build iOS IPA
+        id: build_ipa
+        run: |
+          # Build iOS without code signing
+          flutter build ios --release --no-codesign
+          
+          # Create IPA file
+          mkdir -p build/ios/ipa/Payload
+          cp -r build/ios/iphoneos/Runner.app build/ios/ipa/Payload/
+          cd build/ios/ipa
+          zip -r ../Runner.ipa Payload/
+          cd ../../../
+          
+          echo "ipa_path=build/ios/Runner.ipa" >> $GITHUB_OUTPUT
+          echo "IPA created successfully"
+
+      - name: Upload to Diawi
+        id: upload_diawi
+        run: |
+          # Upload IPA to Diawi
+          RESPONSE=$(curl -X POST \
+            -F "file=@build/ios/Runner.ipa" \
+            -F "token=${{ secrets.DIAWI_TOKEN }}" \
+            -F "callback_emails=${{ secrets.EMAIL_RECIPIENT }}" \
+            -F "installation_notifications=true" \
+            https://upload.diawi.com/)
+          
+          echo "Diawi upload response: $RESPONSE"
+          
+          # Extract job ID from response
+          JOB_ID=$(echo $RESPONSE | jq -r '.job')
+          echo "Diawi Job ID: $JOB_ID"
+          
+          # Wait for processing (usually takes 1-2 minutes)
+          echo "Waiting for Diawi to process the IPA..."
+          sleep 120
+          
+          # Get the download link
+          STATUS_RESPONSE=$(curl -s "https://upload.diawi.com/status?token=${{ secrets.DIAWI_TOKEN }}&job=$JOB_ID")
+          echo "Diawi status response: $STATUS_RESPONSE"
+          
+          DIAWI_LINK=$(echo $STATUS_RESPONSE | jq -r '.link // empty')
+          
+          if [ -n "$DIAWI_LINK" ]; then
+            echo "diawi_link=https://i.diawi.com/$DIAWI_LINK" >> $GITHUB_OUTPUT
+            echo "Diawi link: https://i.diawi.com/$DIAWI_LINK"
+          else
+            echo "Failed to get Diawi link"
+            exit 1
+          fi
+
+      - name: Upload iOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: build/ios/Runner.ipa
+
   sonarqube:
     name: SonarQube
     runs-on: ubuntu-latest
@@ -248,50 +344,67 @@ jobs:
   notify:
     name: Send Notification
     runs-on: ubuntu-latest
-    needs: [build, sonarqube]
+    needs: [build, build-ios, sonarqube]
     if: github.event_name == 'push'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Get Release Download URL
+      - name: Get Android Release Download URL
         id: get_download_url
         run: |
           DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.run_number }}/app-release-${{ github.run_number }}.apk"
           echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
-          echo "Download URL: $DOWNLOAD_URL"
+          echo "Android Download URL: $DOWNLOAD_URL"
 
-      - name: Generate QR Code
+      - name: Generate QR Codes
         run: |
           sudo apt-get update
           sudo apt-get install -y qrencode
-          qrencode -s 10 -o qr_code.png "${{ steps.get_download_url.outputs.download_url }}"
-          echo "QR Code generated successfully"
+          
+          # Android QR Code
+          qrencode -s 10 -o android_qr.png "${{ steps.get_download_url.outputs.download_url }}"
+          
+          # iOS QR Code (from Diawi)
+          qrencode -s 10 -o ios_qr.png "${{ needs.build-ios.outputs.diawi_link }}"
+          
+          echo "QR Codes generated successfully"
 
-      - name: Send Email with QR Code and SonarQube Results
+      - name: Send Cross-Platform Email
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
           server_port: 587
           username: ${{ secrets.GMAIL_USERNAME }}
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
-          subject: "🚀 New App Release ${{ github.run_number }} - QR Code Download & Quality Report"
+          subject: "🚀 Cross-Platform Release ${{ github.run_number }} - Android APK & iOS IPA"
           to: ${{ secrets.EMAIL_RECIPIENT }}
           from: ${{ secrets.GMAIL_USERNAME }}
           html_body: |
-            <h2>🎉 New Release Available!</h2>
+            <h2>🎉 New Cross-Platform Release Available!</h2>
             <p><strong>Release:</strong> ${{ github.run_number }}</p>
             <p><strong>Repository:</strong> ${{ github.repository }}</p>
             <p><strong>Commit:</strong> ${{ github.sha }}</p>
             <p><strong>Branch:</strong> ${{ github.ref_name }}</p>
             
-            <h3>📱 Download APK</h3>
-            <p>Scan the QR code below or click the direct link to download:</p>
-            
-            <p><a href="${{ steps.get_download_url.outputs.download_url }}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Download APK</a></p>
+            <h3>📱 Download Links</h3>
+            <table style="border-collapse: collapse; width: 100%; margin-bottom: 20px;">
+              <tr>
+                <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">
+                  <h4>🤖 Android APK</h4>
+                  <p><a href="${{ steps.get_download_url.outputs.download_url }}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Download APK</a></p>
+                  <p><em>Direct installation via QR code</em></p>
+                </td>
+                <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">
+                  <h4>🍎 iOS IPA</h4>
+                  <p><a href="${{ needs.build-ios.outputs.diawi_link }}" style="background-color: #007AFF; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Install on iPhone</a></p>
+                  <p><em>Direct installation via Diawi</em></p>
+                </td>
+              </tr>
+            </table>
             
             <h3>📊 Code Quality Report (SonarQube)</h3>
-            <table style="border-collapse: collapse; width: 100%; border: 1px solid #ddd;">
+            <table style="border-collapse: collapse; width: 100%; border: 1px solid #ddd; margin-bottom: 20px;">
               <tr style="background-color: #f2f2f2;">
                 <td style="border: 1px solid #ddd; padding: 8px;"><strong>🔒 Vulnerabilities:</strong></td>
                 <td style="border: 1px solid #ddd; padding: 8px; color: ${{ needs.sonarqube.outputs.vulnerabilities == '0' && '#4CAF50' || '#f44336' }};">
@@ -324,10 +437,38 @@ jobs:
               </tr>
             </table>
             
-            <h3>🔗 QR Code</h3>
-            <p>Scan this QR code with your phone to download the APK:</p>
+            <h3>📱 QR Codes for Direct Installation</h3>
+            <table style="border-collapse: collapse; width: 100%;">
+              <tr>
+                <td style="padding: 15px; text-align: center;">
+                  <h4>🤖 Android QR Code</h4>
+                  <p><em>Scan with any Android device</em></p>
+                </td>
+                <td style="padding: 15px; text-align: center;">
+                  <h4>🍎 iOS QR Code</h4>
+                  <p><em>Scan with iPhone/iPad (Safari)</em></p>
+                </td>
+              </tr>
+            </table>
+            
+            <h3>📋 Installation Instructions:</h3>
+            <h4>Android:</h4>
+            <ol>
+              <li>Scan QR code or click download link</li>
+              <li>Allow installation from unknown sources if prompted</li>
+              <li>Install the APK</li>
+            </ol>
+            
+            <h4>iOS:</h4>
+            <ol>
+              <li>Scan QR code with Camera app or click Diawi link</li>
+              <li>Tap "Install" on the Diawi page</li>
+              <li>Go to Settings → General → Device Management</li>
+              <li>Trust the developer certificate</li>
+              <li>App will appear on home screen</li>
+            </ol>
             
             <hr>
             <p><em>This is an automated email from GitHub Actions CI/CD pipeline.</em></p>
             <p><em>SonarQube Dashboard: <a href="${{ secrets.SONAR_HOST_URL }}/dashboard?id=${{ github.repository }}">View Full Report</a></em></p>
-          attachments: qr_code.png
+          attachments: android_qr.png,ios_qr.png
