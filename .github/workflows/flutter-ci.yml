@@ -156,10 +156,16 @@ jobs:
     name: SonarQube
     runs-on: ubuntu-latest
     needs: build
+    outputs:
+      vulnerabilities: ${{ steps.sonar_results.outputs.vulnerabilities }}
+      bugs: ${{ steps.sonar_results.outputs.bugs }}
+      code_smells: ${{ steps.sonar_results.outputs.code_smells }}
+      coverage: ${{ steps.sonar_results.outputs.coverage }}
+      duplicated_lines: ${{ steps.sonar_results.outputs.duplicated_lines }}
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
 
       - name: Create .env file
         run: |
@@ -195,4 +201,133 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} # Add this secret in your repo
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - name: Extract SonarQube Results
+        id: sonar_results
+        run: |
+          # Wait for SonarQube analysis to complete
+          sleep 30
+          
+          # Get project key (usually repository name)
+          PROJECT_KEY="${{ github.repository }}"
+          PROJECT_KEY=$(echo $PROJECT_KEY | sed 's/\//_/g')
+          
+          # Fetch metrics from SonarQube API
+          SONAR_URL="${{ secrets.SONAR_HOST_URL }}"
+          SONAR_TOKEN="${{ secrets.SONAR_TOKEN }}"
+          
+          # Get vulnerabilities
+          VULNERABILITIES=$(curl -s -u "$SONAR_TOKEN:" "$SONAR_URL/api/measures/component?component=$PROJECT_KEY&metricKeys=vulnerabilities" | jq -r '.component.measures[0].value // "0"')
+          
+          # Get bugs
+          BUGS=$(curl -s -u "$SONAR_TOKEN:" "$SONAR_URL/api/measures/component?component=$PROJECT_KEY&metricKeys=bugs" | jq -r '.component.measures[0].value // "0"')
+          
+          # Get code smells
+          CODE_SMELLS=$(curl -s -u "$SONAR_TOKEN:" "$SONAR_URL/api/measures/component?component=$PROJECT_KEY&metricKeys=code_smells" | jq -r '.component.measures[0].value // "0"')
+          
+          # Get coverage
+          COVERAGE=$(curl -s -u "$SONAR_TOKEN:" "$SONAR_URL/api/measures/component?component=$PROJECT_KEY&metricKeys=coverage" | jq -r '.component.measures[0].value // "0"')
+          
+          # Get duplicated lines percentage
+          DUPLICATED_LINES=$(curl -s -u "$SONAR_TOKEN:" "$SONAR_URL/api/measures/component?component=$PROJECT_KEY&metricKeys=duplicated_lines_density" | jq -r '.component.measures[0].value // "0"')
+          
+          echo "vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
+          echo "bugs=$BUGS" >> $GITHUB_OUTPUT
+          echo "code_smells=$CODE_SMELLS" >> $GITHUB_OUTPUT
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          echo "duplicated_lines=$DUPLICATED_LINES" >> $GITHUB_OUTPUT
+          
+          echo "SonarQube Results:"
+          echo "Vulnerabilities: $VULNERABILITIES"
+          echo "Bugs: $BUGS"
+          echo "Code Smells: $CODE_SMELLS"
+          echo "Coverage: $COVERAGE%"
+          echo "Duplicated Lines: $DUPLICATED_LINES%"
+
+  notify:
+    name: Send Notification
+    runs-on: ubuntu-latest
+    needs: [build, sonarqube]
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get Release Download URL
+        id: get_download_url
+        run: |
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.run_number }}/app-release-${{ github.run_number }}.apk"
+          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+          echo "Download URL: $DOWNLOAD_URL"
+
+      - name: Generate QR Code
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qrencode
+          qrencode -s 10 -o qr_code.png "${{ steps.get_download_url.outputs.download_url }}"
+          echo "QR Code generated successfully"
+
+      - name: Send Email with QR Code and SonarQube Results
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: "🚀 New App Release ${{ github.run_number }} - QR Code Download & Quality Report"
+          to: ${{ secrets.EMAIL_RECIPIENT }}
+          from: ${{ secrets.GMAIL_USERNAME }}
+          html_body: |
+            <h2>🎉 New Release Available!</h2>
+            <p><strong>Release:</strong> ${{ github.run_number }}</p>
+            <p><strong>Repository:</strong> ${{ github.repository }}</p>
+            <p><strong>Commit:</strong> ${{ github.sha }}</p>
+            <p><strong>Branch:</strong> ${{ github.ref_name }}</p>
+            
+            <h3>📱 Download APK</h3>
+            <p>Scan the QR code below or click the direct link to download:</p>
+            
+            <p><a href="${{ steps.get_download_url.outputs.download_url }}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Download APK</a></p>
+            
+            <h3>📊 Code Quality Report (SonarQube)</h3>
+            <table style="border-collapse: collapse; width: 100%; border: 1px solid #ddd;">
+              <tr style="background-color: #f2f2f2;">
+                <td style="border: 1px solid #ddd; padding: 8px;"><strong>🔒 Vulnerabilities:</strong></td>
+                <td style="border: 1px solid #ddd; padding: 8px; color: ${{ needs.sonarqube.outputs.vulnerabilities == '0' && '#4CAF50' || '#f44336' }};">
+                  ${{ needs.sonarqube.outputs.vulnerabilities }}
+                </td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;"><strong>🐛 Bugs:</strong></td>
+                <td style="border: 1px solid #ddd; padding: 8px; color: ${{ needs.sonarqube.outputs.bugs == '0' && '#4CAF50' || '#f44336' }};">
+                  ${{ needs.sonarqube.outputs.bugs }}
+                </td>
+              </tr>
+              <tr style="background-color: #f2f2f2;">
+                <td style="border: 1px solid #ddd; padding: 8px;"><strong>💨 Code Smells:</strong></td>
+                <td style="border: 1px solid #ddd; padding: 8px;">
+                  ${{ needs.sonarqube.outputs.code_smells }}
+                </td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;"><strong>🧪 Test Coverage:</strong></td>
+                <td style="border: 1px solid #ddd; padding: 8px;">
+                  ${{ needs.sonarqube.outputs.coverage }}%
+                </td>
+              </tr>
+              <tr style="background-color: #f2f2f2;">
+                <td style="border: 1px solid #ddd; padding: 8px;"><strong>📋 Duplicated Lines:</strong></td>
+                <td style="border: 1px solid #ddd; padding: 8px;">
+                  ${{ needs.sonarqube.outputs.duplicated_lines }}%
+                </td>
+              </tr>
+            </table>
+            
+            <h3>🔗 QR Code</h3>
+            <p>Scan this QR code with your phone to download the APK:</p>
+            
+            <hr>
+            <p><em>This is an automated email from GitHub Actions CI/CD pipeline.</em></p>
+            <p><em>SonarQube Dashboard: <a href="${{ secrets.SONAR_HOST_URL }}/dashboard?id=${{ github.repository }}">View Full Report</a></em></p>
+          attachments: qr_code.png
