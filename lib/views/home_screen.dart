@@ -721,24 +721,22 @@ class HomeScreenState extends State<HomeScreen>
             Container(
               width: 60,
               height: 60,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.black,
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(12), // Rounded corners
               ),
               child: Center(
-                child: ClipOval(
-                  child: SizedBox(
-                    width: 45, // Adjust this value for the image size
-                    height: 60,
-                    child: ColorFiltered(
-                      colorFilter: const ColorFilter.mode(
-                        Colors.white, // Force all icons to be white
-                        BlendMode.srcIn,
-                      ),
-                      child: Image.asset(
-                        imagePath,
-                        fit: BoxFit.contain,
-                      ),
+                child: SizedBox(
+                  width: 45, // Adjust this value for the image size
+                  height: 45,
+                  child: ColorFiltered(
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white, // Force all icons to be white
+                      BlendMode.srcIn,
+                    ),
+                    child: Image.asset(
+                      imagePath,
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),
