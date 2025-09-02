@@ -111,7 +111,7 @@ class ProductCardState extends State<ProductCard> {
                               fontSize: 12,
                               color: themedColor(
                                   context,
-                                  Color.fromARGB(255, 109, 109, 109),
+                                  const Color.fromARGB(255, 109, 109, 109),
                                   TColors
                                       .textSecondary), // <-- Adapt regular price
                               decoration: TextDecoration.lineThrough,
