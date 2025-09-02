@@ -63,6 +63,8 @@ class _PanierScreenState extends State<PanierScreen>
     return ScaffoldMessenger(
       key: _scaffoldMessengerKey,
       child: Scaffold(
+        backgroundColor:
+            themedColor(context, TColors.lightContainer, TColors.darkContainer),
         appBar: AppBar(
           backgroundColor: TColors.primary,
           elevation: 0,

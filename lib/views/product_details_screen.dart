@@ -362,7 +362,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     );
                                   }
                                   return SizedBox(
-                                    height: 270,
+                                    height: 280,
                                     child: ListView.builder(
                                       scrollDirection: Axis.horizontal,
                                       itemCount:
@@ -370,10 +370,30 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       itemBuilder: (context, index) {
                                         final relatedProduct =
                                             viewModel.relatedProducts[index];
-                                        final screenWidth =
-                                            MediaQuery.of(context).size.width;
-                                        final cardWidth =
-                                            (screenWidth - 64) / 2.2;
+
+                                        // Default card width
+                                        double cardWidth = 200.0;
+
+                                        // Calculate extra width if price strings are long
+                                        final priceLength = relatedProduct.price
+                                            .toString()
+                                            .length;
+                                        final regularPriceLength =
+                                            relatedProduct.regularPrice
+                                                    ?.toString()
+                                                    .length ??
+                                                0;
+                                        final maxPriceLength =
+                                            priceLength > regularPriceLength
+                                                ? priceLength
+                                                : regularPriceLength;
+
+                                        // Add extra space if price strings are long
+                                        if (maxPriceLength >= 7) {
+                                          cardWidth += 30;
+                                        } else if (maxPriceLength >= 6) {
+                                          cardWidth += 15;
+                                        }
 
                                         return Container(
                                           width: cardWidth,

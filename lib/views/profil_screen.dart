@@ -50,89 +50,95 @@ class _ProfilScreenState extends State<ProfilScreen> {
               automaticallyImplyLeading: false,
             ),
             SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  const SizedBox(height: 20), // Add this line for spacing
-                  Container(
-                    decoration: BoxDecoration(
-                      color: themedColor(context, TColors.lightContainer,
-                          TColors.darkContainer),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(25),
-                        topRight: Radius.circular(25),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        children: [
-                          // Title Row
-                          const Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 12.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+              child: SizedBox(
+                height:
+                    MediaQuery.of(context).size.height, // Fill screen height
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: themedColor(context, TColors.lightContainer,
+                              TColors.darkContainer),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: SingleChildScrollView(
+                            child: Column(
                               children: [
-                                Text(
-                                  "Mon Profile",
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
+                                // Title Row
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 12.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Mon Profile",
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          const SectionTitle(title: 'Compte'),
-                          isLoggedIn
-                              ? SettingTile(
-                                  icon: Icons.person,
-                                  title: 'Information Personnelle',
-                                  subtitle: 'Modifier votre profile',
+                                const SizedBox(height: 16),
+                                const SectionTitle(title: 'Compte'),
+                                isLoggedIn
+                                    ? SettingTile(
+                                        icon: Icons.person,
+                                        title: 'Information Personnelle',
+                                        subtitle: 'Modifier votre profile',
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const UpdateUserInfoScreen(),
+                                            ),
+                                          );
+                                        },
+                                      )
+                                    : SettingTile(
+                                        icon: Icons.login,
+                                        title: 'Se connecter',
+                                        subtitle: 'Créer un compte',
+                                        onTap: () {
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const LoginScreen(),
+                                            ),
+                                          );
+                                        },
+                                      ),
+
+                                const SectionTitle(title: 'Interface'),
+                                const SettingTile(
+                                  icon: Icons.color_lens,
+                                  title: 'Thème',
+                                  trailing: ThemeToggleSwitch(),
+                                ),
+
+                                const SectionTitle(title: 'Service'),
+                                SettingTile(
+                                  icon: Icons.lock,
+                                  title: 'Confidentialité & Sécurité',
                                   onTap: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            const UpdateUserInfoScreen(),
-                                      ),
-                                    );
-                                  },
-                                )
-                              : SettingTile(
-                                  icon: Icons.login,
-                                  title: 'Se connecter',
-                                  subtitle: 'Créer un compte',
-                                  onTap: () {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const LoginScreen(),
-                                      ),
-                                    );
-                                  },
-                                ),
-
-                          const SectionTitle(title: 'Interface'),
-                          const SettingTile(
-                            icon: Icons.color_lens,
-                            title: 'Thème',
-                            trailing: ThemeToggleSwitch(),
-                          ),
-
-                          const SectionTitle(title: 'Service'),
-                          SettingTile(
-                            icon: Icons.lock,
-                            title: 'Confidentialité & Sécurité',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const StaticInfoScreen(
-                                    title: 'Confidentialité & Sécurité',
-                                    content: '''
+                                            const StaticInfoScreen(
+                                          title: 'Confidentialité & Sécurité',
+                                          content: '''
 Chez Tdiscount, la sécurité de vos données est notre priorité.
 
 - Toutes vos informations personnelles sont stockées de manière sécurisée et ne sont jamais partagées sans votre consentement.
@@ -145,21 +151,22 @@ Chez Tdiscount, la sécurité de vos données est notre priorité.
 
 Pour toute question, contactez notre service client au +216 71 205 105 ou par email à contact@tdiscount.tn.
 ''',
-                                  ),
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
-                          ),
-                          SettingTile(
-                            icon: Icons.help_outline,
-                            title: 'Aide',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const StaticInfoScreen(
-                                    title: 'Aide',
-                                    content: '''
+                                SettingTile(
+                                  icon: Icons.help_outline,
+                                  title: 'Aide',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const StaticInfoScreen(
+                                          title: 'Aide',
+                                          content: '''
 Bienvenue sur Tdiscount Marketplace, la référence de la vente en ligne en Tunisie !
 
 **FAQ Tdiscount**
@@ -176,21 +183,22 @@ Bienvenue sur Tdiscount Marketplace, la référence de la vente en ligne en Tuni
 
 Pour plus d’aide, consultez notre blog ou contactez-nous directement.
 ''',
-                                  ),
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
-                          ),
-                          SettingTile(
-                            icon: Icons.info_outline,
-                            title: 'À propos',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const StaticInfoScreen(
-                                    title: 'À propos',
-                                    content: '''
+                                SettingTile(
+                                  icon: Icons.info_outline,
+                                  title: 'À propos',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const StaticInfoScreen(
+                                          title: 'À propos',
+                                          content: '''
 Tdiscount Marketplace
 
 Bienvenue sur Tdiscount, la marketplace de référence pour la vente en ligne en Tunisie !
@@ -213,29 +221,33 @@ Adresse :
 
 Copyright © 2025 | Tous droits réservés - By iTrend
 ''',
-                                  ),
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                          if (isLoggedIn)
-                            TextButton.icon(
-                              onPressed: () {
-                                showLogoutDialog(context);
-                              },
-                              icon: const Icon(Icons.logout, color: Colors.red),
-                              label: const Text(
-                                'Déconnexion',
-                                style: TextStyle(color: Colors.red),
-                              ),
+                                const SizedBox(height: 20),
+                                if (isLoggedIn)
+                                  TextButton.icon(
+                                    onPressed: () {
+                                      showLogoutDialog(context);
+                                    },
+                                    icon: const Icon(Icons.logout,
+                                        color: Colors.red),
+                                    label: const Text(
+                                      'Déconnexion',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                const SizedBox(height: 20),
+                              ],
                             ),
-                          const SizedBox(height: 20),
-                        ],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

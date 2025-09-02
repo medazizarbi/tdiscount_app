@@ -35,7 +35,8 @@ class ProductCardState extends State<ProductCard> {
 
     return Container(
       decoration: BoxDecoration(
-        color: themedColor(context, TColors.cardlight, TColors.cardlight),
+        color: themedColor(
+            context, TColors.cardlight, TColors.carddark), // <-- Adapt BG
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
@@ -76,24 +77,27 @@ class ProductCardState extends State<ProductCard> {
                 ),
                 // Prices row
                 Padding(
-                  padding: const EdgeInsets.only(
-                      top: 8.0, left: 12.0), // <-- Added left padding
+                  padding: const EdgeInsets.only(top: 8.0, left: 12.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Text(
+                      Text(
                         'TND ',
                         style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: themedColor(context, Colors.black,
+                              TColors.textWhite), // <-- Adapt TND
+                        ),
                       ),
                       Text(
                         widget.price,
-                        style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: themedColor(context, Colors.black,
+                              TColors.textWhite), // <-- Adapt price
+                        ),
                       ),
                       if (widget.regularPrice != null &&
                           double.tryParse(
@@ -103,9 +107,13 @@ class ProductCardState extends State<ProductCard> {
                           padding: const EdgeInsets.only(left: 8.0),
                           child: Text(
                             '${widget.regularPrice}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: Color.fromARGB(255, 109, 109, 109),
+                              color: themedColor(
+                                  context,
+                                  Color.fromARGB(255, 109, 109, 109),
+                                  TColors
+                                      .textSecondary), // <-- Adapt regular price
                               decoration: TextDecoration.lineThrough,
                               decorationColor: Colors.red,
                             ),
@@ -118,16 +126,18 @@ class ProductCardState extends State<ProductCard> {
                 Padding(
                   padding: const EdgeInsets.only(
                     left: 12.0,
-                    right:
-                        30.0, // Reserve space for the cart icon (icon size + margin)
+                    right: 30.0,
                     top: 0.0,
                     bottom: 0.0,
                   ),
                   child: Text(
                     widget.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
-                      color: Color.fromARGB(255, 124, 124, 124),
+                      color: themedColor(
+                          context,
+                          const Color.fromARGB(255, 124, 124, 124),
+                          TColors.textWhite), // <-- Adapt name
                     ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
@@ -144,7 +154,10 @@ class ProductCardState extends State<ProductCard> {
               key: Key('favorite_btn_${widget.productId}'), // <-- Add this line
               icon: Icon(
                 isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: isFavorite ? TColors.textprice : TColors.buttonSecondary,
+                color: isFavorite
+                    ? themedColor(context, TColors.textprice, Colors.redAccent)
+                    : themedColor(context, TColors.buttonSecondary,
+                        TColors.buttonSecondary),
                 size: 24,
               ),
               onPressed: () async {

@@ -138,7 +138,8 @@ class _SubCategorieScreenState extends State<SubCategorieScreen> {
                                           color: themedColor(
                                               context,
                                               TColors.lightContainer,
-                                              TColors.carddark),
+                                              const Color.fromARGB(
+                                                  255, 29, 29, 29)),
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           boxShadow: [

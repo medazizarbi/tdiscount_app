@@ -44,8 +44,12 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Logo
-                Image.asset('assets/images/logo.png',
-                    height: 50), // Replace with your logo asset
+                Image.asset(
+                  Theme.of(context).brightness == Brightness.dark
+                      ? 'assets/images/tdiscount_images/Logo-Tdiscount-market-2.0.png'
+                      : 'assets/images/tdiscount_images/Logo-Tdiscount-market-noire-2.0.png',
+                  height: 50,
+                ),
 
                 const SizedBox(height: 40),
 
@@ -178,30 +182,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 80),
 
-                // Sign-up options
-                const Center(child: Text('inscrivez-vous avec')),
-
-                const SizedBox(height: 5),
-
-                // Social Media Icons
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.facebook, size: 30),
-                    Icon(Icons.g_mobiledata_sharp, size: 30),
-                    Icon(Icons.apple, size: 30),
-                    Icon(Icons.tiktok_outlined, size: 30),
-                  ],
-                ),
-
-                const SizedBox(height: 5),
-
                 // Sign-up Link
                 Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('vous n\'avez pas de compte? '),
+                      const Text('vous n\'avez pas de compte ? '),
                       GestureDetector(
                         onTap: () {
                           // Navigate to sign-up screen

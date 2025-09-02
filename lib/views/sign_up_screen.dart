@@ -49,7 +49,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 20),
-                  Image.asset('assets/images/logo.png', height: 40),
+                  Image.asset(
+                    Theme.of(context).brightness == Brightness.dark
+                        ? 'assets/images/tdiscount_images/Logo-Tdiscount-market-2.0.png'
+                        : 'assets/images/tdiscount_images/Logo-Tdiscount-market-noire-2.0.png',
+                    height: 50,
+                  ),
                   const SizedBox(height: 30),
 
                   buildTextField('Nom*', Icons.person_outline_rounded),
@@ -145,32 +150,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               fontWeight: FontWeight.bold)),
                     ),
                   ),
-                  const SizedBox(height: 80),
-
-                  // Sign-up options
-                  const Center(child: Text('inscrivez-vous avec')),
-
-                  const SizedBox(height: 5),
-
-                  // Social Media Icons
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.facebook, size: 30),
-                      Icon(Icons.g_mobiledata_sharp, size: 30),
-                      Icon(Icons.apple, size: 30),
-                      Icon(Icons.tiktok_outlined, size: 30),
-                    ],
-                  ),
-
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 60),
 
                   // Sign-up Link
                   Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('avez-vous deja un compte ?'),
+                        const Text('Avez-vous déjà un compte ? '),
                         GestureDetector(
                           onTap: () {
                             // Navigate to log in screen
@@ -181,7 +168,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             );
                           },
                           child: const Text(
-                            'log in',
+                            'Se connecter',
                             style: TextStyle(color: Colors.blue),
                           ),
                         ),

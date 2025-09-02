@@ -59,6 +59,8 @@ class _FavorisScreenState extends State<FavorisScreen>
     }
 
     return Scaffold(
+      backgroundColor:
+          themedColor(context, TColors.lightContainer, TColors.darkContainer),
       appBar: AppBar(
         backgroundColor: TColors.primary,
         elevation: 0,

@@ -151,6 +151,7 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
             child: Center(
@@ -169,23 +170,6 @@ class _SubCategoryProductsScreenState extends State<SubCategoryProductsScreen> {
               ),
             ),
           ),
-          /*
-          if (subCategoryDescription != null &&
-              subCategoryDescription.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: Text(
-                subCategoryDescription,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Coolvetica',
-                  fontWeight: FontWeight.w500,
-                  fontStyle: FontStyle.italic,
-                ),
-                textAlign: TextAlign.justify,
-              ),
-            ),
-          */
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
