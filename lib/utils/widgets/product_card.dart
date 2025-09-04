@@ -108,7 +108,7 @@ class ProductCardState extends State<ProductCard> {
                           child: Text(
                             '${widget.regularPrice}',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 10,
                               color: themedColor(
                                   context,
                                   const Color.fromARGB(255, 109, 109, 109),
