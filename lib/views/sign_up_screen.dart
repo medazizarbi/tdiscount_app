@@ -13,7 +13,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  String? _selectedCivility;
   bool _isPrivacyPolicyAccepted = false;
 
   @override
@@ -114,15 +113,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState?.validate() ?? false) {
-                          if (_selectedCivility == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content:
-                                    Text('Veuillez choisir votre civilité'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          } else if (!_isPrivacyPolicyAccepted) {
+                          if (!_isPrivacyPolicyAccepted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text(
