@@ -31,6 +31,7 @@ class AuthViewModel extends ChangeNotifier {
     try {
       userData = await _authService.login(username, password);
       isLoading = false;
+      _isLoggedIn = true;
       notifyListeners();
       return true;
     } catch (e) {

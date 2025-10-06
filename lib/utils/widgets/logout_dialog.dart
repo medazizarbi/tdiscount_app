@@ -12,7 +12,14 @@ Future<void> showLogoutDialog(BuildContext context) async {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Annuler', style: TextStyle(color: Colors.black)),
+          child: Text(
+            'Annuler',
+            style: TextStyle(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black,
+            ),
+          ),
         ),
         TextButton(
           onPressed: () async {
